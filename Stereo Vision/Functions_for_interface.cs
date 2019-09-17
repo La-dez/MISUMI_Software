@@ -277,6 +277,12 @@ namespace Stereo_Vision
                                 Fps_toWrite = Convert.ToInt16(toObject);
                                 break;
                             }
+                        case "FpsMax_toTranslate":
+                            {
+                                string toObject = CutFromEdges(AllLines[i]);
+                                FpsMax_toTranslate = Convert.ToInt16(toObject);
+                                break;
+                            }
                         case "LastFileDigit_vid":
                             {
                                 string toObject = CutFromEdges(AllLines[i]);
@@ -414,7 +420,8 @@ namespace Stereo_Vision
             LastChargeLevel = 100;
             User_Name = "PNTZ";
             Lenght_secs = 60;                           
-            Fps_toWrite = 15;
+            Fps_toWrite = 30;
+            FpsMax_toTranslate = 30;
             LastNumber_Vid = 0;
             LastNumber_Photo = 0;
             Count_of_Digits_vid = 2;
@@ -456,19 +463,28 @@ namespace Stereo_Vision
                 Adjust_Gamma();
                 Adjust_Gain();
 
-                _capture.SetCaptureProperty(CapProp.FrameWidth, 640);
-                _capture.SetCaptureProperty(CapProp.FrameHeight, 480);
+                try
+                {
+
+                    _capture.SetCaptureProperty(CapProp.FrameWidth, 640);
+                    _capture.SetCaptureProperty(CapProp.FrameHeight, 480);
+                }
+                catch
+                {
+                    _capture.SetCaptureProperty(CapProp.FrameWidth, 1280);
+                    _capture.SetCaptureProperty(CapProp.FrameHeight, 720);
+                }
              //   int W_try = (int)_capture.GetCaptureProperty(CapProp.FrameWidth);
                 _capture.SetCaptureProperty(CapProp.FourCC, Current_FourCC);
-                _capture.SetCaptureProperty(CapProp.Fps, Fps_toWrite);
-                int W = (int)_capture.GetCaptureProperty(CapProp.FrameWidth);
-
-                  _capture.SetCaptureProperty(CapProp.FrameWidth, Loaded_Width);
-                  _capture.SetCaptureProperty(CapProp.FrameHeight, Loaded_Height);
-               // _capture.SetCaptureProperty(CapProp.FrameWidth, 320);
-               // _capture.SetCaptureProperty(CapProp.FrameHeight, 240);
-
-                W = (int)_capture.GetCaptureProperty(CapProp.FrameWidth);
+                _capture.SetCaptureProperty(CapProp.Fps, FpsMax_toTranslate);
+                int W_cur = (int)_capture.GetCaptureProperty(CapProp.FrameWidth);
+                if(W_cur!= Loaded_Width)
+                {
+                    _capture.SetCaptureProperty(CapProp.FourCC, Current_FourCC);
+                    _capture.SetCaptureProperty(CapProp.FrameWidth, Loaded_Width);
+                    _capture.SetCaptureProperty(CapProp.FrameHeight, Loaded_Height);
+                }
+                W_cur = (int)_capture.GetCaptureProperty(CapProp.FrameWidth);
                 int FourCC_Current = (int)_capture.GetCaptureProperty(CapProp.FourCC);
                 char[] FourCC_Current_str = FourCC_int_2_str(FourCC_Current);
             }
@@ -515,6 +531,8 @@ namespace Stereo_Vision
                 {
                     sw.WriteLine("<LenghtOfOneFileInSeconds>" + Lenght_secs+ "</LenghtOfOneFileInSeconds>");
                     sw.WriteLine("<FPStoWrite>" + Fps_toWrite+"</FPStoWrite>");
+                    sw.WriteLine("<FpsMax_toTranslate>" + FpsMax_toTranslate + "</FpsMax_toTranslate>");
+
                     sw.WriteLine("<LastFileDigit_vid>" + LastNumber_Vid+"</LastFileDigit_vid>");
                     sw.WriteLine("<LastFileDigit_Photo>" + LastNumber_Photo + "</LastFileDigit_Photo>");
                     sw.WriteLine("<Count_of_files_Vid>" + Count_of_Digits_vid + "</Count_of_files_Vid>");
@@ -528,8 +546,10 @@ namespace Stereo_Vision
                     sw.WriteLine("<Saturation>" + Saturation_Value + "</Saturation>");
                     sw.WriteLine("<Gamma>" + Gamma_Value + "</Gamma>");
                     sw.WriteLine("<Gain>" + Gain_Value + "</Gain>");
-                    sw.WriteLine("<Width>" + (_capture.GetCaptureProperty(CapProp.FrameWidth)).ToString() + "</Width>");
-                    sw.WriteLine("<Height>" + (_capture.GetCaptureProperty(CapProp.FrameHeight)).ToString() + "</Height>");
+                   // sw.WriteLine("<Width>" + (_capture.GetCaptureProperty(CapProp.FrameWidth)).ToString() + "</Width>");
+                   // sw.WriteLine("<Height>" + (_capture.GetCaptureProperty(CapProp.FrameHeight)).ToString() + "</Height>");
+                    sw.WriteLine("<Width>" + (1280).ToString() + "</Width>");
+                    sw.WriteLine("<Height>" + (720).ToString() + "</Height>");
 
                     sw.WriteLine("<Path_2save_Video>" + RecVid_path + "</Path_2save_Video>");
                     sw.WriteLine("<Path_2save_Photo>" + RecPhotos_path + "</Path_2save_Photo>");
@@ -725,7 +745,8 @@ namespace Stereo_Vision
             {
                 Export_Photos_to = "";
             }
-            if (((Export_mode) && (String.IsNullOrEmpty(Export_Vid_to))) || ((!Export_mode) && (String.IsNullOrEmpty(Export_Photos_to))))
+            //  if (((Export_mode) && (String.IsNullOrEmpty(Export_Vid_to))) || ((!Export_mode) && (String.IsNullOrEmpty(Export_Photos_to))))
+            if(true)
             {
                 string Non_C_disk = "C:\\";
                 if (Export_mode) Non_C_disk = Find_another_disk();

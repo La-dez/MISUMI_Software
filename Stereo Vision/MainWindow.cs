@@ -135,7 +135,9 @@ namespace Stereo_Vision
             {
                 if (isRecording) { StopRecording(); }
                 if (isInTranslation) { StopCapture(); }
+                if(isPlayingVideoNow) { View_Video_Stop(); }
                 isInTranslation = false;
+                isPlayingVideoNow = false;
                 SaveSettings();
                 throwed_to_hiber = true;
                 WakeUpTimer.Enabled = true;
@@ -210,6 +212,7 @@ namespace Stereo_Vision
         private void B_Pl_GoToMain_Click(object sender, EventArgs e)
         {
             OpenMainPanel();
+            if (isPlayingVideoNow) View_Video_Stop();
             StartCapture();
             CV_ImBox_Capture.Visible = true;
             CV_ImBox_VidPhoto_Player.Visible = false;

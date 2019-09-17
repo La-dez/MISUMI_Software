@@ -15,7 +15,6 @@ namespace Stereo_Vision
         bool Playing_mode = true; //true - video, false - photo;
         List<string> FilesToView;
         int CurrentIndex = 0;
-
         VideoCapture CurrentVideo;
         int TotalFrames_inCurVid=0;
         int CurrentFrameNo_inCurVid=0;
@@ -104,7 +103,8 @@ namespace Stereo_Vision
                     {
                         Find_and_Resort_Files(ppPlayMode_2set);
                     }
-                    else { }                 
+                    else { }
+                    if (isPlayingVideoNow) View_Video_Stop();
                     B_Pl_PhotoMode.BackgroundImage = BMP_ExMode_Photo;
                     B_Pl_VideoMode.BackgroundImage = BMP_ExMode_Video_off;
                 }
@@ -157,9 +157,8 @@ namespace Stereo_Vision
         private void View_Image_byIndex(int pIndex)
         {
             var VisibleImage = new Mat(FilesToView[pIndex]);
-            Mat result = new Mat();
-            CvInvoke.Resize(VisibleImage, result, Size_for_Resizing, 0, 0, Inter.Linear);
-            CV_ImBox_VidPhoto_Player.Image = result;
+            CvInvoke.Resize(VisibleImage, resizedim, Size_for_Resizing, 0, 0, Inter.Linear);
+            CV_ImBox_VidPhoto_Player.Image = resizedim;
         }
         private void View_Video_byIndex(int pIndex)
         {
@@ -171,31 +170,97 @@ namespace Stereo_Vision
             isPlayingVideoNow = false;
             CurrentFrame = new Mat();
             CurrentFrameNo_inCurVid = 0;
-            TRB_Pl_VideoTimer.Maximum = TotalFrames_inCurVid;
+            TRB_Pl_VideoTimer.Maximum = TotalFrames_inCurVid-1;
             TRB_Pl_VideoTimer.Minimum = 0;
             TRB_Pl_VideoTimer.Value = 0;
 
+            Get_and_Load_CurrentFrame(CurrentFrameNo_inCurVid);
+            CV_ImBox_VidPhoto_Player.Invalidate();
+            Refresh_Video_Labels();
         }
 
         private void View_Video_Prev()
         {
-            if (CurrentIndex - 1 == -1) CurrentIndex = 0;
+            if (isPlayingVideoNow) View_Video_Stop();
+            if (CurrentIndex - 1 == -1) CurrentIndex = FilesToView.Count-1;
             else CurrentIndex--;
             View_Video_byIndex(CurrentIndex);
+            Refresh_Video_Labels();
         }
         private void View_Video_Next()
         {
+            if (isPlayingVideoNow) View_Video_Stop();
             if (CurrentIndex + 1 == FilesToView.Count) CurrentIndex = 0;
             else CurrentIndex++;
             View_Video_byIndex(CurrentIndex);
+            Refresh_Video_Labels();
         }
         private void View_Video_Stop()
         {
+            View_Video_Pause();
+            CurrentFrameNo_inCurVid = 0;
+            TRB_Pl_VideoTimer.Value = 0;
+            Get_and_Load_CurrentFrame(CurrentFrameNo_inCurVid);
+            CV_ImBox_VidPhoto_Player.Invalidate();
+            Refresh_Video_Labels();
+        }
+        private void Refresh_Video_Labels()
+        {
+            string Text_TimeNow = "00:00";
+            string Text_TimeLeft = "-01:00";
+            string Mins_now_str = "00";
+            string Mins_left_str = "00";
+            string Secs_now_str = "00";
+            string Secs_left_str = "00";
 
+            int Secs_now = (int)Math.Round((float)CurrentFrameNo_inCurVid / (float)FPS_toPlay);
+            int Secs_total = (int)Math.Round((float)TotalFrames_inCurVid / (float)FPS_toPlay);
+            int Secs_left = Secs_total - Secs_now;
+
+            int Mins_now = Secs_now / 60;
+            Secs_now = Secs_now % 60;
+            int Mins_left = Secs_left / 60;
+            Secs_left = Secs_left % 60;
+
+            if (Mins_now < 100)
+            {
+                Mins_now_str = String.Format(("{0:d2}"), Mins_now);
+                Mins_left_str = String.Format(("{0:d2}"), Mins_left);
+            }
+            else
+            {
+                Mins_now_str = String.Format(("{0:d3}"), Mins_now);
+                Mins_left_str = String.Format(("{0:d3}"), Mins_left);
+            }
+
+            Secs_now_str = String.Format(("{0:d2}"), Secs_now);
+            Secs_left_str = String.Format(("{0:d2}"), Secs_left);
+
+            Text_TimeNow = Mins_now_str + ":" + Secs_now_str;
+            Text_TimeLeft ="-"+ Mins_left_str + ":" + Secs_left_str;
+
+            L_Pl_Video_TimeCur.Text = Text_TimeNow;
+            L_Pl_Video_TimeLeft.Text = Text_TimeLeft;
+        }
+        private void Get_and_Load_CurrentFrame(int pFrameNum)
+        {
+            try
+            {
+                CurrentVideo.SetCaptureProperty(CapProp.PosFrames, pFrameNum);
+                CurrentVideo.Read(CurrentFrame);
+                //CV_ImBox_VidPhoto_Player.Image = CurrentFrame;
+                CvInvoke.Resize(CurrentFrame, resizedim, Size_for_Resizing, 0, 0, Inter.Linear);
+                CV_ImBox_VidPhoto_Player.Image = resizedim;
+            }
+            catch { CV_ImBox_VidPhoto_Player.Image = null; }
         }
         private void View_Video_Scroll()
         {
-
+            if(CurrentVideo!=null)
+            {
+                CurrentFrameNo_inCurVid = TRB_Pl_VideoTimer.Value;
+                Refresh_Video_Labels();
+            }
         }
         private void View_Video_Pause()
         {
@@ -214,26 +279,38 @@ namespace Stereo_Vision
         }
         private async void View_Video_Continue()
         {
-            if (CurrentVideo == null) return;
+            if (CurrentVideo == null)
+            {
+                isPlayingVideoNow = false;
+                return;
+            }
+            else
+            {
+                isPlayingVideoNow = true;
+            }
 
             Image Img_Bkp = B_Pl_VideoPlayPause.BackgroundImage;
             bool isPlayingVideoNow_bkp = isPlayingVideoNow;
 
             try
             {
-                while((isPlayingVideoNow)&&(CurrentFrameNo_inCurVid<TotalFrames_inCurVid))
-                {
-                    CurrentVideo.SetCaptureProperty(CapProp.PosFrames, CurrentFrameNo_inCurVid);
-                    CurrentVideo.Read(CurrentFrame);
-                    CV_ImBox_VidPhoto_Player.Image = CurrentFrame;
-                   // await System.Threading.Tasks.Task
-                }
-                isPlayingVideoNow = true;
                 B_Pl_VideoPlayPause.BackgroundImage = BMP_Playing_Pause;
+                while ((isPlayingVideoNow)&&(CurrentFrameNo_inCurVid<TotalFrames_inCurVid))
+                {
+                    Get_and_Load_CurrentFrame(CurrentFrameNo_inCurVid);
+                    TRB_Pl_VideoTimer.Value = CurrentFrameNo_inCurVid;
+                    CurrentFrameNo_inCurVid++;
+                    Refresh_Video_Labels();
+                    await System.Threading.Tasks.Task.Delay(1000 / FPS_toPlay);
+                }
+                if(CurrentFrameNo_inCurVid >= TotalFrames_inCurVid)
+                {
+                    View_Video_Stop();
+                }
             }
             catch
             {
-
+                isPlayingVideoNow = false;
                 isPlayingVideoNow = isPlayingVideoNow_bkp;
                 B_Pl_VideoPlayPause.BackgroundImage = Img_Bkp;
             }

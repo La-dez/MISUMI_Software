@@ -25,7 +25,8 @@ namespace Stereo_Vision
         //Var's for Video Translation and recording
         int TotalFramesGotten = 0;
         double CurrentFPS = 0;
-        double Fps_toWrite = 10;
+        double Fps_toWrite = 30;
+        double FpsMax_toTranslate = 30;
 
         //Var's for videorecord
         double Lenght_secs = 10;
@@ -95,9 +96,9 @@ namespace Stereo_Vision
                // _capture.SetCaptureProperty(CapProp.Settings, 1);
 
                 //Не работает, по факту
-                exposure = _capture.GetCaptureProperty(CapProp.Exposure);
+              /*  exposure = _capture.GetCaptureProperty(CapProp.Exposure);
                 _capture.SetCaptureProperty(CapProp.Exposure,-7);
-                exposure = _capture.GetCaptureProperty(CapProp.Exposure);
+                exposure = _capture.GetCaptureProperty(CapProp.Exposure);*/
                 //Тоже не раотает
                 /*_capture.SetCaptureProperty(CapProp.AutoExposure,  0.25);
                 
@@ -113,12 +114,7 @@ namespace Stereo_Vision
             }
             CurrentFrame = new Mat();
 
-
-
-            int MaxHeight = 1080;
-            int MaxWidth = 1920;
             int FourCC_MJPG = VideoWriter.Fourcc('M', 'J', 'P', 'G');
-            int FourCC_YUY2 = VideoWriter.Fourcc('Y', 'U', 'Y', '2');
            // int FourCC_noc = 0;
            // int FourCC_noc2 = -466162819;
             Current_FourCC = FourCC_MJPG;
@@ -137,6 +133,7 @@ namespace Stereo_Vision
             _capture.SetCaptureProperty(CapProp.FrameHeight, 720);
             FourCC_Current = (int)_capture.GetCaptureProperty(CapProp.FourCC);
             FourCC_Current_str = FourCC_int_2_str(FourCC_Current);
+            int CurrentWidth = (int)_capture.GetCaptureProperty(CapProp.FrameWidth);
 
 
             STW.Start();
