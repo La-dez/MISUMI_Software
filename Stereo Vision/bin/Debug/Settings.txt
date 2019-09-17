@@ -1,0 +1,3 @@
+<LenghtOfOneFileInSeconds>60</LenghtOfOneFileInSeconds>
+<FPStoWrite>10</FPStoWrite>
+<LastFileDigit>5</LastFileDigit>
