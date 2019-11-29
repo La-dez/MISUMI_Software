@@ -21,20 +21,20 @@ namespace Stereo_Vision
         bool FullScrin = false;
         TabPage[] adminPages = null;
         int LastChargeLevel = 100;
-        Bitmap BMP2set_chargelev = new Bitmap("20-0.png");
-        public static Bitmap BMP2set_chargelev_100_80 = new Bitmap("100-80.png");
-        public static Bitmap BMP2set_chargelev_80_60 = new Bitmap("80-60.png");
-        public static Bitmap BMP2set_chargelev_60_40 = new Bitmap("60-40.png");
-        public static Bitmap BMP2set_chargelev_40_20 = new Bitmap("40-20.png");
-        public static Bitmap BMP2set_chargelev_20_0 = new Bitmap("20-0.png");
-        static Bitmap BMP_ExMode_Video = new Bitmap("ex_video.png");
-        static Bitmap BMP_ExMode_Video_off = new Bitmap("ex_video_off.png");
-        static Bitmap BMP_ExMode_Photo = new Bitmap("ex_photo2.png");
-        static Bitmap BMP_ExMode_Photo_off = new Bitmap("ex_photo2_off.png");
+        Bitmap BMP2set_chargelev = new Bitmap("Resources\\20-0.png");
+        public static Bitmap BMP2set_chargelev_100_80 = new Bitmap("Resources\\100-80.png");
+        public static Bitmap BMP2set_chargelev_80_60 = new Bitmap("Resources\\80-60.png");
+        public static Bitmap BMP2set_chargelev_60_40 = new Bitmap("Resources\\60-40.png");
+        public static Bitmap BMP2set_chargelev_40_20 = new Bitmap("Resources\\40-20.png");
+        public static Bitmap BMP2set_chargelev_20_0 = new Bitmap("Resources\\20-0.png");
+        static Bitmap BMP_ExMode_Video = new Bitmap("Resources\\ex_video.png");
+        static Bitmap BMP_ExMode_Video_off = new Bitmap("Resources\\ex_video_off.png");
+        static Bitmap BMP_ExMode_Photo = new Bitmap("Resources\\ex_photo2.png");
+        static Bitmap BMP_ExMode_Photo_off = new Bitmap("Resources\\ex_photo2_off.png");
         static Bitmap BMP_PlMode_3D = new Bitmap("Resources\\3D.png");
         static Bitmap BMP_PlMode_3D_off = new Bitmap("Resources\\3D_off.png");
-        static Bitmap BMP_Playing_Play = new Bitmap("play_play.png");
-        static Bitmap BMP_Playing_Pause = new Bitmap("play_pause.png");
+        static Bitmap BMP_Playing_Play = new Bitmap("Resources\\play_play.png");
+        static Bitmap BMP_Playing_Pause = new Bitmap("Resources\\play_pause.png");
         string Text2set = "?%";
 
         delegate void DelegateForMessages(string text);
@@ -232,12 +232,12 @@ namespace Stereo_Vision
         {
             if(recison)
             {
-                B_SwitchRec.BackgroundImage = new Bitmap("stop.png");
+                B_SwitchRec.BackgroundImage = new Bitmap("Resources\\stop.png");
                 label1.Text = "Стоп";
             }
             else
             {
-                B_SwitchRec.BackgroundImage = new Bitmap("rec.png");
+                B_SwitchRec.BackgroundImage = new Bitmap("Resources\\rec.png");
                 label1.Text = "Запись";
             }
         }
@@ -245,7 +245,7 @@ namespace Stereo_Vision
         {
             PB_Indicator.Visible = true;
             PB_Indicator.ImageLocation =
-                System.IO.Path.Combine(System.Windows.Forms.Application.StartupPath, "rec_anim.gif");
+                System.IO.Path.Combine(System.Windows.Forms.Application.StartupPath, "Resources\\rec_anim.gif");
             LogMessage("Индикатор показан!");
         }
         private void Delete_Indicator()

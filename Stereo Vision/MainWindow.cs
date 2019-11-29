@@ -33,7 +33,7 @@ namespace Stereo_Vision
             InitializeComponent();
             //Additionally and specially for recording
             PB_Indicator.ImageLocation =  
-                Path.Combine(System.Windows.Forms.Application.StartupPath, "rec_anim.gif");
+                Path.Combine(System.Windows.Forms.Application.StartupPath, "Resources\\rec_anim.gif");
 
             // Lock and un lock purpose
             SystemEvents.SessionSwitch += new SessionSwitchEventHandler(SystemEvents_SessionSwitch);
@@ -191,7 +191,7 @@ namespace Stereo_Vision
         {
             OpenMainPanel();
         }
-        private void B_Browse_Click(object sender, EventArgs e)
+        private void B_Export_Click(object sender, EventArgs e)
         {
             OpenExportPanel();
         }
