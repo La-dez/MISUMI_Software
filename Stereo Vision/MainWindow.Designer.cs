@@ -112,7 +112,7 @@ namespace Stereo_Vision
             this.B_Ex_Search_PathTo = new System.Windows.Forms.Button();
             this.label7 = new System.Windows.Forms.Label();
             this.TB_Ex_Count = new System.Windows.Forms.TextBox();
-            this.Pan_UserMainBase = new System.Windows.Forms.Panel();
+            this.Pan_MainMenu = new System.Windows.Forms.Panel();
             this.TLP_UserMainPanel = new System.Windows.Forms.TableLayoutPanel();
             this.label13 = new System.Windows.Forms.Label();
             this.B_ViewMode = new System.Windows.Forms.Button();
@@ -146,6 +146,17 @@ namespace Stereo_Vision
             this.PB_Indicator = new System.Windows.Forms.PictureBox();
             this.CV_ImBox_Capture = new Emgu.CV.UI.ImageBox();
             this.CV_ImBox_VidPhoto_Player = new Emgu.CV.UI.ImageBox();
+            this.Pan_Measurements = new System.Windows.Forms.Panel();
+            this.B_Mes_p2l = new System.Windows.Forms.Button();
+            this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+            this.B_Mes_p2p = new System.Windows.Forms.Button();
+            this.B_Mes_p2pl = new System.Windows.Forms.Button();
+            this.B_Mes_LengthOfBroken = new System.Windows.Forms.Button();
+            this.B_Mes_Perimeter = new System.Windows.Forms.Button();
+            this.B_Mes_Area = new System.Windows.Forms.Button();
+            this.B_Mes_DeleteAll = new System.Windows.Forms.Button();
+            this.B_Mes_Reconstruct3D = new System.Windows.Forms.Button();
+            this.B_Mes_Back = new System.Windows.Forms.Button();
             this.TLP_BASE.SuspendLayout();
             this.Pan_Video.SuspendLayout();
             this.Pan_Player.SuspendLayout();
@@ -176,7 +187,7 @@ namespace Stereo_Vision
             ((System.ComponentModel.ISupportInitialize)(this.TrBGain)).BeginInit();
             this.Pan_Export.SuspendLayout();
             this.TLP_ExportTable.SuspendLayout();
-            this.Pan_UserMainBase.SuspendLayout();
+            this.Pan_MainMenu.SuspendLayout();
             this.TLP_UserMainPanel.SuspendLayout();
             this.P_ChargeLev.SuspendLayout();
             this.TLP_ChargeLev.SuspendLayout();
@@ -184,6 +195,8 @@ namespace Stereo_Vision
             ((System.ComponentModel.ISupportInitialize)(this.PB_Indicator)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.CV_ImBox_Capture)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.CV_ImBox_VidPhoto_Player)).BeginInit();
+            this.Pan_Measurements.SuspendLayout();
+            this.tableLayoutPanel2.SuspendLayout();
             this.SuspendLayout();
             // 
             // TLP_BASE
@@ -214,10 +227,11 @@ namespace Stereo_Vision
             // 
             // Pan_Video
             // 
+            this.Pan_Video.Controls.Add(this.Pan_Measurements);
             this.Pan_Video.Controls.Add(this.Pan_Player);
             this.Pan_Video.Controls.Add(this.Pan_Settings);
             this.Pan_Video.Controls.Add(this.Pan_Export);
-            this.Pan_Video.Controls.Add(this.Pan_UserMainBase);
+            this.Pan_Video.Controls.Add(this.Pan_MainMenu);
             this.Pan_Video.Controls.Add(this.L_SnapShotSaved);
             this.Pan_Video.Controls.Add(this.P_ChargeLev);
             this.Pan_Video.Controls.Add(this.PB_Indicator);
@@ -1493,15 +1507,15 @@ namespace Stereo_Vision
             this.TB_Ex_Count.Text = "1";
             this.TB_Ex_Count.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // Pan_UserMainBase
+            // Pan_MainMenu
             // 
-            this.Pan_UserMainBase.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.Pan_UserMainBase.Controls.Add(this.TLP_UserMainPanel);
-            this.Pan_UserMainBase.Location = new System.Drawing.Point(49, 362);
-            this.Pan_UserMainBase.Margin = new System.Windows.Forms.Padding(0);
-            this.Pan_UserMainBase.Name = "Pan_UserMainBase";
-            this.Pan_UserMainBase.Size = new System.Drawing.Size(1677, 182);
-            this.Pan_UserMainBase.TabIndex = 4;
+            this.Pan_MainMenu.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.Pan_MainMenu.Controls.Add(this.TLP_UserMainPanel);
+            this.Pan_MainMenu.Location = new System.Drawing.Point(49, 362);
+            this.Pan_MainMenu.Margin = new System.Windows.Forms.Padding(0);
+            this.Pan_MainMenu.Name = "Pan_MainMenu";
+            this.Pan_MainMenu.Size = new System.Drawing.Size(1677, 182);
+            this.Pan_MainMenu.TabIndex = 4;
             // 
             // TLP_UserMainPanel
             // 
@@ -1998,6 +2012,207 @@ namespace Stereo_Vision
             this.CV_ImBox_VidPhoto_Player.TabIndex = 8;
             this.CV_ImBox_VidPhoto_Player.TabStop = false;
             // 
+            // Pan_Measurements
+            // 
+            this.Pan_Measurements.BackColor = System.Drawing.Color.Black;
+            this.Pan_Measurements.Controls.Add(this.tableLayoutPanel2);
+            this.Pan_Measurements.Location = new System.Drawing.Point(301, 953);
+            this.Pan_Measurements.Name = "Pan_Measurements";
+            this.Pan_Measurements.Size = new System.Drawing.Size(1918, 169);
+            this.Pan_Measurements.TabIndex = 9;
+            // 
+            // B_Mes_p2l
+            // 
+            this.B_Mes_p2l.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("B_Mes_p2l.BackgroundImage")));
+            this.B_Mes_p2l.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.B_Mes_p2l.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.B_Mes_p2l.FlatAppearance.BorderColor = System.Drawing.Color.Black;
+            this.B_Mes_p2l.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.B_Mes_p2l.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.B_Mes_p2l.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            this.B_Mes_p2l.Location = new System.Drawing.Point(216, 3);
+            this.B_Mes_p2l.Name = "B_Mes_p2l";
+            this.tableLayoutPanel2.SetRowSpan(this.B_Mes_p2l, 2);
+            this.B_Mes_p2l.Size = new System.Drawing.Size(207, 163);
+            this.B_Mes_p2l.TabIndex = 1;
+            this.B_Mes_p2l.Text = "Расстояние  до прямой";
+            this.B_Mes_p2l.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.B_Mes_p2l.UseVisualStyleBackColor = true;
+            // 
+            // tableLayoutPanel2
+            // 
+            this.tableLayoutPanel2.ColumnCount = 9;
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
+            this.tableLayoutPanel2.Controls.Add(this.B_Mes_p2l, 1, 0);
+            this.tableLayoutPanel2.Controls.Add(this.B_Mes_p2p, 0, 0);
+            this.tableLayoutPanel2.Controls.Add(this.B_Mes_p2pl, 2, 0);
+            this.tableLayoutPanel2.Controls.Add(this.B_Mes_LengthOfBroken, 3, 0);
+            this.tableLayoutPanel2.Controls.Add(this.B_Mes_Perimeter, 4, 0);
+            this.tableLayoutPanel2.Controls.Add(this.B_Mes_Area, 5, 0);
+            this.tableLayoutPanel2.Controls.Add(this.B_Mes_DeleteAll, 6, 0);
+            this.tableLayoutPanel2.Controls.Add(this.B_Mes_Reconstruct3D, 7, 0);
+            this.tableLayoutPanel2.Controls.Add(this.B_Mes_Back, 8, 0);
+            this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel2.Location = new System.Drawing.Point(0, 0);
+            this.tableLayoutPanel2.Name = "tableLayoutPanel2";
+            this.tableLayoutPanel2.RowCount = 2;
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 70F));
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(1918, 169);
+            this.tableLayoutPanel2.TabIndex = 0;
+            // 
+            // B_Mes_p2p
+            // 
+            this.B_Mes_p2p.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("B_Mes_p2p.BackgroundImage")));
+            this.B_Mes_p2p.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.B_Mes_p2p.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.B_Mes_p2p.FlatAppearance.BorderColor = System.Drawing.Color.Black;
+            this.B_Mes_p2p.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.B_Mes_p2p.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.B_Mes_p2p.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            this.B_Mes_p2p.Location = new System.Drawing.Point(3, 3);
+            this.B_Mes_p2p.Name = "B_Mes_p2p";
+            this.tableLayoutPanel2.SetRowSpan(this.B_Mes_p2p, 2);
+            this.B_Mes_p2p.Size = new System.Drawing.Size(207, 163);
+            this.B_Mes_p2p.TabIndex = 2;
+            this.B_Mes_p2p.Text = "Расстояние  до точки";
+            this.B_Mes_p2p.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.B_Mes_p2p.UseVisualStyleBackColor = true;
+            // 
+            // B_Mes_p2pl
+            // 
+            this.B_Mes_p2pl.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("B_Mes_p2pl.BackgroundImage")));
+            this.B_Mes_p2pl.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.B_Mes_p2pl.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.B_Mes_p2pl.FlatAppearance.BorderColor = System.Drawing.Color.Black;
+            this.B_Mes_p2pl.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.B_Mes_p2pl.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.B_Mes_p2pl.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            this.B_Mes_p2pl.Location = new System.Drawing.Point(429, 3);
+            this.B_Mes_p2pl.Name = "B_Mes_p2pl";
+            this.tableLayoutPanel2.SetRowSpan(this.B_Mes_p2pl, 2);
+            this.B_Mes_p2pl.Size = new System.Drawing.Size(207, 163);
+            this.B_Mes_p2pl.TabIndex = 3;
+            this.B_Mes_p2pl.Text = "Расстояние  до плоскости";
+            this.B_Mes_p2pl.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.B_Mes_p2pl.UseVisualStyleBackColor = true;
+            // 
+            // B_Mes_LengthOfBroken
+            // 
+            this.B_Mes_LengthOfBroken.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("B_Mes_LengthOfBroken.BackgroundImage")));
+            this.B_Mes_LengthOfBroken.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.B_Mes_LengthOfBroken.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.B_Mes_LengthOfBroken.FlatAppearance.BorderColor = System.Drawing.Color.Black;
+            this.B_Mes_LengthOfBroken.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.B_Mes_LengthOfBroken.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.B_Mes_LengthOfBroken.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            this.B_Mes_LengthOfBroken.Location = new System.Drawing.Point(642, 3);
+            this.B_Mes_LengthOfBroken.Name = "B_Mes_LengthOfBroken";
+            this.tableLayoutPanel2.SetRowSpan(this.B_Mes_LengthOfBroken, 2);
+            this.B_Mes_LengthOfBroken.Size = new System.Drawing.Size(207, 163);
+            this.B_Mes_LengthOfBroken.TabIndex = 4;
+            this.B_Mes_LengthOfBroken.Text = "Длина ломаной";
+            this.B_Mes_LengthOfBroken.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.B_Mes_LengthOfBroken.UseVisualStyleBackColor = true;
+            // 
+            // B_Mes_Perimeter
+            // 
+            this.B_Mes_Perimeter.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("B_Mes_Perimeter.BackgroundImage")));
+            this.B_Mes_Perimeter.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.B_Mes_Perimeter.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.B_Mes_Perimeter.FlatAppearance.BorderColor = System.Drawing.Color.Black;
+            this.B_Mes_Perimeter.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.B_Mes_Perimeter.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.B_Mes_Perimeter.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            this.B_Mes_Perimeter.Location = new System.Drawing.Point(855, 3);
+            this.B_Mes_Perimeter.Name = "B_Mes_Perimeter";
+            this.tableLayoutPanel2.SetRowSpan(this.B_Mes_Perimeter, 2);
+            this.B_Mes_Perimeter.Size = new System.Drawing.Size(207, 163);
+            this.B_Mes_Perimeter.TabIndex = 5;
+            this.B_Mes_Perimeter.Text = "Периметр";
+            this.B_Mes_Perimeter.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.B_Mes_Perimeter.UseVisualStyleBackColor = true;
+            // 
+            // B_Mes_Area
+            // 
+            this.B_Mes_Area.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("B_Mes_Area.BackgroundImage")));
+            this.B_Mes_Area.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.B_Mes_Area.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.B_Mes_Area.FlatAppearance.BorderColor = System.Drawing.Color.Black;
+            this.B_Mes_Area.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.B_Mes_Area.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.B_Mes_Area.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            this.B_Mes_Area.Location = new System.Drawing.Point(1068, 3);
+            this.B_Mes_Area.Name = "B_Mes_Area";
+            this.tableLayoutPanel2.SetRowSpan(this.B_Mes_Area, 2);
+            this.B_Mes_Area.Size = new System.Drawing.Size(207, 163);
+            this.B_Mes_Area.TabIndex = 6;
+            this.B_Mes_Area.Text = "Площадь";
+            this.B_Mes_Area.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.B_Mes_Area.UseVisualStyleBackColor = true;
+            // 
+            // B_Mes_DeleteAll
+            // 
+            this.B_Mes_DeleteAll.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("B_Mes_DeleteAll.BackgroundImage")));
+            this.B_Mes_DeleteAll.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.B_Mes_DeleteAll.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.B_Mes_DeleteAll.FlatAppearance.BorderColor = System.Drawing.Color.Black;
+            this.B_Mes_DeleteAll.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.B_Mes_DeleteAll.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.B_Mes_DeleteAll.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            this.B_Mes_DeleteAll.Location = new System.Drawing.Point(1281, 3);
+            this.B_Mes_DeleteAll.Name = "B_Mes_DeleteAll";
+            this.tableLayoutPanel2.SetRowSpan(this.B_Mes_DeleteAll, 2);
+            this.B_Mes_DeleteAll.Size = new System.Drawing.Size(207, 163);
+            this.B_Mes_DeleteAll.TabIndex = 7;
+            this.B_Mes_DeleteAll.Text = "Удалить все измерения";
+            this.B_Mes_DeleteAll.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.B_Mes_DeleteAll.UseVisualStyleBackColor = true;
+            // 
+            // B_Mes_Reconstruct3D
+            // 
+            this.B_Mes_Reconstruct3D.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("B_Mes_Reconstruct3D.BackgroundImage")));
+            this.B_Mes_Reconstruct3D.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.B_Mes_Reconstruct3D.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.B_Mes_Reconstruct3D.FlatAppearance.BorderColor = System.Drawing.Color.Black;
+            this.B_Mes_Reconstruct3D.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.B_Mes_Reconstruct3D.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.B_Mes_Reconstruct3D.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            this.B_Mes_Reconstruct3D.Location = new System.Drawing.Point(1494, 3);
+            this.B_Mes_Reconstruct3D.Name = "B_Mes_Reconstruct3D";
+            this.tableLayoutPanel2.SetRowSpan(this.B_Mes_Reconstruct3D, 2);
+            this.B_Mes_Reconstruct3D.Size = new System.Drawing.Size(207, 163);
+            this.B_Mes_Reconstruct3D.TabIndex = 8;
+            this.B_Mes_Reconstruct3D.Text = "Восстановить 3D";
+            this.B_Mes_Reconstruct3D.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.B_Mes_Reconstruct3D.UseVisualStyleBackColor = true;
+            // 
+            // B_Mes_Back
+            // 
+            this.B_Mes_Back.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("B_Mes_Back.BackgroundImage")));
+            this.B_Mes_Back.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.B_Mes_Back.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.B_Mes_Back.FlatAppearance.BorderColor = System.Drawing.Color.Black;
+            this.B_Mes_Back.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.B_Mes_Back.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.B_Mes_Back.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            this.B_Mes_Back.Location = new System.Drawing.Point(1707, 3);
+            this.B_Mes_Back.Name = "B_Mes_Back";
+            this.tableLayoutPanel2.SetRowSpan(this.B_Mes_Back, 2);
+            this.B_Mes_Back.Size = new System.Drawing.Size(208, 163);
+            this.B_Mes_Back.TabIndex = 9;
+            this.B_Mes_Back.Text = "Назад";
+            this.B_Mes_Back.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.B_Mes_Back.UseVisualStyleBackColor = true;
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
@@ -2051,7 +2266,7 @@ namespace Stereo_Vision
             this.Pan_Export.ResumeLayout(false);
             this.TLP_ExportTable.ResumeLayout(false);
             this.TLP_ExportTable.PerformLayout();
-            this.Pan_UserMainBase.ResumeLayout(false);
+            this.Pan_MainMenu.ResumeLayout(false);
             this.TLP_UserMainPanel.ResumeLayout(false);
             this.TLP_UserMainPanel.PerformLayout();
             this.P_ChargeLev.ResumeLayout(false);
@@ -2061,6 +2276,8 @@ namespace Stereo_Vision
             ((System.ComponentModel.ISupportInitialize)(this.PB_Indicator)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.CV_ImBox_Capture)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.CV_ImBox_VidPhoto_Player)).EndInit();
+            this.Pan_Measurements.ResumeLayout(false);
+            this.tableLayoutPanel2.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -2092,7 +2309,7 @@ namespace Stereo_Vision
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Panel Pan_BASE_BackgroundPanel;
-        private System.Windows.Forms.Panel Pan_UserMainBase;
+        private System.Windows.Forms.Panel Pan_MainMenu;
         private System.Windows.Forms.Panel P_ChargeLev;
         private System.ComponentModel.BackgroundWorker BGWR_ChargeLev;
         private System.Windows.Forms.TableLayoutPanel TLP_ChargeLev;
@@ -2181,6 +2398,17 @@ namespace Stereo_Vision
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.Button B_Pl_ModelPrevious;
         private System.Windows.Forms.Button B_Pl_ModelNext;
+        private System.Windows.Forms.Panel Pan_Measurements;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
+        private System.Windows.Forms.Button B_Mes_p2l;
+        private System.Windows.Forms.Button B_Mes_p2p;
+        private System.Windows.Forms.Button B_Mes_p2pl;
+        private System.Windows.Forms.Button B_Mes_LengthOfBroken;
+        private System.Windows.Forms.Button B_Mes_Perimeter;
+        private System.Windows.Forms.Button B_Mes_Area;
+        private System.Windows.Forms.Button B_Mes_DeleteAll;
+        private System.Windows.Forms.Button B_Mes_Reconstruct3D;
+        private System.Windows.Forms.Button B_Mes_Back;
     }
 }
 

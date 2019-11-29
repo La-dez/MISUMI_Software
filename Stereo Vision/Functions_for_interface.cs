@@ -176,39 +176,40 @@ namespace Stereo_Vision
         }
         private void OpenSettings()
         {
-            Pan_Export.Visible = false;
-            Pan_UserMainBase.Visible = false;
-            Pan_Settings.Visible = true;
-            Pan_Player.Visible = false;
+            TogglePanelsVisability(false,false,true);
         }
         private void OpenMainPanel()
         {
-            Pan_Export.Visible = false;
-            Pan_UserMainBase.Visible = true;
-            Pan_Settings.Visible = false;
-            Pan_Player.Visible = false;
+            TogglePanelsVisability(true);
         }
         private void OpenExportPanel()
         {
-            Pan_Export.Visible = true;
-            Pan_UserMainBase.Visible = false;
-            Pan_Settings.Visible = false;
-            Pan_Player.Visible = false;
+            TogglePanelsVisability(false, true);
+
             CB_Ex_ChooseExportMode.SelectedIndex = Export_style;
             Open_Export_DirectoryTo(true);
         }
         private void OpenPlayPanel()
         {
-            Pan_Export.Visible = false;
-            Pan_UserMainBase.Visible = false;
-            Pan_Settings.Visible = false;
-            Pan_Player.Visible = true;
+            TogglePanelsVisability(false,false,false,true);
 
             StopCapture();
             Initialize_Player_Controls(Playing_mode);
             
         }
-       
+        private void OpenMeasurementsPanel()
+        {
+            TogglePanelsVisability(false,false,false,false,true);
+            StopCapture();
+        }
+        private void TogglePanelsVisability(bool isMainMenuVisible = false, bool isExportVisible=false,bool isSettingsVisible=false, bool isPlayerVisible=false, bool isMeasurementsVisible=false)
+        {
+            Pan_MainMenu.Visible = isMainMenuVisible;
+            Pan_Export.Visible = isExportVisible;
+            Pan_Settings.Visible = isSettingsVisible;
+            Pan_Player.Visible = isPlayerVisible;
+            Pan_Measurements.Visible = isMeasurementsVisible;
+        }
         private void SwitchAdminMode(bool isAdmin)
         {
             LBConsole.Visible = isAdmin;
