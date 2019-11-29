@@ -12,7 +12,9 @@ namespace Stereo_Vision
 {
     partial class MainWindow
     {
-        bool Playing_mode = true; //true - video, false - photo;
+
+        enum PlayModes { Photo = 0, Video, Models3D };
+        PlayModes Playing_mode = PlayModes.Video;
         List<string> FilesToView;
         int CurrentIndex = 0;
         VideoCapture CurrentVideo;
@@ -20,8 +22,7 @@ namespace Stereo_Vision
         int CurrentFrameNo_inCurVid=0;
         int FPS_toPlay;
 
-
-        private void Initialize_Player_Controls(bool pPlayMode_2set)
+        private void Initialize_Player_Controls(PlayModes pPlayMode_2set)
         {
 
             CV_ImBox_Capture.Visible = false;
@@ -29,22 +30,12 @@ namespace Stereo_Vision
             Toogle_Play_Mode(pPlayMode_2set);
 
         }
-        private void Load_File_onControls(bool pPlayMode_2set)
+        private void Load_File_onControls(PlayModes pPlayMode_2set)
         {
             string InitialFilePath = null;
             if (FilesToView.Count == 0)
-            {
-                System.Drawing.Bitmap BMP_noFiles = new Bitmap(CV_ImBox_Capture.Width, CV_ImBox_Capture.Height,
-                    System.Drawing.Imaging.PixelFormat.Format24bppRgb);
-                using (Graphics g = Graphics.FromImage(BMP_noFiles))
-                {
-                    g.Clear(Color.Black);
-                    string text_2draw = "Не найдено файлов для просмотра";
-                    var drawBrush = new SolidBrush(Color.FromArgb(0, 255, 0));
-                    var font = new Font("Arial", 18);
-                    g.DrawString(text_2draw, font, drawBrush, new PointF(5, 5));
-                }
-                CurrentFrame = (new Image<Emgu.CV.Structure.Bgr, byte>(BMP_noFiles)).Mat;
+            {               
+                CurrentFrame = (new Image<Emgu.CV.Structure.Bgr, byte>(Create_ImageOfEmptyness())).Mat;
                 CV_ImBox_VidPhoto_Player.Image = CurrentFrame;
             }
             else
@@ -52,82 +43,135 @@ namespace Stereo_Vision
                 CurrentIndex = 0;
                 InitialFilePath = FilesToView[CurrentIndex];
                 Init_Scroll_Slider(pPlayMode_2set);
-                if (pPlayMode_2set) View_Video_byIndex(0);
-                else View_Image_byIndex(0);
+
+                if (pPlayMode_2set==PlayModes.Photo) View_Video_byIndex(0);
+                else if(pPlayMode_2set == PlayModes.Video) View_Image_byIndex(0);
+                else View_Model_byIndex(0);
             }
         }
-        private void Init_Scroll_Slider(bool ppPlayMode_2set)
+        private Bitmap Create_ImageOfEmptyness()
         {
-            if(ppPlayMode_2set)
+            System.Drawing.Bitmap BMP_noFiles = new Bitmap(CV_ImBox_Capture.Width, CV_ImBox_Capture.Height,
+                    System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+            using (Graphics g = Graphics.FromImage(BMP_noFiles))
             {
-                TRB_Pl_VideoTimer.Minimum = 0;
-                TRB_Pl_VideoTimer.Maximum = 100;
-                TRB_Pl_VideoTimer.Value = 0;
+                g.Clear(Color.Black);
+                string text_2draw = "Не найдено файлов для просмотра";
+                var drawBrush = new SolidBrush(Color.FromArgb(0, 255, 0));
+                var font = new Font("Arial", 18);
+                g.DrawString(text_2draw, font, drawBrush, new PointF(5, 5));
             }
-            else
-            {
-                TRB_Pl_PhotoLister.Minimum = 0;
-                TRB_Pl_PhotoLister.Maximum = FilesToView.Count-1;
-                L_Pl_Photo_All.Text = (FilesToView.Count).ToString();
-                TRB_Pl_PhotoLister.Value = 0;
-                L_Pl_Photo_Cur.Text = (TRB_Pl_PhotoLister.Value + 1).ToString();
-            }
+            return BMP_noFiles;
         }
-        private void Toogle_Play_Mode(bool ppPlayMode_2set)
+        private void Init_Scroll_Slider(PlayModes ppPlayMode_2set)
         {
-            string L_Ex_mode_text_bkp = L_Ex_Mode.Text;
+            switch(ppPlayMode_2set)
+            {
+                case PlayModes.Photo:
+                    {
+
+                        TRB_Pl_PhotoLister.Minimum = 0;
+                        TRB_Pl_PhotoLister.Maximum = FilesToView.Count - 1;
+                        TRB_Pl_PhotoLister.Value = 0;
+
+                        L_Pl_Photo_All.Text = (FilesToView.Count).ToString();
+                        L_Pl_Photo_Cur.Text = (TRB_Pl_PhotoLister.Value + 1).ToString();
+                        break;
+                    }
+                case PlayModes.Video:
+                    {
+                        TRB_Pl_VideoTimer.Minimum = 0;
+                        TRB_Pl_VideoTimer.Maximum = 100;
+                        TRB_Pl_VideoTimer.Value = 0;
+                        break;
+                    }
+                case PlayModes.Models3D:
+                    {
+                        TRB_Pl_ModelsLister.Minimum = 0;
+                        TRB_Pl_ModelsLister.Maximum = 0;
+                        TRB_Pl_ModelsLister.Value = 0;
+
+                        L_Pl_Models_All.Text = (FilesToView.Count).ToString();
+                        L_Pl_Models_Cur.Text = (TRB_Pl_ModelsLister.Value + 1).ToString();
+                        break;
+                    }
+            }
+
+        }
+
+        private void Toogle_Play_Mode(PlayModes ppPlayMode_2set)
+        {
+            //bkp на случай, если переключиться не получится
+            /*string L_Ex_mode_text_bkp = L_Ex_Mode.Text;
             string Path_from_bkp = TB_Ex_PathFrom.Text;
-            string Path_to_bkp = TB_Ex_PathTo.Text;
-            Image BMP_vid = B_Ex_VideoMode.BackgroundImage;
-            Image BMP_pho = B_Ex_PhotoMode.BackgroundImage;
-            bool Play_m_bkp = Playing_mode;
+            string Path_to_bkp = TB_Ex_PathTo.Text;*/
+
+            Image Image_3D_bkp = B_Pl_3DMode.BackgroundImage;
+            Image Image_vid_bkp = B_Pl_VideoMode.BackgroundImage;
+            Image Image_pho_bkp = B_Pl_PhotoMode.BackgroundImage;
+            PlayModes Play_m_bkp = Playing_mode;
+
             try
             {
-                Pan_Pl_Video.Visible = ppPlayMode_2set;
-                Pan_Pl_Photo.Visible = !ppPlayMode_2set;
-                if (ppPlayMode_2set)
-                {
-                    if (!string.IsNullOrWhiteSpace(RecVid_path))
-                    {
-                        Find_and_Resort_Files(ppPlayMode_2set);
-                    }
-                    else { }
-                    B_Pl_PhotoMode.BackgroundImage = BMP_ExMode_Photo_off;
-                    B_Pl_VideoMode.BackgroundImage = BMP_ExMode_Video;
+                string Path_to_files = null;
 
-                }
-                else
+                switch (ppPlayMode_2set)
                 {
-
-                    if (!string.IsNullOrWhiteSpace(RecPhotos_path))
-                    {
-                        Find_and_Resort_Files(ppPlayMode_2set);
-                    }
-                    else { }
-                    if (isPlayingVideoNow) View_Video_Stop();
-                    B_Pl_PhotoMode.BackgroundImage = BMP_ExMode_Photo;
-                    B_Pl_VideoMode.BackgroundImage = BMP_ExMode_Video_off;
+                    case PlayModes.Photo:
+                        {
+                            Path_to_files = Rec_Photos_path;
+                            B_Pl_PhotoMode.BackgroundImage = BMP_ExMode_Photo;
+                            B_Pl_VideoMode.BackgroundImage = BMP_ExMode_Video_off;
+                            B_Pl_3DMode.BackgroundImage = BMP_PlMode_3D_off;
+                            break;
+                        }
+                    case PlayModes.Video:
+                        {
+                            Path_to_files = Rec_Videos_path;
+                            B_Pl_PhotoMode.BackgroundImage = BMP_ExMode_Photo_off;
+                            B_Pl_VideoMode.BackgroundImage = BMP_ExMode_Video;
+                            B_Pl_3DMode.BackgroundImage = BMP_PlMode_3D_off;
+                            break;
+                        }
+                    case PlayModes.Models3D:
+                        {                        
+                            Path_to_files = Rec_Models_path;
+                            B_Pl_PhotoMode.BackgroundImage = BMP_ExMode_Photo_off;
+                            B_Pl_VideoMode.BackgroundImage = BMP_ExMode_Video_off;
+                            B_Pl_3DMode.BackgroundImage = BMP_PlMode_3D;
+                            break;
+                        }
                 }
+
+                if (!string.IsNullOrWhiteSpace(Path_to_files))
+                {
+                    Find_and_Resort_Files(ppPlayMode_2set, Path_to_files);
+                }
+                else { }
+                if ((Playing_mode==PlayModes.Video) && isPlayingVideoNow) View_Video_Stop();
+
+
                 Load_File_onControls(ppPlayMode_2set);
                 Playing_mode = ppPlayMode_2set;
+                Pan_Pl_Video.Visible = (ppPlayMode_2set == PlayModes.Video);
+                Pan_Pl_Photo.Visible = (ppPlayMode_2set == PlayModes.Photo);
+                Pan_Pl_3D.Visible = (ppPlayMode_2set == PlayModes.Models3D);
             }
             catch
             {
-                Pan_Pl_Video.Visible = Play_m_bkp;
-                Pan_Pl_Photo.Visible = !Play_m_bkp;
-
                 /* L_Ex_Mode.Text = L_Ex_mode_text_bkp;
                  TB_Ex_PathFrom.Text = Path_from_bkp;
                  TB_Ex_PathTo.Text = Path_to_bkp;*/
-                B_Ex_VideoMode.BackgroundImage = BMP_vid;
-                B_Ex_PhotoMode.BackgroundImage = BMP_pho;
+                B_Pl_VideoMode.BackgroundImage = Image_vid_bkp;
+                B_Pl_PhotoMode.BackgroundImage = Image_pho_bkp;
+                B_Pl_3DMode.BackgroundImage = Image_3D_bkp;
                 Playing_mode = Play_m_bkp;
-            }
+            }    
         }
 
-        private void Find_and_Resort_Files(bool pPlayMode)
+        private void Find_and_Resort_Files(PlayModes pPlayMode, string pDirectory)
         {
-            string StartDir = (pPlayMode) ? RecVid_path : RecPhotos_path;
+            string StartDir = pDirectory;
             FilesToView = new List<string>();
 
             if (!string.IsNullOrWhiteSpace(StartDir))
@@ -178,7 +222,10 @@ namespace Stereo_Vision
             CV_ImBox_VidPhoto_Player.Invalidate();
             Refresh_Video_Labels();
         }
+        private void View_Model_byIndex(int pIndex)
+        {
 
+        }
         private void View_Video_Prev()
         {
             if (isPlayingVideoNow) View_Video_Stop();

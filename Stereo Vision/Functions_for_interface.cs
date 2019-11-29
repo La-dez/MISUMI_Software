@@ -31,6 +31,8 @@ namespace Stereo_Vision
         static Bitmap BMP_ExMode_Video_off = new Bitmap("ex_video_off.png");
         static Bitmap BMP_ExMode_Photo = new Bitmap("ex_photo2.png");
         static Bitmap BMP_ExMode_Photo_off = new Bitmap("ex_photo2_off.png");
+        static Bitmap BMP_PlMode_3D = new Bitmap("Resources\\3D.png");
+        static Bitmap BMP_PlMode_3D_off = new Bitmap("Resources\\3D_off.png");
         static Bitmap BMP_Playing_Play = new Bitmap("play_play.png");
         static Bitmap BMP_Playing_Pause = new Bitmap("play_pause.png");
         string Text2set = "?%";
@@ -175,21 +177,21 @@ namespace Stereo_Vision
         private void OpenSettings()
         {
             Pan_Export.Visible = false;
-            Pan_UserMain.Visible = false;
+            Pan_UserMainBase.Visible = false;
             Pan_Settings.Visible = true;
             Pan_Player.Visible = false;
         }
         private void OpenMainPanel()
         {
             Pan_Export.Visible = false;
-            Pan_UserMain.Visible = true;
+            Pan_UserMainBase.Visible = true;
             Pan_Settings.Visible = false;
             Pan_Player.Visible = false;
         }
         private void OpenExportPanel()
         {
             Pan_Export.Visible = true;
-            Pan_UserMain.Visible = false;
+            Pan_UserMainBase.Visible = false;
             Pan_Settings.Visible = false;
             Pan_Player.Visible = false;
             CB_Ex_ChooseExportMode.SelectedIndex = Export_style;
@@ -198,7 +200,7 @@ namespace Stereo_Vision
         private void OpenPlayPanel()
         {
             Pan_Export.Visible = false;
-            Pan_UserMain.Visible = false;
+            Pan_UserMainBase.Visible = false;
             Pan_Settings.Visible = false;
             Pan_Player.Visible = true;
 
@@ -370,13 +372,13 @@ namespace Stereo_Vision
                         case "Path_2save_Video":
                             {
                                 string toObject = CutFromEdges(AllLines[i]);
-                                RecVid_path = toObject;
+                                Rec_Videos_path = toObject;
                                 break;
                             }
                         case "Path_2save_Photo":
                             {
                                 string toObject = CutFromEdges(AllLines[i]);
-                                RecPhotos_path = toObject;
+                                Rec_Photos_path = toObject;
                                 break;
                             }
                         case "Last_export_path_Video":
@@ -436,8 +438,8 @@ namespace Stereo_Vision
 
             Loaded_Width = 1280;
             Loaded_Height = 720;
-            RecVid_path = Path.Combine("C:\\", "Video");
-            RecPhotos_path = Path.Combine("C:\\", "Photo");
+            Rec_Videos_path = Path.Combine("C:\\", "Video");
+            Rec_Photos_path = Path.Combine("C:\\", "Photo");
             Export_Vid_from = Path.Combine("C:\\", "Video");
             Export_Photos_from = Path.Combine("C:\\", "Photo");
             Export_Vid_to = Path.Combine("C:\\", "Video" + " export " + User_Name); ;
@@ -492,8 +494,8 @@ namespace Stereo_Vision
             {
 
             }
-            TB_Settings_VidSavePath.Text = RecVid_path;
-            TB_Settings_PhotoSavePath.Text = RecPhotos_path;
+            TB_Settings_VidSavePath.Text = Rec_Videos_path;
+            TB_Settings_PhotoSavePath.Text = Rec_Photos_path;
 
             if (Export_mode)
             {
@@ -551,8 +553,8 @@ namespace Stereo_Vision
                     sw.WriteLine("<Width>" + (1280).ToString() + "</Width>");
                     sw.WriteLine("<Height>" + (720).ToString() + "</Height>");
 
-                    sw.WriteLine("<Path_2save_Video>" + RecVid_path + "</Path_2save_Video>");
-                    sw.WriteLine("<Path_2save_Photo>" + RecPhotos_path + "</Path_2save_Photo>");
+                    sw.WriteLine("<Path_2save_Video>" + Rec_Videos_path + "</Path_2save_Video>");
+                    sw.WriteLine("<Path_2save_Photo>" + Rec_Photos_path + "</Path_2save_Photo>");
                     sw.WriteLine("<Last_export_path_Video>" + Export_Vid_from + "</Last_export_path_Video>");
                     sw.WriteLine("<Last_export_path_Photo>" + Export_Photos_from + "</Last_export_path_Photo>");
                     sw.WriteLine("<Last_export_path_Video_to>" + Export_Vid_to + "</Last_export_path_Photo>");
@@ -709,8 +711,8 @@ namespace Stereo_Vision
         private void Open_Export_DirectoryFrom()
         {
             FolderBrowserDialog folderBrowser = new FolderBrowserDialog();
-            if(Export_mode) folderBrowser.SelectedPath = RecVid_path;
-            else folderBrowser.SelectedPath = RecPhotos_path;
+            if(Export_mode) folderBrowser.SelectedPath = Rec_Videos_path;
+            else folderBrowser.SelectedPath = Rec_Photos_path;
             DialogResult result = folderBrowser.ShowDialog();
             
             if (Export_mode) Export_Vid_from = folderBrowser.SelectedPath;

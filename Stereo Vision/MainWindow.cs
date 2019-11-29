@@ -71,9 +71,9 @@ namespace Stereo_Vision
                 CurrentFrame2 = new Mat();
                 resizedim = new Mat();
                 Size_for_Resizing = new Size(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height - 120);
-               /* Width_for_Resizing = CV_ImBox_Capture.Width;
-                Height_for_Resizing = CV_ImBox_Capture.Height;
-                Size_for_Resizing = new Size(Width_for_Resizing, Height_for_Resizing);*/
+               // Width_for_Resizing = CV_ImBox_Capture.Width;
+              //  Height_for_Resizing = CV_ImBox_Capture.Height;
+               // Size_for_Resizing = new Size(Width_for_Resizing, Height_for_Resizing);
             }
             catch { }
             finally { this.Visible = true; }
@@ -354,13 +354,13 @@ namespace Stereo_Vision
         private void B_Settings_FindVidPath_Click(object sender, EventArgs e)
         {
             Simple_choose_Directory(ref TB_Settings_VidSavePath);
-            RecVid_path = TB_Settings_VidSavePath.Text;
+            Rec_Videos_path = TB_Settings_VidSavePath.Text;
         }
 
         private void B_Settings_FindPhotoPath_Click(object sender, EventArgs e)
         {
             Simple_choose_Directory(ref TB_Settings_PhotoSavePath);
-            RecPhotos_path = TB_Settings_PhotoSavePath.Text;
+            Rec_Photos_path = TB_Settings_PhotoSavePath.Text;
         }
 
         private void WakeUpTimer_Tick(object sender, EventArgs e)
@@ -465,14 +465,18 @@ namespace Stereo_Vision
 
         private void B_Pl_VideoMode_Click(object sender, EventArgs e)
         {
-            Toogle_Play_Mode(true);
+            Toogle_Play_Mode(PlayModes.Video);
         }
 
         private void B_Pl_PhotoMode_Click(object sender, EventArgs e)
         {
-            Toogle_Play_Mode(false);
+            Toogle_Play_Mode(PlayModes.Photo);
         }
 
+        private void B_Pl_3DMode_Click(object sender, EventArgs e)
+        {
+            Toogle_Play_Mode(PlayModes.Models3D);
+        }
         private void B_Pl_PhotoPrevious_Click(object sender, EventArgs e)
         {
             View_Image_Prev();
@@ -509,6 +513,22 @@ namespace Stereo_Vision
         {
             View_Video_Scroll();
         }
+
+        private void TRB_Pl_ModelsLister_Scroll(object sender, EventArgs e)
+        {
+
+        }
+
+        private void B_Pl_ModelPrevious_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void B_Pl_ModelNext_Click(object sender, EventArgs e)
+        {
+
+        }
+
     }
 }
 

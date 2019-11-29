@@ -31,8 +31,9 @@ namespace Stereo_Vision
         //Var's for videorecord
         double Lenght_secs = 10;
         int FramesToGot = 60 * 30;
-        string RecVid_path = Path.Combine(/*System.Windows.Forms.Application.StartupPath*/"C:\\", "Video");
-        string RecPhotos_path = Path.Combine(/*System.Windows.Forms.Application.StartupPath*/"C:\\", "Photo");
+        string Rec_Videos_path = Path.Combine(/*System.Windows.Forms.Application.StartupPath*/"C:\\", "Video");
+        string Rec_Photos_path = Path.Combine(/*System.Windows.Forms.Application.StartupPath*/"C:\\", "Photo");
+        string Rec_Models_path = Path.Combine(/*System.Windows.Forms.Application.StartupPath*/"C:\\", "3D Models");
         string Export_Vid_from = Path.Combine(/*System.Windows.Forms.Application.StartupPath*/"C:\\", "Video");
         string Export_Photos_from = Path.Combine(/*System.Windows.Forms.Application.StartupPath*/"C:\\", "Photo");
         string Export_Vid_to = null;
@@ -255,7 +256,7 @@ namespace Stereo_Vision
                       /*  using (CurrentFrame2 = resizedim.Clone())
                         {*/
                             Photo_name_lastcaptured = CalculatenName_forNewPhoto_withoutPath();
-                            CurrentFrame.Save(RecPhotos_path + "\\" + Photo_name_lastcaptured);
+                            CurrentFrame.Save(Rec_Photos_path + "\\" + Photo_name_lastcaptured);
                             LastNumber_Photo++;
                             isSnapShot_needed = false;
                             UpdateTextBox("Кадр " + Photo_name_lastcaptured + " сохранен!" , L_SnapShotSaved);
@@ -364,7 +365,7 @@ namespace Stereo_Vision
                 TotalFramesGotten = 0;
                 FramesToGot = (int)(Fps_toWrite * Lenght_secs);
                 Video_name_lastcaptured = CalculatenName_forNewVideo();
-                string FullPathAndName = RecVid_path + "\\" + Video_name_lastcaptured;
+                string FullPathAndName = Rec_Videos_path + "\\" + Video_name_lastcaptured;
 
                 int fWidth = Convert.ToInt32(_capture.GetCaptureProperty(CapProp.FrameWidth));
                 int fHeight = Convert.ToInt32(_capture.GetCaptureProperty(CapProp.FrameHeight));

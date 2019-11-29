@@ -1,0 +1,21 @@
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x86\Debug\Emgu.CV.UI.dll
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x86\Debug\Emgu.CV.UI.GL.dll
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x86\Debug\Emgu.CV.World.dll
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x86\Debug\ZedGraph.dll
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x86\Debug\concrt140.dll
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x86\Debug\cvextern.dll
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x86\Debug\msvcp140.dll
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x86\Debug\opencv_ffmpeg341_64.dll
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x86\Debug\vcruntime140.dll
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x86\Debug\cvextern.lib
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x86\Debug\HDVision.exe.config
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x86\Debug\HDVision.exe
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x86\Debug\HDVision.pdb
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\obj\x86\Debug\Stereo_Vision.Export_files_form.resources
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\obj\x86\Debug\Stereo_Vision.MainWindow.resources
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\obj\x86\Debug\Stereo_Vision.Properties.Resources.resources
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\obj\x86\Debug\Stereo Vision.csproj.GenerateResource.cache
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\obj\x86\Debug\Stereo Vision.csproj.CoreCompileInputs.cache
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\obj\x86\Debug\Stereo Vision.csproj.CopyComplete
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\obj\x86\Debug\HDVision.exe
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\obj\x86\Debug\HDVision.pdb
