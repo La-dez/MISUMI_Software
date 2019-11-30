@@ -21,6 +21,7 @@ namespace Stereo_Vision
         bool isInTranslation = false;
         bool isPlayingVideoNow = false;
         bool throwed_to_hiber = false;
+        bool isMeasuring = false;
         bool isArduino_closed = true;
         int ticks = 0;
         string User_Name = "PNTZ";
@@ -55,6 +56,7 @@ namespace Stereo_Vision
                 PrepareTheCamera();
                 //SetResolution(1280, 720);
                 SwitchAdminMode(AdminMode);
+                OpenMainPanel();
                 HideSomeThings();
                 Restore_CaptureDirectory();
                 Read_and_Load_Settings();
@@ -75,7 +77,7 @@ namespace Stereo_Vision
               //  Height_for_Resizing = CV_ImBox_Capture.Height;
                // Size_for_Resizing = new Size(Width_for_Resizing, Height_for_Resizing);
             }
-            catch { }
+            catch(Exception exc) { LogError(exc.Message); }
             finally { this.Visible = true; }
         }
 
@@ -214,8 +216,6 @@ namespace Stereo_Vision
             OpenMainPanel();
             if (isPlayingVideoNow) View_Video_Stop();
             StartCapture();
-            CV_ImBox_Capture.Visible = true;
-            CV_ImBox_VidPhoto_Player.Visible = false;
         }
         private void B_SwitchRec_Click(object sender, EventArgs e)
         {
@@ -465,17 +465,17 @@ namespace Stereo_Vision
 
         private void B_Pl_VideoMode_Click(object sender, EventArgs e)
         {
-            Toogle_Play_Mode(PlayModes.Video);
+            Toogle_Play_Mode(Modes.Video);
         }
 
         private void B_Pl_PhotoMode_Click(object sender, EventArgs e)
         {
-            Toogle_Play_Mode(PlayModes.Photo);
+            Toogle_Play_Mode(Modes.Photo);
         }
 
         private void B_Pl_3DMode_Click(object sender, EventArgs e)
         {
-            Toogle_Play_Mode(PlayModes.Models3D);
+            Toogle_Play_Mode(Modes.Models3D);
         }
         private void B_Pl_PhotoPrevious_Click(object sender, EventArgs e)
         {
@@ -529,6 +529,70 @@ namespace Stereo_Vision
 
         }
 
+        private void ChB_Mes_p2p_CheckedChanged(object sender, EventArgs e)
+        {
+            if (ChB_Mes_p2p.Checked) Init_Measurements_byType(MeasurementTypes.Distance_2point);
+            else Disable_Measurements();
+        }
+
+        private void ChB_Mes_p2l_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void ChB_Mes_p2pl_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void ChB_Mes_LenghtOfBroken_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void ChB_Mes_Perimeter_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void ChB_Mes_Area_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void B_Mes_DeleteAll_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void B_Mes_Reconstruct3D_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void B_Mes_Back_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void B_Pl_Photo_Measure_Click(object sender, EventArgs e)
+        {
+            OpenMeasurementsPanel();
+            Init_all_for_Measurements(FilesToView[CurrentIndex]);
+            DB_Invalidate();
+        }
+
+        private void B_MeasureMode_Click(object sender, EventArgs e)
+        {
+            OpenMeasurementsPanel();
+            Init_all_for_Measurements(Photo_name_lastcaptured_fullpath);
+            DB_Invalidate(); 
+        }
+
+        private void PB_MeasurementPB_Click(object sender, EventArgs e)
+        {
+            DB_Invalidate();
+        }
     }
 }
 

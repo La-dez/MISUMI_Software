@@ -44,6 +44,7 @@ namespace Stereo_Vision
         string Snapshot_name = "Snapshot_";
         string Video_name_lastcaptured = "Video_00.mp4";
         string Photo_name_lastcaptured = "Snapshot_000.jpeg";
+        string Photo_name_lastcaptured_fullpath = null;
         int Brightness_Value = 0;
         int Contrast_Value = 0;
         int Saturation_Value = 0;
@@ -257,6 +258,7 @@ namespace Stereo_Vision
                         {*/
                             Photo_name_lastcaptured = CalculatenName_forNewPhoto_withoutPath();
                             CurrentFrame.Save(Rec_Photos_path + "\\" + Photo_name_lastcaptured);
+                            Photo_name_lastcaptured_fullpath = Rec_Photos_path + "\\" + Photo_name_lastcaptured;
                             LastNumber_Photo++;
                             isSnapShot_needed = false;
                             UpdateTextBox("Кадр " + Photo_name_lastcaptured + " сохранен!" , L_SnapShotSaved);

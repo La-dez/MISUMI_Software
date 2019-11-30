@@ -181,6 +181,10 @@ namespace Stereo_Vision
         private void OpenMainPanel()
         {
             TogglePanelsVisability(true);
+
+            CV_ImBox_Capture.Visible = true;
+            CV_ImBox_VidPhoto_Player.Visible = false;
+            PB_MeasurementPB.Visible = false;
         }
         private void OpenExportPanel()
         {
@@ -200,7 +204,13 @@ namespace Stereo_Vision
         private void OpenMeasurementsPanel()
         {
             TogglePanelsVisability(false,false,false,false,true);
+
+            CV_ImBox_Capture.Visible = false;
+            CV_ImBox_VidPhoto_Player.Visible = false;
+            PB_MeasurementPB.Visible = true;
+
             StopCapture();
+
         }
         private void TogglePanelsVisability(bool isMainMenuVisible = false, bool isExportVisible=false,bool isSettingsVisible=false, bool isPlayerVisible=false, bool isMeasurementsVisible=false)
         {
@@ -630,9 +640,6 @@ namespace Stereo_Vision
         }
         private void HideSomeThings()
         {
-            Pan_Settings.Visible = false;
-            Pan_Export.Visible = false;
-            Pan_Player.Visible = false;
             L_SnapShotSaved.Visible = false;
         }
         private void MinimizeWindow()

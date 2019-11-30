@@ -13,8 +13,8 @@ namespace Stereo_Vision
     partial class MainWindow
     {
 
-        enum PlayModes { Photo = 0, Video, Models3D };
-        PlayModes Playing_mode = PlayModes.Video;
+        enum Modes { Photo = 0, Video, Models3D };
+        Modes Playing_mode = Modes.Video;
         List<string> FilesToView;
         int CurrentIndex = 0;
         VideoCapture CurrentVideo;
@@ -22,15 +22,16 @@ namespace Stereo_Vision
         int CurrentFrameNo_inCurVid=0;
         int FPS_toPlay;
 
-        private void Initialize_Player_Controls(PlayModes pPlayMode_2set)
+        private void Initialize_Player_Controls(Modes pPlayMode_2set)
         {
 
             CV_ImBox_Capture.Visible = false;
             CV_ImBox_VidPhoto_Player.Visible = true;
+            PB_MeasurementPB.Visible = false;
             Toogle_Play_Mode(pPlayMode_2set);
 
         }
-        private void Load_File_onControls(PlayModes pPlayMode_2set)
+        private void Load_File_onControls(Modes pPlayMode_2set)
         {
             string InitialFilePath = null;
             if (FilesToView.Count == 0)
@@ -44,8 +45,8 @@ namespace Stereo_Vision
                 InitialFilePath = FilesToView[CurrentIndex];
                 Init_Scroll_Slider(pPlayMode_2set);
 
-                if (pPlayMode_2set==PlayModes.Photo) View_Video_byIndex(0);
-                else if(pPlayMode_2set == PlayModes.Video) View_Image_byIndex(0);
+                if (pPlayMode_2set==Modes.Video) View_Video_byIndex(0);
+                else if(pPlayMode_2set == Modes.Photo) View_Image_byIndex(0);
                 else View_Model_byIndex(0);
             }
         }
@@ -63,11 +64,11 @@ namespace Stereo_Vision
             }
             return BMP_noFiles;
         }
-        private void Init_Scroll_Slider(PlayModes ppPlayMode_2set)
+        private void Init_Scroll_Slider(Modes ppPlayMode_2set)
         {
             switch(ppPlayMode_2set)
             {
-                case PlayModes.Photo:
+                case Modes.Photo:
                     {
 
                         TRB_Pl_PhotoLister.Minimum = 0;
@@ -78,14 +79,14 @@ namespace Stereo_Vision
                         L_Pl_Photo_Cur.Text = (TRB_Pl_PhotoLister.Value + 1).ToString();
                         break;
                     }
-                case PlayModes.Video:
+                case Modes.Video:
                     {
                         TRB_Pl_VideoTimer.Minimum = 0;
                         TRB_Pl_VideoTimer.Maximum = 100;
                         TRB_Pl_VideoTimer.Value = 0;
                         break;
                     }
-                case PlayModes.Models3D:
+                case Modes.Models3D:
                     {
                         TRB_Pl_ModelsLister.Minimum = 0;
                         TRB_Pl_ModelsLister.Maximum = 0;
@@ -99,7 +100,7 @@ namespace Stereo_Vision
 
         }
 
-        private void Toogle_Play_Mode(PlayModes ppPlayMode_2set)
+        private void Toogle_Play_Mode(Modes ppPlayMode_2set)
         {
             //bkp на случай, если переключиться не получится
             /*string L_Ex_mode_text_bkp = L_Ex_Mode.Text;
@@ -109,7 +110,7 @@ namespace Stereo_Vision
             Image Image_3D_bkp = B_Pl_3DMode.BackgroundImage;
             Image Image_vid_bkp = B_Pl_VideoMode.BackgroundImage;
             Image Image_pho_bkp = B_Pl_PhotoMode.BackgroundImage;
-            PlayModes Play_m_bkp = Playing_mode;
+            Modes Play_m_bkp = Playing_mode;
 
             try
             {
@@ -117,7 +118,7 @@ namespace Stereo_Vision
 
                 switch (ppPlayMode_2set)
                 {
-                    case PlayModes.Photo:
+                    case Modes.Photo:
                         {
                             Path_to_files = Rec_Photos_path;
                             B_Pl_PhotoMode.BackgroundImage = BMP_ExMode_Photo;
@@ -125,7 +126,7 @@ namespace Stereo_Vision
                             B_Pl_3DMode.BackgroundImage = BMP_PlMode_3D_off;
                             break;
                         }
-                    case PlayModes.Video:
+                    case Modes.Video:
                         {
                             Path_to_files = Rec_Videos_path;
                             B_Pl_PhotoMode.BackgroundImage = BMP_ExMode_Photo_off;
@@ -133,7 +134,7 @@ namespace Stereo_Vision
                             B_Pl_3DMode.BackgroundImage = BMP_PlMode_3D_off;
                             break;
                         }
-                    case PlayModes.Models3D:
+                    case Modes.Models3D:
                         {                        
                             Path_to_files = Rec_Models_path;
                             B_Pl_PhotoMode.BackgroundImage = BMP_ExMode_Photo_off;
@@ -148,14 +149,14 @@ namespace Stereo_Vision
                     Find_and_Resort_Files(ppPlayMode_2set, Path_to_files);
                 }
                 else { }
-                if ((Playing_mode==PlayModes.Video) && isPlayingVideoNow) View_Video_Stop();
+                if ((Playing_mode==Modes.Video) && isPlayingVideoNow) View_Video_Stop();
 
 
                 Load_File_onControls(ppPlayMode_2set);
                 Playing_mode = ppPlayMode_2set;
-                Pan_Pl_Video.Visible = (ppPlayMode_2set == PlayModes.Video);
-                Pan_Pl_Photo.Visible = (ppPlayMode_2set == PlayModes.Photo);
-                Pan_Pl_3D.Visible = (ppPlayMode_2set == PlayModes.Models3D);
+                Pan_Pl_Video.Visible = (ppPlayMode_2set == Modes.Video);
+                Pan_Pl_Photo.Visible = (ppPlayMode_2set == Modes.Photo);
+                Pan_Pl_3D.Visible = (ppPlayMode_2set == Modes.Models3D);
             }
             catch
             {
@@ -169,7 +170,7 @@ namespace Stereo_Vision
             }    
         }
 
-        private void Find_and_Resort_Files(PlayModes pPlayMode, string pDirectory)
+        private void Find_and_Resort_Files(Modes pPlayMode, string pDirectory)
         {
             string StartDir = pDirectory;
             FilesToView = new List<string>();
