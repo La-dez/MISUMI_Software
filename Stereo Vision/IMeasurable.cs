@@ -78,7 +78,7 @@ namespace Stereo_Vision
             }
             catch
             {
-                result = new Point2d(PT_left.X + CenterOfImg.X, PT_left.Y);
+                result = new Point2d(PT_left.X + SizeOfCtrl.Width/2, PT_left.Y);
             }
             return result;
         }

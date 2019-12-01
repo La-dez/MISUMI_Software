@@ -650,6 +650,7 @@ namespace Stereo_Vision
         {
             if (CurrentStereoImage.isMeasureOpened())
                 CurrentStereoImage.AddPoint_2NewMeasurement(e.X, e.Y);
+            DB_Invalidate();
         }
 
         private void TLP_UserMainPanel_Paint(object sender, PaintEventArgs e)

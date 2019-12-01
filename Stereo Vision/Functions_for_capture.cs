@@ -122,7 +122,7 @@ namespace Stereo_Vision
             int FourCC_MP4 = VideoWriter.Fourcc('M', 'P', '4', 'V');
             int FourCC_LAGS = VideoWriter.Fourcc('L', 'A', 'G', 'S');
             int FourCC_H264 = VideoWriter.Fourcc('H', '2', '6', '4');
-            int FCC_2set = FourCC_MPEG;
+            int FCC_2set = FourCC_MJPG;
             // int FourCC_noc = 0;
             // int FourCC_noc2 = -466162819;
             //Current_FourCC = FourCC_MJPG;
