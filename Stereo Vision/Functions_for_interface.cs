@@ -181,10 +181,9 @@ namespace Stereo_Vision
         private void OpenMainPanel()
         {
             TogglePanelsVisability(true);
-
             CV_ImBox_Capture.Visible = true;
             CV_ImBox_VidPhoto_Player.Visible = false;
-            PB_MeasurementPB.Visible = false;
+            PB_MeasurementPB.Visible = true;
         }
         private void OpenExportPanel()
         {
@@ -203,13 +202,16 @@ namespace Stereo_Vision
         }
         private void OpenMeasurementsPanel()
         {
+            StopCapture();
             TogglePanelsVisability(false,false,false,false,true);
 
+            isMeasuring = true;
             CV_ImBox_Capture.Visible = false;
             CV_ImBox_VidPhoto_Player.Visible = false;
             PB_MeasurementPB.Visible = true;
-
-            StopCapture();
+            PB_MeasurementPB.Show();
+            Timer_InvalidateAfter_EnteringMes.Start();
+            //DB_Invalidate();
 
         }
         private void TogglePanelsVisability(bool isMainMenuVisible = false, bool isExportVisible=false,bool isSettingsVisible=false, bool isPlayerVisible=false, bool isMeasurementsVisible=false)
@@ -628,9 +630,9 @@ namespace Stereo_Vision
         }
         private void MaximizeWindow()
         {
+            FullScrin = true;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.WindowState = FormWindowState.Maximized;
-            FullScrin = true;
       
         }
         private void InvalidateAllThis()

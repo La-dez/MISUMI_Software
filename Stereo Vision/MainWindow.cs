@@ -54,7 +54,7 @@ namespace Stereo_Vision
                 MaximizeWindow();
                 CreateAttachmentFactor(ref AttachmentFactor, LBConsole);
                 PrepareTheCamera();
-                //SetResolution(1280, 720);
+                SetResolution(1280, 720);
                 SwitchAdminMode(AdminMode);
                 OpenMainPanel();
                 HideSomeThings();
@@ -72,10 +72,18 @@ namespace Stereo_Vision
                 CurrentFrame = new Mat();
                 CurrentFrame2 = new Mat();
                 resizedim = new Mat();
-                Size_for_Resizing = new Size(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height - 120);
-               // Width_for_Resizing = CV_ImBox_Capture.Width;
-              //  Height_for_Resizing = CV_ImBox_Capture.Height;
-               // Size_for_Resizing = new Size(Width_for_Resizing, Height_for_Resizing);
+                if(FullScrin) Size_for_Resizing = new Size(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height - 185);
+                else Size_for_Resizing = new Size(this.Width, this.Height - 150);
+
+
+                myBuffer = currentContext.Allocate(PB_MeasurementPB.CreateGraphics(), PB_MeasurementPB.DisplayRectangle);
+                Draw_Base(false);
+                myBuffer.Render();
+                myBuffer.Dispose();
+
+                // Width_for_Resizing = CV_ImBox_Capture.Width;
+                //  Height_for_Resizing = CV_ImBox_Capture.Height;
+                // Size_for_Resizing = new Size(Width_for_Resizing, Height_for_Resizing);
             }
             catch(Exception exc) { LogError(exc.Message); }
             finally { this.Visible = true; }
@@ -116,7 +124,8 @@ namespace Stereo_Vision
         {
             TLP_UserMainPanel.Refresh() ;
 
-            Size_for_Resizing = new Size(this.Width, this.Height - 120);
+            if (FullScrin) Size_for_Resizing = new Size(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height - 120);
+            else Size_for_Resizing = new Size(this.Width, this.Height - 150);
         }
 
         private void TLP_UserMainPanel_Resize(object sender, EventArgs e)
@@ -537,27 +546,32 @@ namespace Stereo_Vision
 
         private void ChB_Mes_p2l_CheckedChanged(object sender, EventArgs e)
         {
-
+            if (ChB_Mes_p2l.Checked) Init_Measurements_byType(MeasurementTypes.Distance_2line);
+            else Disable_Measurements();
         }
 
         private void ChB_Mes_p2pl_CheckedChanged(object sender, EventArgs e)
         {
-
+            if (ChB_Mes_p2pl.Checked) Init_Measurements_byType(MeasurementTypes.Distance_2plane);
+            else Disable_Measurements();
         }
 
         private void ChB_Mes_LenghtOfBroken_CheckedChanged(object sender, EventArgs e)
         {
-
+            if (ChB_Mes_LenghtOfBroken.Checked) Init_Measurements_byType(MeasurementTypes.Polyline);
+            else Disable_Measurements();
         }
 
         private void ChB_Mes_Perimeter_CheckedChanged(object sender, EventArgs e)
         {
-
+            if (ChB_Mes_Perimeter.Checked) Init_Measurements_byType(MeasurementTypes.Perimeter);
+            else Disable_Measurements();
         }
 
         private void ChB_Mes_Area_CheckedChanged(object sender, EventArgs e)
         {
-
+            if (ChB_Mes_Area.Checked) Init_Measurements_byType(MeasurementTypes.Area);
+            else Disable_Measurements();
         }
 
         private void B_Mes_DeleteAll_Click(object sender, EventArgs e)
@@ -572,26 +586,75 @@ namespace Stereo_Vision
 
         private void B_Mes_Back_Click(object sender, EventArgs e)
         {
-
+            if (ActivatePreviousMode != null) ActivatePreviousMode();
         }
 
+        Action ActivatePreviousMode = null;
         private void B_Pl_Photo_Measure_Click(object sender, EventArgs e)
         {
-            OpenMeasurementsPanel();
+            ActivatePreviousMode = (Action)OpenPlayPanel;
             Init_all_for_Measurements(FilesToView[CurrentIndex]);
+            OpenMeasurementsPanel();
             DB_Invalidate();
         }
 
         private void B_MeasureMode_Click(object sender, EventArgs e)
         {
-            OpenMeasurementsPanel();
             Init_all_for_Measurements(Photo_name_lastcaptured_fullpath);
+            ActivatePreviousMode = new Action(()=> 
+            {   OpenMainPanel();
+                if(!isInTranslation) StartCapture();
+                });
+            OpenMeasurementsPanel();
             DB_Invalidate(); 
         }
 
         private void PB_MeasurementPB_Click(object sender, EventArgs e)
         {
             DB_Invalidate();
+        }
+
+        private void PB_MeasurementPB_Paint(object sender, PaintEventArgs e)
+        {
+            int a = 0;
+        }
+
+        private void PB_MeasurementPB_BackColorChanged(object sender, EventArgs e)
+        {
+            int b = 0;
+        }
+
+        private void Timer_InvalidateAfter_EnteringMes_Tick(object sender, EventArgs e)
+        {
+            DB_Invalidate();
+            Timer_InvalidateAfter_EnteringMes.Stop();
+        }
+
+        private void CV_ImBox_VidPhoto_Player_MouseUp(object sender, MouseEventArgs e)
+        {
+
+        }
+
+        private void PB_MeasurementPB_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (!CurrentStereoImage.isMeasureOpened()) CurrentStereoImage.NewMeasurement(CurrentMeasureType);
+        }
+
+        private void PB_MeasurementPB_DoubleClick(object sender, EventArgs e)
+        {
+            if (CurrentStereoImage.isMeasure_supportsClose()) CurrentStereoImage.Make_LastMeasurement_Ready();
+
+        }
+
+        private void PB_MeasurementPB_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (CurrentStereoImage.isMeasureOpened())
+                CurrentStereoImage.AddPoint_2NewMeasurement(e.X, e.Y);
+        }
+
+        private void TLP_UserMainPanel_Paint(object sender, PaintEventArgs e)
+        {
+
         }
     }
 }

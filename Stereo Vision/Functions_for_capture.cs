@@ -117,20 +117,26 @@ namespace Stereo_Vision
             CurrentFrame = new Mat();
 
             int FourCC_MJPG = VideoWriter.Fourcc('M', 'J', 'P', 'G');
-           // int FourCC_noc = 0;
-           // int FourCC_noc2 = -466162819;
-            Current_FourCC = FourCC_MJPG;
+            int FourCC_MPEG = VideoWriter.Fourcc('M', 'P', 'E', 'G');
+            int FourCC_YUY2 = VideoWriter.Fourcc('Y', 'U', 'Y', '2');
+            int FourCC_MP4 = VideoWriter.Fourcc('M', 'P', '4', 'V');
+            int FourCC_LAGS = VideoWriter.Fourcc('L', 'A', 'G', 'S');
+            int FourCC_H264 = VideoWriter.Fourcc('H', '2', '6', '4');
+            int FCC_2set = FourCC_MPEG;
+            // int FourCC_noc = 0;
+            // int FourCC_noc2 = -466162819;
+            //Current_FourCC = FourCC_MJPG;
             /* int FourCC_MP4 = VideoWriter.Fourcc('M', 'P', '4', 'V'); 
              int FourCC_LAGS = VideoWriter.Fourcc('L', 'A', 'G', 'S');
              int FourCC_H264 = VideoWriter.Fourcc('H', '2', '6', '4');
              int FourCC_YUY2 = VideoWriter.Fourcc('Y', 'U', 'Y', '2');*/
 
-             char[] FourCC_MJPG_str = FourCC_int_2_str(FourCC_MJPG);
+            char[] FourCC_MJPG_str = FourCC_int_2_str(FourCC_MJPG);
 
              int FourCC_Current = (int)_capture.GetCaptureProperty(CapProp.FourCC);
              char[] FourCC_Current_str = FourCC_int_2_str(FourCC_Current);
 
-            _capture.SetCaptureProperty(CapProp.FourCC, FourCC_MJPG);
+            _capture.SetCaptureProperty(CapProp.FourCC, FCC_2set);
             _capture.SetCaptureProperty(CapProp.FrameWidth, 1280);
             _capture.SetCaptureProperty(CapProp.FrameHeight, 720);
             FourCC_Current = (int)_capture.GetCaptureProperty(CapProp.FourCC);
@@ -311,7 +317,7 @@ namespace Stereo_Vision
             else
             {
                 PrepareTheCamera();
-                SetResolution(1920, 1080);
+                SetResolution(1280, 720);
                 Read_and_Load_Settings();
                 _capture.Start();
                 isInTranslation = true;

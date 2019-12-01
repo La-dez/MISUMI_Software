@@ -27,7 +27,7 @@ namespace Stereo_Vision
 
             CV_ImBox_Capture.Visible = false;
             CV_ImBox_VidPhoto_Player.Visible = true;
-            PB_MeasurementPB.Visible = false;
+            PB_MeasurementPB.Visible = true;
             Toogle_Play_Mode(pPlayMode_2set);
 
         }
