@@ -158,9 +158,9 @@ namespace Stereo_Vision
             this.L_ChargeLev = new System.Windows.Forms.Label();
             this.PB_Indicator = new System.Windows.Forms.PictureBox();
             this.LBConsole = new System.Windows.Forms.ListBox();
+            this.PB_MeasurementPB = new System.Windows.Forms.PictureBox();
             this.CV_ImBox_Capture = new Emgu.CV.UI.ImageBox();
             this.CV_ImBox_VidPhoto_Player = new Emgu.CV.UI.ImageBox();
-            this.PB_MeasurementPB = new System.Windows.Forms.PictureBox();
             this.BGWR_ChargeLev = new System.ComponentModel.BackgroundWorker();
             this.WakeUpTimer = new System.Windows.Forms.Timer(this.components);
             this.Timer_InvalidateAfter_EnteringMes = new System.Windows.Forms.Timer(this.components);
@@ -204,9 +204,9 @@ namespace Stereo_Vision
             this.TLP_ChargeLev.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.PB_ChargeVal)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.PB_Indicator)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PB_MeasurementPB)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.CV_ImBox_Capture)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.CV_ImBox_VidPhoto_Player)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.PB_MeasurementPB)).BeginInit();
             this.SuspendLayout();
             // 
             // TLP_BASE
@@ -960,7 +960,7 @@ namespace Stereo_Vision
             this.TLP_Settings_Camera.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 75F));
             this.TLP_Settings_Camera.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 232F));
             this.TLP_Settings_Camera.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.TLP_Settings_Camera.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 76F));
+            this.TLP_Settings_Camera.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 77F));
             this.TLP_Settings_Camera.Controls.Add(this.TrBContrast, 1, 1);
             this.TLP_Settings_Camera.Controls.Add(this.L_Settings_l1, 0, 0);
             this.TLP_Settings_Camera.Controls.Add(this.TrBBrightness, 1, 0);
@@ -2304,6 +2304,22 @@ namespace Stereo_Vision
             this.LBConsole.Visible = false;
             this.LBConsole.SelectedIndexChanged += new System.EventHandler(this.LBConsole_SelectedIndexChanged);
             // 
+            // PB_MeasurementPB
+            // 
+            this.PB_MeasurementPB.BackColor = System.Drawing.Color.Honeydew;
+            this.PB_MeasurementPB.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("PB_MeasurementPB.BackgroundImage")));
+            this.PB_MeasurementPB.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.PB_MeasurementPB.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.PB_MeasurementPB.InitialImage = null;
+            this.PB_MeasurementPB.Location = new System.Drawing.Point(0, 0);
+            this.PB_MeasurementPB.Name = "PB_MeasurementPB";
+            this.PB_MeasurementPB.Size = new System.Drawing.Size(1898, 959);
+            this.PB_MeasurementPB.TabIndex = 10;
+            this.PB_MeasurementPB.TabStop = false;
+            this.PB_MeasurementPB.DoubleClick += new System.EventHandler(this.PB_MeasurementPB_DoubleClick);
+            this.PB_MeasurementPB.MouseDown += new System.Windows.Forms.MouseEventHandler(this.PB_MeasurementPB_MouseDown);
+            this.PB_MeasurementPB.MouseUp += new System.Windows.Forms.MouseEventHandler(this.PB_MeasurementPB_MouseUp);
+            // 
             // CV_ImBox_Capture
             // 
             this.CV_ImBox_Capture.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
@@ -2330,19 +2346,6 @@ namespace Stereo_Vision
             this.CV_ImBox_VidPhoto_Player.TabIndex = 8;
             this.CV_ImBox_VidPhoto_Player.TabStop = false;
             this.CV_ImBox_VidPhoto_Player.MouseUp += new System.Windows.Forms.MouseEventHandler(this.CV_ImBox_VidPhoto_Player_MouseUp);
-            // 
-            // PB_MeasurementPB
-            // 
-            this.PB_MeasurementPB.BackColor = System.Drawing.Color.Honeydew;
-            this.PB_MeasurementPB.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.PB_MeasurementPB.Location = new System.Drawing.Point(0, 0);
-            this.PB_MeasurementPB.Name = "PB_MeasurementPB";
-            this.PB_MeasurementPB.Size = new System.Drawing.Size(1898, 959);
-            this.PB_MeasurementPB.TabIndex = 10;
-            this.PB_MeasurementPB.TabStop = false;
-            this.PB_MeasurementPB.DoubleClick += new System.EventHandler(this.PB_MeasurementPB_DoubleClick);
-            this.PB_MeasurementPB.MouseDown += new System.Windows.Forms.MouseEventHandler(this.PB_MeasurementPB_MouseDown);
-            this.PB_MeasurementPB.MouseUp += new System.Windows.Forms.MouseEventHandler(this.PB_MeasurementPB_MouseUp);
             // 
             // BGWR_ChargeLev
             // 
@@ -2424,9 +2427,9 @@ namespace Stereo_Vision
             this.TLP_ChargeLev.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.PB_ChargeVal)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.PB_Indicator)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PB_MeasurementPB)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.CV_ImBox_Capture)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.CV_ImBox_VidPhoto_Player)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.PB_MeasurementPB)).EndInit();
             this.ResumeLayout(false);
 
         }

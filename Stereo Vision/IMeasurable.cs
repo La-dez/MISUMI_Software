@@ -93,7 +93,7 @@ namespace Stereo_Vision
                 Point2d Data_right_onCtrl = Transform_Img2Ctrl(Data_right_onImage.X, Data_right_onImage.Y);
 
                 Point3d Data3D = new Point3d(0,0,0);
-                stereoPair.Transform(Data_left_onImage, Data_left_onImage, ref Data3D);
+                try { stereoPair.Transform(Data_left_onImage, Data_left_onImage, ref Data3D); } catch { }
 
                 Special_3D_pt NewPoint = new Special_3D_pt(Data_left_onCtrl, Data_right_onCtrl, Data_left_onImage, Data_right_onImage, Data3D);
                 LastMeasurement.Add_Point(NewPoint);
