@@ -40,3 +40,9 @@ E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x8
 E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x86\Release\x86\vcruntime140.dll
 E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x86\Release\Emgu.CV.UI.xml
 E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x86\Release\Emgu.CV.World.xml
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x86\Release\OpenTK.dll
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x86\Release\OpenTK.GLControl.dll
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x86\Release\OpenTK.pdb
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x86\Release\OpenTK.xml
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x86\Release\OpenTK.GLControl.pdb
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x86\Release\OpenTK.GLControl.xml

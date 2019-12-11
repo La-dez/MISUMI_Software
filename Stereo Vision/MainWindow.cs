@@ -20,8 +20,9 @@ namespace Stereo_Vision
         bool AdminMode = false;
         bool isInTranslation = false;
         bool isPlayingVideoNow = false;
-        bool throwed_to_hiber = false;
         bool isMeasuring = false;
+        bool is3DViewing = false;
+        bool throwed_to_hiber = false;
         bool isArduino_closed = true;
         int ticks = 0;
         string User_Name = "PNTZ";
@@ -49,7 +50,7 @@ namespace Stereo_Vision
             this.Visible = false;
             try
             {
-
+                Build_Interface();
 
                 MaximizeWindow();
                 CreateAttachmentFactor(ref AttachmentFactor, LBConsole);
@@ -88,7 +89,36 @@ namespace Stereo_Vision
             catch(Exception exc) { LogError(exc.Message); }
             finally { this.Visible = true; }
         }
+        private void Build_Interface()
+        {
+            //MainPanelRestruct
+            Pan_BASE_BackgroundPanel.Controls.Add(this.Pan_Settings);
+            Pan_BASE_BackgroundPanel.Controls.Add(this.Pan_Export);
+            Pan_BASE_BackgroundPanel.Controls.Add(this.Pan_Player);
+            Pan_BASE_BackgroundPanel.Controls.Add(this.Pan_MainMenu);
+            Pan_BASE_BackgroundPanel.Controls.Add(this.Pan_Measurements);
+            Pan_Settings.Dock = DockStyle.Fill;
+            Pan_Export.Dock = DockStyle.Fill;
+            Pan_Player.Dock = DockStyle.Fill;
+            Pan_MainMenu.Dock = DockStyle.Fill;
+            Pan_Measurements.Dock = DockStyle.Fill;
+            Pan_MainMenu.BringToFront();
 
+            //ViewRegion restruct
+            this.Pan_ViewRegion.Controls.Add(this.CV_ImBox_VidPhoto_Player);
+            this.Pan_ViewRegion.Controls.Add(this.CV_ImBox_Capture);
+            this.Pan_ViewRegion.Controls.Add(this.PB_MeasurementPB);
+            this.Pan_ViewRegion.Controls.Add(this.OTK_3D_Control);
+            this.Pan_ViewRegion.Controls.Add(this.L_SnapShotSaved);
+            this.Pan_ViewRegion.Controls.Add(this.P_ChargeLev);
+            this.Pan_ViewRegion.Controls.Add(this.PB_Indicator);
+            this.Pan_ViewRegion.Controls.Add(this.LBConsole);
+
+            CV_ImBox_VidPhoto_Player.Dock = DockStyle.Fill;
+            CV_ImBox_Capture.Dock = DockStyle.Fill;
+            PB_MeasurementPB.Dock = DockStyle.Fill;
+            OTK_3D_Control.Dock = DockStyle.Fill;
+        }
         private void MainWindow_KeyDown(object sender, KeyEventArgs e)
         {
             if ((e.KeyCode == Keys.Q) && e.Alt)
@@ -581,6 +611,10 @@ namespace Stereo_Vision
 
         private void B_Mes_Reconstruct3D_Click(object sender, EventArgs e)
         {
+            Init3M();
+        }
+        private void B_Ex_3DMode_Click(object sender, EventArgs e)
+        {
 
         }
 
@@ -657,6 +691,65 @@ namespace Stereo_Vision
         {
 
         }
+       
+        private void Timer_3DRenderer_Tick(object sender, EventArgs e)
+        {
+            if (is3DViewing)
+                try { Draw(); }
+                catch
+                { /*RenderTimer.Stop(); */}
+        }
+
+        private void OTK_3D_Control_Resize(object sender, EventArgs e)
+        {
+            if (!M3D_loaded)
+                return;
+            else OTK_3D_Control.Invalidate();
+        }
+
+        private void OTK_3D_Control_MouseDown(object sender, MouseEventArgs e)
+        {
+            int ObjectN = FindAnObject(e.X, e.Y);
+        }
+
+        private void OTK_3D_Control_MouseUp(object sender, MouseEventArgs e)
+        {
+            if ((Figure.IsGrabed()) || (BasicMesh.IsGrabed()))
+            {
+                Figure.SetGrabParameters(false, 0, 0); BasicMesh.SetGrabParameters(false, 0, 0);
+            }
+
+        }
+
+        private void OTK_3D_Control_MouseMove(object sender, MouseEventArgs e)
+        {
+            var Fig = new OpenTK_3DMesh.MyMesh();
+            if (MeshesFixedByEachOther)
+            {
+                if ((Figure.IsGrabed()) || (BasicMesh.IsGrabed()))
+                    if (Figure.IsGrabed()) Fig = Figure;
+                    else Fig = BasicMesh;
+                if (!Fig.IsGrabed()) return;
+                trans = 1.925f * (-Fig.MoveZ) * 0.001f; //эмпирическая формула
+                Fig.MoveX += (e.X - remX) * trans; Fig.MoveY -= (e.Y - remY) * trans;
+                remX = e.X; remY = e.Y;
+            }
+            else
+            {
+                if (!Figure.IsGrabed()) return;
+                else
+                {
+                    Fig = Figure;
+                    trans = 1.925f * (-Fig.MoveZ) * 0.001f; //эмпирическая формула
+                    Fig.MoveX += (e.X - remX) * trans; Fig.MoveY -= (e.Y - remY) * trans;
+                    Fig = BasicMesh;
+                    Fig.MoveX += (e.X - remX) * trans; Fig.MoveY -= (e.Y - remY) * trans;
+                    remX = e.X; remY = e.Y;
+                }
+            }
+        }
+
+       
     }
 }
 

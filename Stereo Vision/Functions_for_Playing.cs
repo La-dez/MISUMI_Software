@@ -225,7 +225,7 @@ namespace Stereo_Vision
         }
         private void View_Model_byIndex(int pIndex)
         {
-
+            System.Windows.Forms.MessageBox.Show(":aaaaa");
         }
         private void View_Video_Prev()
         {
