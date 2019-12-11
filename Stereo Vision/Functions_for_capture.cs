@@ -33,7 +33,7 @@ namespace Stereo_Vision
         int FramesToGot = 60 * 30;
         string Rec_Videos_path = Path.Combine(/*System.Windows.Forms.Application.StartupPath*/"C:\\", "Video");
         string Rec_Photos_path = Path.Combine(/*System.Windows.Forms.Application.StartupPath*/"C:\\", "Photo");
-        string Rec_Models_path = Path.Combine(/*System.Windows.Forms.Application.StartupPath*/"C:\\", "3D Models");
+        string Rec_Models_path = Path.Combine(/*System.Windows.Forms.Application.StartupPath*/System.Windows.Forms.Application.StartupPath,"Models");
         string Export_Vid_from = Path.Combine(/*System.Windows.Forms.Application.StartupPath*/"C:\\", "Video");
         string Export_Photos_from = Path.Combine(/*System.Windows.Forms.Application.StartupPath*/"C:\\", "Photo");
         string Export_Vid_to = null;

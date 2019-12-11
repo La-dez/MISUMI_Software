@@ -714,9 +714,9 @@ namespace Stereo_Vision
 
         private void OTK_3D_Control_MouseUp(object sender, MouseEventArgs e)
         {
-            if ((Figure.IsGrabed()) || (BasicMesh.IsGrabed()))
+            if ((BasicMesh.IsGrabed()) || (Figure.IsGrabed()))
             {
-                Figure.SetGrabParameters(false, 0, 0); BasicMesh.SetGrabParameters(false, 0, 0);
+                BasicMesh.SetGrabParameters(false, 0, 0); Figure.SetGrabParameters(false, 0, 0);
             }
 
         }
@@ -726,9 +726,9 @@ namespace Stereo_Vision
             var Fig = new OpenTK_3DMesh.MyMesh();
             if (MeshesFixedByEachOther)
             {
-                if ((Figure.IsGrabed()) || (BasicMesh.IsGrabed()))
-                    if (Figure.IsGrabed()) Fig = Figure;
-                    else Fig = BasicMesh;
+                if ((BasicMesh.IsGrabed()) || (Figure.IsGrabed()))
+                    if (BasicMesh.IsGrabed()) Fig = BasicMesh;
+                    else Fig = Figure;
                 if (!Fig.IsGrabed()) return;
                 trans = 1.925f * (-Fig.MoveZ) * 0.001f; //эмпирическая формула
                 Fig.MoveX += (e.X - remX) * trans; Fig.MoveY -= (e.Y - remY) * trans;
@@ -736,13 +736,13 @@ namespace Stereo_Vision
             }
             else
             {
-                if (!Figure.IsGrabed()) return;
+                if (!BasicMesh.IsGrabed()) return;
                 else
                 {
-                    Fig = Figure;
+                    Fig = BasicMesh;
                     trans = 1.925f * (-Fig.MoveZ) * 0.001f; //эмпирическая формула
                     Fig.MoveX += (e.X - remX) * trans; Fig.MoveY -= (e.Y - remY) * trans;
-                    Fig = BasicMesh;
+                    Fig = Figure;
                     Fig.MoveX += (e.X - remX) * trans; Fig.MoveY -= (e.Y - remY) * trans;
                     remX = e.X; remY = e.Y;
                 }

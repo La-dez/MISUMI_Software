@@ -8,6 +8,7 @@ using OpenTK_3DMesh;
 using OpenTK.Graphics.OpenGL;
 using System.Drawing;
 using System.Windows.Forms;
+using CameraMath.Wrapper;
 
 
 namespace Stereo_Vision
@@ -40,8 +41,8 @@ namespace Stereo_Vision
                                                                  /* 2 вершина, позиция: */ 0.0f, 0.0f, 0.0f, /* цвет: */ 0.0f, 1.0f, 0.0f, 
                                                                  /* 3 вершина, позиция: */ -1.0f, 0.5f, 0.0f, /* цвет: */ 0.0f, 0.0f, 1.0f  , 
                                                                  /* 2 вершина, позиция: */ -1.0f, -0.5f, 0.0f, /* цвет: */ 0.0f, 1.0f, 0.0f};
-        MyMesh BasicMesh = null;
         MyMesh Figure = null;
+        MyMesh BasicMesh = null;
         static int[] meshVAO = new int[2];
         static int meshVBO = 0;
 
@@ -158,16 +159,16 @@ namespace Stereo_Vision
         }
         private void LoadFigures()
         {
-            BasicMesh = new MyMesh();
             Figure = new MyMesh();
+            BasicMesh = new MyMesh();
             // MyMesh.CreteCilindricMesh(out Figure, 1.5f, 360.0f, 1.0f, 0.1f, Color.FromArgb(0, 255, 0));
             // MyMesh.CreteSphereMesh(out Figure, 2.0f, 0.1f, Color.FromArgb(0, 255, 0));
-            MyMesh.CretePlainMesh(out Figure, 2.0f, 0.09f, Color.FromArgb(0, 255, 0));
-            MyMesh.CreteSphereMesh(out BasicMesh, 2.0f, 0.1f, Color.FromArgb(0, 255, 0));
-            Figure.SetZoomFactor(1.0f);
+            MyMesh.CretePlainMesh(out BasicMesh, 2.0f, 0.09f, Color.FromArgb(0, 255, 0));
+            MyMesh.CreteSphereMesh(out Figure, 2.0f, 0.1f, Color.FromArgb(0, 255, 0));
             BasicMesh.SetZoomFactor(1.0f);
-            Figure.MoveX = 0.5f; Figure.MoveY = 0.0f; Figure.MoveZ = -5.0f;
-            BasicMesh.MoveX = -0.5f; BasicMesh.MoveY = 0.0f; BasicMesh.MoveZ = -5.0f;
+            Figure.SetZoomFactor(1.0f);
+            BasicMesh.MoveX = 0.5f; BasicMesh.MoveY = 0.0f; BasicMesh.MoveZ = -5.0f;
+            Figure.MoveX = -0.5f; Figure.MoveY = 0.0f; Figure.MoveZ = -5.0f;
         }
         private void CreateBuffers()
         {
@@ -178,13 +179,13 @@ namespace Stereo_Vision
         private void BindTextures()
         {
             AllowInvalidate = false;
-            int bufsize = BasicMesh.GetBufferSize();
+            int bufsize = Figure.GetBufferSize();
             GL.BindBuffer(BufferTarget.ArrayBuffer, meshVBO);
-            GL.BufferData(BufferTarget.ArrayBuffer, new IntPtr(BasicMesh.GetBufferSize() + Figure.GetBufferSize()),
+            GL.BufferData(BufferTarget.ArrayBuffer, new IntPtr(Figure.GetBufferSize() + BasicMesh.GetBufferSize()),
                 new IntPtr(0), BufferUsageHint.StaticDraw);
-            GL.BufferSubData(BufferTarget.ArrayBuffer, new IntPtr(0), new IntPtr(BasicMesh.GetBufferSize()), BasicMesh.GetMeshData());
-            GL.BufferSubData(BufferTarget.ArrayBuffer, new IntPtr(BasicMesh.GetBufferSize()),
-                new IntPtr(Figure.GetBufferSize()), Figure.GetMeshData());
+            GL.BufferSubData(BufferTarget.ArrayBuffer, new IntPtr(0), new IntPtr(Figure.GetBufferSize()), Figure.GetMeshData());
+            GL.BufferSubData(BufferTarget.ArrayBuffer, new IntPtr(Figure.GetBufferSize()),
+                new IntPtr(BasicMesh.GetBufferSize()), BasicMesh.GetMeshData());
 
             positionLocation = GL.GetAttribLocation(program, "position");
             colorLocation = GL.GetAttribLocation(program, "color");
@@ -205,16 +206,16 @@ namespace Stereo_Vision
             GL.EnableVertexAttribArray(1);
             GL.BindBuffer(BufferTarget.ArrayBuffer, meshVBO);
             GL.VertexAttribPointer(positionLocation, 3, VertexAttribPointerType.Float, false, MyMesh.vertexSize,
-                BasicMesh.GetBufferSize() + MyMesh.vertexOffsetPosition);
+                Figure.GetBufferSize() + MyMesh.vertexOffsetPosition);
             GL.VertexAttribPointer(colorLocation, 3, VertexAttribPointerType.Float, false, MyMesh.vertexSize,
-                BasicMesh.GetBufferSize() + MyMesh.vertexOffsetColor);
+                Figure.GetBufferSize() + MyMesh.vertexOffsetColor);
 
             GL.VertexAttribPointer(positionLocation, 3, VertexAttribPointerType.Float, false, MyMesh.vertexSize, MyMesh.vertexOffsetPosition);
             GL.VertexAttribPointer(colorLocation, 3, VertexAttribPointerType.Float, false, MyMesh.vertexSize, MyMesh.vertexOffsetColor);
             /*  BasicMesh.MoveZ = -(TrBZModifier.Value / 100.0f);
               Figure.MoveZ = -(TrBZModifier.Value / 100.0f);*/
-            BasicMesh.MoveZ = -(200 / 100.0f);
             Figure.MoveZ = -(200 / 100.0f);
+            BasicMesh.MoveZ = -(200 / 100.0f);
             AllowInvalidate = true;
         }
         private Vector3 GetNormalizedRayWor(float MouseX3D, int MouseY3D)
@@ -238,55 +239,55 @@ namespace Stereo_Vision
                 GL.EnableClientState(ArrayCap.VertexArray);
                 GL.UseProgram(program);
                 Matrix4 xr, yr, zr;
-                Matrix4Translation(dataMatrix2, Figure.MoveX, Figure.MoveY, Figure.MoveZ);//перенос        
+                Matrix4Translation(dataMatrix2, BasicMesh.MoveX, BasicMesh.MoveY, BasicMesh.MoveZ);//перенос        
 
-                xr = Matrix4.CreateRotationX(Figure.GetElementRotation(0));
-                yr = Matrix4.CreateRotationY(Figure.GetElementRotation(1));
-                zr = Matrix4.CreateRotationZ(Figure.GetElementRotation(2));
+                xr = Matrix4.CreateRotationX(BasicMesh.GetElementRotation(0));
+                yr = Matrix4.CreateRotationY(BasicMesh.GetElementRotation(1));
+                zr = Matrix4.CreateRotationZ(BasicMesh.GetElementRotation(2));
                 Matrix4Mul(ref dataMatrix2, Matrix4Trans(zr * yr * xr)); // поворот
 
-                float zf = Figure.GetZoomFactor();
+                float zf = BasicMesh.GetZoomFactor();
                 Matrix4Mul(ref dataMatrix2, Matrix4Trans(Matrix4.CreateScale(zf, zf, zf))); // увеличение
                 Matrix4Mul(modelViewProjectionMatrix, ViewProjectionMatrix, dataMatrix2);
 
                 modelViewProjectionMatrixLocation = GL.GetUniformLocation(program, "modelViewProjectionMatrix");
                 GL.UniformMatrix4(modelViewProjectionMatrixLocation, 1, Convert.ToBoolean(All.True), modelViewProjectionMatrix);
-                GL.DrawArrays(PrimitiveType.LineStrip, BasicMesh.GetNumberOfVertices(), Figure.GetNumberOfVertices() - Figure.GetAxis());
+                GL.DrawArrays(PrimitiveType.LineStrip, Figure.GetNumberOfVertices(), BasicMesh.GetNumberOfVertices() - BasicMesh.GetAxis());
                 GL.PointSize(2.0f);
-                GL.DrawArrays(PrimitiveType.Points, BasicMesh.GetNumberOfVertices() + Figure.GetNumberOfVertices() - Figure.GetAxis(), Figure.GetAxis());
+                GL.DrawArrays(PrimitiveType.Points, Figure.GetNumberOfVertices() + BasicMesh.GetNumberOfVertices() - BasicMesh.GetAxis(), BasicMesh.GetAxis());
 
                 
                 if (!MeshesFixedByEachOther)
                 {
-                    if (BasicMesh.IsRecalculated)
+                    if (Figure.IsRecalculated)
                     {
-                        Matrix4Translation(dataMatrix2, BasicMesh.MoveX, BasicMesh.MoveY, BasicMesh.MoveZ);//перенос
-                        xr = Matrix4.CreateRotationX(BasicMesh.GetElementRotation(0));
-                        yr = Matrix4.CreateRotationY(BasicMesh.GetElementRotation(1));
-                        zr = Matrix4.CreateRotationZ(BasicMesh.GetElementRotation(2));
+                        Matrix4Translation(dataMatrix2, Figure.MoveX, Figure.MoveY, Figure.MoveZ);//перенос
+                        xr = Matrix4.CreateRotationX(Figure.GetElementRotation(0));
+                        yr = Matrix4.CreateRotationY(Figure.GetElementRotation(1));
+                        zr = Matrix4.CreateRotationZ(Figure.GetElementRotation(2));
                     }
                 }
                 else
                 {
-                    BasicMesh.SetGetElementRotation(Figure.GetElementRotation(0), 0);
-                    BasicMesh.SetGetElementRotation(Figure.GetElementRotation(1), 1);
-                    BasicMesh.SetGetElementRotation(Figure.GetElementRotation(2), 2);
-                    xr = Matrix4.CreateRotationX(BasicMesh.GetElementRotation(0));
-                    yr = Matrix4.CreateRotationY(BasicMesh.GetElementRotation(1));
-                    zr = Matrix4.CreateRotationZ(BasicMesh.GetElementRotation(2));
-                    Matrix4Translation(dataMatrix2, Figure.MoveX, Figure.MoveY, Figure.MoveZ);//перенос  
+                    Figure.SetGetElementRotation(BasicMesh.GetElementRotation(0), 0);
+                    Figure.SetGetElementRotation(BasicMesh.GetElementRotation(1), 1);
+                    Figure.SetGetElementRotation(BasicMesh.GetElementRotation(2), 2);
+                    xr = Matrix4.CreateRotationX(Figure.GetElementRotation(0));
+                    yr = Matrix4.CreateRotationY(Figure.GetElementRotation(1));
+                    zr = Matrix4.CreateRotationZ(Figure.GetElementRotation(2));
+                    Matrix4Translation(dataMatrix2, BasicMesh.MoveX, BasicMesh.MoveY, BasicMesh.MoveZ);//перенос  
                 }
 
                 Matrix4Mul(ref dataMatrix2, Matrix4Trans(zr * yr * xr));
 
-                zf = BasicMesh.GetZoomFactor();
+                zf = Figure.GetZoomFactor();
                 Matrix4Mul(ref dataMatrix2, Matrix4Trans(Matrix4.CreateScale(zf, zf, zf))); // увеличение
                 Matrix4Mul(modelViewProjectionMatrix, ViewProjectionMatrix, dataMatrix2);
 
                 modelViewProjectionMatrixLocation = GL.GetUniformLocation(program, "modelViewProjectionMatrix");
                 GL.UniformMatrix4(modelViewProjectionMatrixLocation, 1, Convert.ToBoolean(All.True), modelViewProjectionMatrix);
-                if (BasicMesh.GetTypeID() != 4)
-                    GL.DrawArrays(PrimitiveType.Triangles, 0, BasicMesh.GetNumberOfVertices());
+                if (Figure.GetTypeID() != 4)
+                    GL.DrawArrays(PrimitiveType.Triangles, 0, Figure.GetNumberOfVertices());
               /*  else //Это отрисовка измерений. Надо переписать под чистую
                 {
                     GL.PointSize(3.0f);
@@ -451,22 +452,72 @@ namespace Stereo_Vision
                 MessageBox.Show(exw.Message);
             }
         }
+        double sred100X = 0;
+        double sred100Y = 0;
+        double sred100Z = 0;
+        private void Load3DModel(string way)
+        {
+            var trPtArrayRead = new TriangPointArray3f();
+            try { PLYReader.ReadBinary(way, ref trPtArrayRead); }
+            catch { }
+           // BCalculateQD.Enabled = false;
+            MeshUtils.FilterLongEdge(ref trPtArrayRead, 0.2);
+            IndexTriplet indexTr = null;
+            uint localMAX1 = trPtArrayRead.GetNumberOfTriangles();
+            uint localMAX2 = trPtArrayRead.GetNumberOfPoints();
+            IndexTriplet[] TriangleModelMass = new IndexTriplet[localMAX1];
+            RGBPointOwnType[] RGBPointsMass = new RGBPointOwnType[localMAX2];
+            RGBPoint3f DataPoint = new RGBPoint3f();
+
+            for (uint i = 0; i < localMAX1; i++)
+            {
+                indexTr = trPtArrayRead.GetTriangle(i);
+                TriangleModelMass[i] = indexTr;
+            }
+
+            for (uint i = 0; i < localMAX2; i++)
+            {
+                RGBPointsMass[i] = new RGBPointOwnType();
+                DataPoint = trPtArrayRead.GetPoint(i);
+                RGBPointsMass[i].X = DataPoint.X;
+                RGBPointsMass[i].Y = DataPoint.Y;
+                RGBPointsMass[i].Z = -DataPoint.Z;
+                RGBPointsMass[i].R = ((double)DataPoint.R) / 255.0;
+                RGBPointsMass[i].G = ((double)DataPoint.G) / 255.0;
+                RGBPointsMass[i].B = ((double)DataPoint.B) / 255.0;
+                sred100X += RGBPointsMass[i].X;
+                sred100Y += RGBPointsMass[i].Y;
+                sred100Z += RGBPointsMass[i].Z;
+            }
+            sred100X = sred100X / localMAX2;
+            sred100Y = sred100Y / localMAX2;
+            sred100Z = sred100Z / localMAX2;
+            for (uint i = 0; i < localMAX2; i++)
+            {
+                RGBPointsMass[i].X -= sred100X;
+                RGBPointsMass[i].Y -= sred100Y;
+                RGBPointsMass[i].Z -= sred100Z;
+            }
+            Figure = new MyMesh(RGBPointsMass, TriangleModelMass);
+            BindTextures();
+           // NeedLoader = false; ChkBModel.Checked = true;
+        }
         private int FindAnObject(float MouseX3D, int MouseY3D)
         {
             Vector3 ray_wor = GetNormalizedRayWor(MouseX3D, MouseY3D);
-            Vector3 O_C = new Vector3(-Figure.MoveX + CameraPosition[0],
-                                      -Figure.MoveY + CameraPosition[1],
-                                      -Figure.MoveZ + CameraPosition[2]);
-            float b2 = ray_wor.X * O_C.X + ray_wor.Y * O_C.Y + ray_wor.Z * O_C.Z;
-            float TR2 = Figure.GetTopRadius() * Figure.GetZoomFactor();
-            float c2 = (float)(O_C.X * O_C.X + O_C.Y * O_C.Y + O_C.Z * O_C.Z) - TR2 * TR2;
-
-            O_C = new Vector3(-BasicMesh.MoveX + CameraPosition[0],
+            Vector3 O_C = new Vector3(-BasicMesh.MoveX + CameraPosition[0],
                                       -BasicMesh.MoveY + CameraPosition[1],
                                       -BasicMesh.MoveZ + CameraPosition[2]);
+            float b2 = ray_wor.X * O_C.X + ray_wor.Y * O_C.Y + ray_wor.Z * O_C.Z;
+            float TR2 = BasicMesh.GetTopRadius() * BasicMesh.GetZoomFactor();
+            float c2 = (float)(O_C.X * O_C.X + O_C.Y * O_C.Y + O_C.Z * O_C.Z) - TR2 * TR2;
+
+            O_C = new Vector3(-Figure.MoveX + CameraPosition[0],
+                                      -Figure.MoveY + CameraPosition[1],
+                                      -Figure.MoveZ + CameraPosition[2]);
 
             float b = ray_wor.X * O_C.X + ray_wor.Y * O_C.Y + ray_wor.Z * O_C.Z;
-            float TR = BasicMesh.GetTopRadius() * BasicMesh.GetZoomFactor();
+            float TR = Figure.GetTopRadius() * Figure.GetZoomFactor();
             float c = (float)(O_C.X * O_C.X + O_C.Y * O_C.Y + O_C.Z * O_C.Z) - TR * TR;
             float Discr2 = b2 * b2 - c2, Discr1 = b * b - c;
             float sDiscr1 = (float)Math.Sqrt(Discr1), sDiscr2 = (float)Math.Sqrt(Discr2);
@@ -476,8 +527,8 @@ namespace Stereo_Vision
             {
                 if ((t1 < t2 ? t1 : t2) < (t3 < t4 ? t3 : t4))
                 {
-                    var Figu = BasicMesh;
-                    BasicMesh.SetGrabParameters(true, t1, t2);
+                    var Figu = Figure;
+                    Figure.SetGrabParameters(true, t1, t2);
                     // MessageBox.Show("Найдено 2 объекта, первый(треугольник) ближе "
                     //   + Triangle.GetGrabPart().ToString());
                     remX = MouseX3D; remY = MouseY3D;
@@ -485,8 +536,8 @@ namespace Stereo_Vision
                 }
                 else
                 {
-                    var Figu = Figure;
-                    Figure.SetGrabParameters(true, t3, t4);
+                    var Figu = BasicMesh;
+                    BasicMesh.SetGrabParameters(true, t3, t4);
                     // MessageBox.Show("Найдено 2 объекта, второй(фигура) ближе "+
                     //     Figure.GetGrabPart().ToString());
                     remX = MouseX3D; remY = MouseY3D;
@@ -495,15 +546,15 @@ namespace Stereo_Vision
             }
             else if (b * b - c >= 0)
             {
-                var Figu = BasicMesh;
-                BasicMesh.SetGrabParameters(true, t1, t2);
+                var Figu = Figure;
+                Figure.SetGrabParameters(true, t1, t2);
                 remX = MouseX3D; remY = MouseY3D;
                 return 1;
             }
             else if (b2 * b2 - c2 >= 0)
             {
-                var Figu = Figure;
-                Figure.SetGrabParameters(true, t3, t4);
+                var Figu = BasicMesh;
+                BasicMesh.SetGrabParameters(true, t3, t4);
                 remX = MouseX3D; remY = MouseY3D;
                 return 2;
             }

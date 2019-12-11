@@ -158,7 +158,7 @@ namespace Stereo_Vision
                 Pan_Pl_Photo.Visible = (ppPlayMode_2set == Modes.Photo);
                 Pan_Pl_3D.Visible = (ppPlayMode_2set == Modes.Models3D);
             }
-            catch
+            catch(Exception exc)
             {
                 /* L_Ex_Mode.Text = L_Ex_mode_text_bkp;
                  TB_Ex_PathFrom.Text = Path_from_bkp;
@@ -226,6 +226,7 @@ namespace Stereo_Vision
         private void View_Model_byIndex(int pIndex)
         {
             System.Windows.Forms.MessageBox.Show(":aaaaa");
+            Load3DModel(Path.Combine(System.Windows.Forms.Application.StartupPath,"Models","demo.ply"));
         }
         private void View_Video_Prev()
         {
