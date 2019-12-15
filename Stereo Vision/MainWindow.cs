@@ -681,8 +681,16 @@ namespace Stereo_Vision
 
         private void PB_MeasurementPB_MouseDown(object sender, MouseEventArgs e)
         {
-            if (!CurrentStereoImage.isLastMeasureOpened()) CurrentStereoImage.NewMeasurement(CurrentMeasureType);
-            else CurrentStereoImage.FindAnyPointUnderMouse(e.Location);
+           //
+            if (!CurrentStereoImage.isLastMeasureOpened())
+            {
+                bool PtFound = CurrentStereoImage.FindAnyPointUnderMouse(e.Location);
+                if (!PtFound)  CurrentStereoImage.NewMeasurement(CurrentMeasureType);
+            }
+            else
+            {
+                
+            }
         }
 
         private void PB_MeasurementPB_DoubleClick(object sender, EventArgs e)
@@ -693,9 +701,20 @@ namespace Stereo_Vision
 
         private void PB_MeasurementPB_MouseUp(object sender, MouseEventArgs e)
         {
-            if (CurrentStereoImage.isLastMeasureOpened())
+            if (!CurrentStereoImage.isLastMeasureOpened())
+            {
+                if(CurrentStereoImage.AnyPointUnderCursor)
+                if (CurrentStereoImage.Point_UnderCursor_grabbed) CurrentStereoImage.Point_Ungrab();
+            }
+            else
+            {
                 CurrentStereoImage.AddPoint_2NewMeasurement(e.X, e.Y);
+            }
             DB_Invalidate();
+        }
+        private void PB_MeasurementPB_MouseMove(object sender, MouseEventArgs e)
+        {
+            CurrentStereoImage.Edit_Grabbed_Point(e.Location);
         }
 
         private void TLP_UserMainPanel_Paint(object sender, PaintEventArgs e)
@@ -760,10 +779,7 @@ namespace Stereo_Vision
             }
         }
 
-        private void PB_MeasurementPB_MouseMove(object sender, MouseEventArgs e)
-        {
-
-        }
+ 
     }
 }
 

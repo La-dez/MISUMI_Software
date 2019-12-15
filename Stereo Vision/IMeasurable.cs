@@ -11,10 +11,12 @@ namespace Stereo_Vision
     public class StereoImage
     {
         public Image BasicImage;
-        public Size SizeOfCtrl;
         public List<Measurement> Measuremets { get { return _Measuremets; } }
         private List<Measurement> _Measuremets { get; set; }
         private Measurement LastMeasurement;
+
+        public int Ctrl_Height { get; private set; }
+        public int Ctrl_Width { get; private set; }
         public int Im_Height { get { return BasicImage.Height; } }
         public int Im_Width { get { return BasicImage.Width; } }
         public float X_ration = 1;
@@ -24,13 +26,17 @@ namespace Stereo_Vision
         public double DetectionRadius_px
         {
             get { return _DetectionRadius_px; }
-            private set { _DetectionRadius_px = value;  DetectionRadius_onCtrl = value * X_ration; }
+            private set { _DetectionRadius_px = value; DetectionRadius_onCtrl = value * X_ration; }
         }
         private double _DetectionRadius_px { get; set; }
 
 
-        public double DetectionRadius_onCtrl { get; private set; } 
-        public dynamic FoundPoint = new { MeasureNumber = -1, PointNumber = -1, isGrabed = false };
+        public double DetectionRadius_onCtrl { get; private set; }
+
+        public bool AnyPointUnderCursor { get; protected set; }
+        public bool Point_UnderCursor_grabbed { get; protected set; }
+        protected int Point_UnderCursor_MeasureNumber { set; get; }
+        protected int Point_UnderCursor_PointNumber { set; get; }
 
 
 
@@ -41,10 +47,11 @@ namespace Stereo_Vision
         public StereoImage(System.Drawing.Bitmap BMP, Size pSizeOfCtrl)
         {
             BasicImage = BMP;
-            SizeOfCtrl = pSizeOfCtrl;
+            Ctrl_Height = pSizeOfCtrl.Height;
+            Ctrl_Width = pSizeOfCtrl.Width;
             CenterOfImg = new Point(pSizeOfCtrl.Width / 2, pSizeOfCtrl.Height / 2);
-            X_ration = (float)SizeOfCtrl.Width / ((float)BasicImage.Width);
-            Y_ration = (float)SizeOfCtrl.Height / ((float)BasicImage.Height);
+            X_ration = (float)Ctrl_Width / ((float)BasicImage.Width);
+            Y_ration = (float)Ctrl_Height / ((float)BasicImage.Height);
             _Measuremets = new List<Measurement>();
             pointFinder = CorrPointFactory.GetSimpleCorrPointFinder(stereoPair);
             // Set distance range (mm)
@@ -55,6 +62,10 @@ namespace Stereo_Vision
             pointFinder.SetSearchRectAddSize(5, 5);
 
             DetectionRadius_px = 5;
+            AnyPointUnderCursor = false;
+            Point_UnderCursor_grabbed = false;
+            Point_UnderCursor_MeasureNumber = -1;
+            Point_UnderCursor_PointNumber = -1;
         }
         public Point2d Transform_Ctrl2Img(float X_ctrl,float Y_ctrl)
         {
@@ -85,7 +96,7 @@ namespace Stereo_Vision
                     }
             }
         }
-        public Point2d FindCorPoint(Point2d PT_left)
+        public Point2d FindCorPoint_onImg(Point2d PT_left)
         {
             Point2d result = new Point2d(0, 0);
             try
@@ -94,26 +105,36 @@ namespace Stereo_Vision
             }
             catch
             {
-                result = new Point2d(PT_left.X + SizeOfCtrl.Width/2, PT_left.Y);
+                result = new Point2d(PT_left.X + Im_Width/2, PT_left.Y);
             }
             return result;
         }
-        public bool FindAnyPointUnderMouse(Point pCursor_coordinates)
+        public bool FindAnyPointUnderMouse(Point pCursor_coordinates, bool NeedGrab = true)
         {
             bool result = false;
-            var Pt_omg = Transform_Ctrl2Img(pCursor_coordinates.X, pCursor_coordinates.Y);
-            var Pt_2d = new Point2d(pCursor_coordinates.X, pCursor_coordinates.Y);
+            var Pt_onImg_cursor_2d = Transform_Ctrl2Img(pCursor_coordinates.X, pCursor_coordinates.Y);
+            var Pt_onCtrl_cursor_2d = new Point2d(pCursor_coordinates.X, pCursor_coordinates.Y);
             for (int i = 0; i < Measuremets.Count(); i++)
             {
-                var found_ind = Measuremets[i].Find_Pt_inRadiusOfPt(Pt_2d, DetectionRadius_px);
+                var found_ind = Measuremets[i].Find_Pt_inRadiusOfPt(Pt_onCtrl_cursor_2d, DetectionRadius_px);
                 if(found_ind != -1)
                 {
-                    FoundPoint = new { MeasureNumber = i, PointNumber = found_ind, isGrabed = false };
+                    AnyPointUnderCursor = true;
+                    Point_UnderCursor_MeasureNumber = i;
+                    Point_UnderCursor_PointNumber = found_ind;
+                    if (NeedGrab) Point_Grab();
                 }
             }
 
             return result;
         }
+        public void Point_Ungrab() => Point_UnderCursor_grabbed = false;
+        public void Point_Grab()
+        {
+            if(AnyPointUnderCursor)
+            Point_UnderCursor_grabbed = true;
+        }
+        
         public void AddPoint_2NewMeasurement(int X_onCtrl_left, int Y_onCtrl_left)
         {
             if (LastMeasurement != null)
@@ -121,7 +142,7 @@ namespace Stereo_Vision
                 Point2d Data_left_onCtrl = new Point2d(X_onCtrl_left, Y_onCtrl_left);
                 Point2d Data_left_onImage = Transform_Ctrl2Img(X_onCtrl_left, Y_onCtrl_left);
                 
-                Point2d Data_right_onImage = FindCorPoint(Data_left_onImage);
+                Point2d Data_right_onImage = FindCorPoint_onImg(Data_left_onImage);
                 Point2d Data_right_onCtrl = Transform_Img2Ctrl(Data_right_onImage.X, Data_right_onImage.Y);
 
                 Point3d Data3D = new Point3d(0,0,0);
@@ -173,14 +194,44 @@ namespace Stereo_Vision
             Point2d Data_left_onImage = Transform_Ctrl2Img(X_onCtrl_left, Y_onCtrl_left);
             Point2d Data_right_onImage = Transform_Ctrl2Img(X_onCtrl_right, Y_onCtrl_right);
             Point3d Data3D = null;
-            stereoPair.Transform(Data_left_onImage, Data_left_onImage, ref Data3D);
+            stereoPair.Transform(Data_left_onImage, Data_right_onImage, ref Data3D);
 
             Special_3D_pt NewPoint = new Special_3D_pt(Data_left_onCtrl, Data_right_onCtrl, Data_left_onImage, Data_right_onImage, Data3D);
             Measuremets[Mes_index].Edit_Point_byIndex(Pt_index, NewPoint);
         }
-        public void Edit_Grabbed_Point(int Mes_index, uint Pt_index, int X_onCtrl_left, int Y_onCtrl_left, int X_onCtrl_right, int Y_onCtrl_right)
+
+        public void Edit_Point_inMeasurement_byIndex(int Mes_index, uint Pt_index, Point2d Pt_onCtrl_left, Point2d Pt_onCtrl_right, Point2d Pt_onIm_left, Point2d Pt_onIm_right)
         {
-           //TODO: 1) Определение, левая или правая координата 2) Автокорреляция , если левая
+            Point3d Data3D = null;
+            stereoPair.Transform(Pt_onIm_left, Pt_onIm_right, ref Data3D);
+            Special_3D_pt NewPoint = new Special_3D_pt(Pt_onCtrl_left, Pt_onCtrl_right, Pt_onIm_left, Pt_onIm_right, Data3D);
+            Measuremets[Mes_index].Edit_Point_byIndex(Pt_index, NewPoint);
+        }
+
+
+        public void Edit_Grabbed_Point(Point NewPosition_ctrl)
+        {
+            //TODO: 2) Автокорреляция , если левая
+            if (Point_UnderCursor_grabbed)
+            {
+                bool OnLeftPart = true;
+                var Pt_on_img = Transform_Ctrl2Img(NewPosition_ctrl.X, NewPosition_ctrl.Y);
+                if (Pt_on_img.X > CenterOfImg.X) OnLeftPart = false;
+
+                if (OnLeftPart)
+                {
+                    var Pt_left_onCtrl = new Point2d(NewPosition_ctrl.X, NewPosition_ctrl.Y);
+                    var Pt_left_onImg = Pt_on_img;
+                    var Pt_right_onImg = FindCorPoint_onImg(Pt_left_onImg);
+                    var Pt_right_onCtrl = Transform_Img2Ctrl(Pt_right_onImg.X, Pt_right_onImg.Y);
+                    Edit_Point_inMeasurement_byIndex(Point_UnderCursor_MeasureNumber, (uint)Point_UnderCursor_PointNumber,
+                        Pt_left_onCtrl, Pt_right_onCtrl, Pt_left_onImg, Pt_right_onImg);
+                }
+                else
+                {
+
+                }
+            }
         }
 
         public void Make_LastMeasurement_Ready()

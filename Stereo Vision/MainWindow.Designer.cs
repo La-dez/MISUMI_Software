@@ -46,14 +46,6 @@ namespace Stereo_Vision
             this.TLP_Pl_PlayerMain = new System.Windows.Forms.TableLayoutPanel();
             this.B_Pl_GoToMain = new System.Windows.Forms.Button();
             this.Pan_Pl_Base_forAnyPLCtrls = new System.Windows.Forms.Panel();
-            this.Pan_Pl_3D = new System.Windows.Forms.Panel();
-            this.TLP_Pl_3D = new System.Windows.Forms.TableLayoutPanel();
-            this.L_Pl_Models_Cur = new System.Windows.Forms.Label();
-            this.L_Pl_Models_All = new System.Windows.Forms.Label();
-            this.TRB_Pl_ModelsLister = new System.Windows.Forms.TrackBar();
-            this.label16 = new System.Windows.Forms.Label();
-            this.B_Pl_ModelPrevious = new System.Windows.Forms.Button();
-            this.B_Pl_ModelNext = new System.Windows.Forms.Button();
             this.Pan_Pl_Photo = new System.Windows.Forms.Panel();
             this.TLP_Pl_Photo = new System.Windows.Forms.TableLayoutPanel();
             this.B_Pl_Photo_Measure = new System.Windows.Forms.Button();
@@ -63,6 +55,14 @@ namespace Stereo_Vision
             this.L_Pl_PhotoPlayerName = new System.Windows.Forms.Label();
             this.B_Pl_PhotoPrevious = new System.Windows.Forms.Button();
             this.B_Pl_PhotoNext = new System.Windows.Forms.Button();
+            this.Pan_Pl_3D = new System.Windows.Forms.Panel();
+            this.TLP_Pl_3D = new System.Windows.Forms.TableLayoutPanel();
+            this.L_Pl_Models_Cur = new System.Windows.Forms.Label();
+            this.L_Pl_Models_All = new System.Windows.Forms.Label();
+            this.TRB_Pl_ModelsLister = new System.Windows.Forms.TrackBar();
+            this.label16 = new System.Windows.Forms.Label();
+            this.B_Pl_ModelPrevious = new System.Windows.Forms.Button();
+            this.B_Pl_ModelNext = new System.Windows.Forms.Button();
             this.Pan_Pl_Video = new System.Windows.Forms.Panel();
             this.TLP_Pl_Video = new System.Windows.Forms.TableLayoutPanel();
             this.B_Pl_VideoNext = new System.Windows.Forms.Button();
@@ -176,12 +176,12 @@ namespace Stereo_Vision
             this.Pan_Player.SuspendLayout();
             this.TLP_Pl_PlayerMain.SuspendLayout();
             this.Pan_Pl_Base_forAnyPLCtrls.SuspendLayout();
-            this.Pan_Pl_3D.SuspendLayout();
-            this.TLP_Pl_3D.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.TRB_Pl_ModelsLister)).BeginInit();
             this.Pan_Pl_Photo.SuspendLayout();
             this.TLP_Pl_Photo.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.TRB_Pl_PhotoLister)).BeginInit();
+            this.Pan_Pl_3D.SuspendLayout();
+            this.TLP_Pl_3D.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.TRB_Pl_ModelsLister)).BeginInit();
             this.Pan_Pl_Video.SuspendLayout();
             this.TLP_Pl_Video.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.TRB_Pl_VideoTimer)).BeginInit();
@@ -432,140 +432,6 @@ namespace Stereo_Vision
             this.Pan_Pl_Base_forAnyPLCtrls.Size = new System.Drawing.Size(654, 97);
             this.Pan_Pl_Base_forAnyPLCtrls.TabIndex = 10;
             // 
-            // Pan_Pl_3D
-            // 
-            this.Pan_Pl_3D.BackColor = System.Drawing.Color.Black;
-            this.Pan_Pl_3D.Controls.Add(this.TLP_Pl_3D);
-            this.Pan_Pl_3D.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.Pan_Pl_3D.Location = new System.Drawing.Point(0, 0);
-            this.Pan_Pl_3D.Margin = new System.Windows.Forms.Padding(0);
-            this.Pan_Pl_3D.Name = "Pan_Pl_3D";
-            this.Pan_Pl_3D.Size = new System.Drawing.Size(654, 97);
-            this.Pan_Pl_3D.TabIndex = 10;
-            // 
-            // TLP_Pl_3D
-            // 
-            this.TLP_Pl_3D.ColumnCount = 8;
-            this.TLP_Pl_3D.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
-            this.TLP_Pl_3D.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
-            this.TLP_Pl_3D.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
-            this.TLP_Pl_3D.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
-            this.TLP_Pl_3D.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
-            this.TLP_Pl_3D.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
-            this.TLP_Pl_3D.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
-            this.TLP_Pl_3D.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
-            this.TLP_Pl_3D.Controls.Add(this.L_Pl_Models_Cur, 0, 1);
-            this.TLP_Pl_3D.Controls.Add(this.L_Pl_Models_All, 7, 1);
-            this.TLP_Pl_3D.Controls.Add(this.TRB_Pl_ModelsLister, 1, 1);
-            this.TLP_Pl_3D.Controls.Add(this.label16, 2, 0);
-            this.TLP_Pl_3D.Controls.Add(this.B_Pl_ModelPrevious, 0, 2);
-            this.TLP_Pl_3D.Controls.Add(this.B_Pl_ModelNext, 4, 2);
-            this.TLP_Pl_3D.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.TLP_Pl_3D.Location = new System.Drawing.Point(0, 0);
-            this.TLP_Pl_3D.Margin = new System.Windows.Forms.Padding(0);
-            this.TLP_Pl_3D.Name = "TLP_Pl_3D";
-            this.TLP_Pl_3D.RowCount = 4;
-            this.TLP_Pl_3D.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.TLP_Pl_3D.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.TLP_Pl_3D.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.TLP_Pl_3D.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.TLP_Pl_3D.Size = new System.Drawing.Size(654, 97);
-            this.TLP_Pl_3D.TabIndex = 0;
-            // 
-            // L_Pl_Models_Cur
-            // 
-            this.L_Pl_Models_Cur.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.L_Pl_Models_Cur.AutoSize = true;
-            this.L_Pl_Models_Cur.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.L_Pl_Models_Cur.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.L_Pl_Models_Cur.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.L_Pl_Models_Cur.Location = new System.Drawing.Point(4, 24);
-            this.L_Pl_Models_Cur.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.L_Pl_Models_Cur.Name = "L_Pl_Models_Cur";
-            this.L_Pl_Models_Cur.Size = new System.Drawing.Size(73, 24);
-            this.L_Pl_Models_Cur.TabIndex = 12;
-            this.L_Pl_Models_Cur.Text = "0";
-            this.L_Pl_Models_Cur.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // L_Pl_Models_All
-            // 
-            this.L_Pl_Models_All.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.L_Pl_Models_All.AutoSize = true;
-            this.L_Pl_Models_All.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.L_Pl_Models_All.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.L_Pl_Models_All.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.L_Pl_Models_All.Location = new System.Drawing.Point(571, 24);
-            this.L_Pl_Models_All.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.L_Pl_Models_All.Name = "L_Pl_Models_All";
-            this.L_Pl_Models_All.Size = new System.Drawing.Size(79, 24);
-            this.L_Pl_Models_All.TabIndex = 13;
-            this.L_Pl_Models_All.Text = "999";
-            this.L_Pl_Models_All.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // TRB_Pl_ModelsLister
-            // 
-            this.TRB_Pl_ModelsLister.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.TRB_Pl_ModelsLister.AutoSize = false;
-            this.TLP_Pl_3D.SetColumnSpan(this.TRB_Pl_ModelsLister, 6);
-            this.TRB_Pl_ModelsLister.Location = new System.Drawing.Point(81, 24);
-            this.TRB_Pl_ModelsLister.Margin = new System.Windows.Forms.Padding(0);
-            this.TRB_Pl_ModelsLister.Maximum = 100;
-            this.TRB_Pl_ModelsLister.Name = "TRB_Pl_ModelsLister";
-            this.TRB_Pl_ModelsLister.Size = new System.Drawing.Size(486, 24);
-            this.TRB_Pl_ModelsLister.TabIndex = 10;
-            this.TRB_Pl_ModelsLister.TickStyle = System.Windows.Forms.TickStyle.None;
-            this.TRB_Pl_ModelsLister.Scroll += new System.EventHandler(this.TRB_Pl_ModelsLister_Scroll);
-            // 
-            // label16
-            // 
-            this.label16.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.label16.AutoSize = true;
-            this.label16.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.TLP_Pl_3D.SetColumnSpan(this.label16, 4);
-            this.label16.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label16.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.label16.Location = new System.Drawing.Point(162, 0);
-            this.label16.Margin = new System.Windows.Forms.Padding(0);
-            this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(324, 24);
-            this.label16.TabIndex = 7;
-            this.label16.Text = "Просмотр 3D моделей";
-            this.label16.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // B_Pl_ModelPrevious
-            // 
-            this.B_Pl_ModelPrevious.BackColor = System.Drawing.Color.Black;
-            this.B_Pl_ModelPrevious.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("B_Pl_ModelPrevious.BackgroundImage")));
-            this.B_Pl_ModelPrevious.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.TLP_Pl_3D.SetColumnSpan(this.B_Pl_ModelPrevious, 4);
-            this.B_Pl_ModelPrevious.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.B_Pl_ModelPrevious.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.B_Pl_ModelPrevious.Location = new System.Drawing.Point(0, 48);
-            this.B_Pl_ModelPrevious.Margin = new System.Windows.Forms.Padding(0);
-            this.B_Pl_ModelPrevious.Name = "B_Pl_ModelPrevious";
-            this.TLP_Pl_3D.SetRowSpan(this.B_Pl_ModelPrevious, 2);
-            this.B_Pl_ModelPrevious.Size = new System.Drawing.Size(324, 49);
-            this.B_Pl_ModelPrevious.TabIndex = 10;
-            this.B_Pl_ModelPrevious.UseVisualStyleBackColor = false;
-            this.B_Pl_ModelPrevious.Click += new System.EventHandler(this.B_Pl_ModelPrevious_Click);
-            // 
-            // B_Pl_ModelNext
-            // 
-            this.B_Pl_ModelNext.BackColor = System.Drawing.Color.Black;
-            this.B_Pl_ModelNext.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("B_Pl_ModelNext.BackgroundImage")));
-            this.B_Pl_ModelNext.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.TLP_Pl_3D.SetColumnSpan(this.B_Pl_ModelNext, 4);
-            this.B_Pl_ModelNext.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.B_Pl_ModelNext.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.B_Pl_ModelNext.Location = new System.Drawing.Point(324, 48);
-            this.B_Pl_ModelNext.Margin = new System.Windows.Forms.Padding(0);
-            this.B_Pl_ModelNext.Name = "B_Pl_ModelNext";
-            this.TLP_Pl_3D.SetRowSpan(this.B_Pl_ModelNext, 2);
-            this.B_Pl_ModelNext.Size = new System.Drawing.Size(330, 49);
-            this.B_Pl_ModelNext.TabIndex = 11;
-            this.B_Pl_ModelNext.UseVisualStyleBackColor = false;
-            this.B_Pl_ModelNext.Click += new System.EventHandler(this.B_Pl_ModelNext_Click);
-            // 
             // Pan_Pl_Photo
             // 
             this.Pan_Pl_Photo.BackColor = System.Drawing.Color.Black;
@@ -721,6 +587,140 @@ namespace Stereo_Vision
             this.B_Pl_PhotoNext.TabIndex = 11;
             this.B_Pl_PhotoNext.UseVisualStyleBackColor = false;
             this.B_Pl_PhotoNext.Click += new System.EventHandler(this.B_Pl_PhotoNext_Click);
+            // 
+            // Pan_Pl_3D
+            // 
+            this.Pan_Pl_3D.BackColor = System.Drawing.Color.Black;
+            this.Pan_Pl_3D.Controls.Add(this.TLP_Pl_3D);
+            this.Pan_Pl_3D.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.Pan_Pl_3D.Location = new System.Drawing.Point(0, 0);
+            this.Pan_Pl_3D.Margin = new System.Windows.Forms.Padding(0);
+            this.Pan_Pl_3D.Name = "Pan_Pl_3D";
+            this.Pan_Pl_3D.Size = new System.Drawing.Size(654, 97);
+            this.Pan_Pl_3D.TabIndex = 10;
+            // 
+            // TLP_Pl_3D
+            // 
+            this.TLP_Pl_3D.ColumnCount = 8;
+            this.TLP_Pl_3D.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
+            this.TLP_Pl_3D.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
+            this.TLP_Pl_3D.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
+            this.TLP_Pl_3D.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
+            this.TLP_Pl_3D.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
+            this.TLP_Pl_3D.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
+            this.TLP_Pl_3D.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
+            this.TLP_Pl_3D.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
+            this.TLP_Pl_3D.Controls.Add(this.L_Pl_Models_Cur, 0, 1);
+            this.TLP_Pl_3D.Controls.Add(this.L_Pl_Models_All, 7, 1);
+            this.TLP_Pl_3D.Controls.Add(this.TRB_Pl_ModelsLister, 1, 1);
+            this.TLP_Pl_3D.Controls.Add(this.label16, 2, 0);
+            this.TLP_Pl_3D.Controls.Add(this.B_Pl_ModelPrevious, 0, 2);
+            this.TLP_Pl_3D.Controls.Add(this.B_Pl_ModelNext, 4, 2);
+            this.TLP_Pl_3D.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.TLP_Pl_3D.Location = new System.Drawing.Point(0, 0);
+            this.TLP_Pl_3D.Margin = new System.Windows.Forms.Padding(0);
+            this.TLP_Pl_3D.Name = "TLP_Pl_3D";
+            this.TLP_Pl_3D.RowCount = 4;
+            this.TLP_Pl_3D.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.TLP_Pl_3D.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.TLP_Pl_3D.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.TLP_Pl_3D.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.TLP_Pl_3D.Size = new System.Drawing.Size(654, 97);
+            this.TLP_Pl_3D.TabIndex = 0;
+            // 
+            // L_Pl_Models_Cur
+            // 
+            this.L_Pl_Models_Cur.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.L_Pl_Models_Cur.AutoSize = true;
+            this.L_Pl_Models_Cur.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.L_Pl_Models_Cur.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.L_Pl_Models_Cur.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            this.L_Pl_Models_Cur.Location = new System.Drawing.Point(4, 24);
+            this.L_Pl_Models_Cur.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.L_Pl_Models_Cur.Name = "L_Pl_Models_Cur";
+            this.L_Pl_Models_Cur.Size = new System.Drawing.Size(73, 24);
+            this.L_Pl_Models_Cur.TabIndex = 12;
+            this.L_Pl_Models_Cur.Text = "0";
+            this.L_Pl_Models_Cur.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // L_Pl_Models_All
+            // 
+            this.L_Pl_Models_All.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.L_Pl_Models_All.AutoSize = true;
+            this.L_Pl_Models_All.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.L_Pl_Models_All.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.L_Pl_Models_All.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            this.L_Pl_Models_All.Location = new System.Drawing.Point(571, 24);
+            this.L_Pl_Models_All.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.L_Pl_Models_All.Name = "L_Pl_Models_All";
+            this.L_Pl_Models_All.Size = new System.Drawing.Size(79, 24);
+            this.L_Pl_Models_All.TabIndex = 13;
+            this.L_Pl_Models_All.Text = "999";
+            this.L_Pl_Models_All.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // TRB_Pl_ModelsLister
+            // 
+            this.TRB_Pl_ModelsLister.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.TRB_Pl_ModelsLister.AutoSize = false;
+            this.TLP_Pl_3D.SetColumnSpan(this.TRB_Pl_ModelsLister, 6);
+            this.TRB_Pl_ModelsLister.Location = new System.Drawing.Point(81, 24);
+            this.TRB_Pl_ModelsLister.Margin = new System.Windows.Forms.Padding(0);
+            this.TRB_Pl_ModelsLister.Maximum = 100;
+            this.TRB_Pl_ModelsLister.Name = "TRB_Pl_ModelsLister";
+            this.TRB_Pl_ModelsLister.Size = new System.Drawing.Size(486, 24);
+            this.TRB_Pl_ModelsLister.TabIndex = 10;
+            this.TRB_Pl_ModelsLister.TickStyle = System.Windows.Forms.TickStyle.None;
+            this.TRB_Pl_ModelsLister.Scroll += new System.EventHandler(this.TRB_Pl_ModelsLister_Scroll);
+            // 
+            // label16
+            // 
+            this.label16.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.label16.AutoSize = true;
+            this.label16.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.TLP_Pl_3D.SetColumnSpan(this.label16, 4);
+            this.label16.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.label16.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            this.label16.Location = new System.Drawing.Point(162, 0);
+            this.label16.Margin = new System.Windows.Forms.Padding(0);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(324, 24);
+            this.label16.TabIndex = 7;
+            this.label16.Text = "Просмотр 3D моделей";
+            this.label16.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // B_Pl_ModelPrevious
+            // 
+            this.B_Pl_ModelPrevious.BackColor = System.Drawing.Color.Black;
+            this.B_Pl_ModelPrevious.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("B_Pl_ModelPrevious.BackgroundImage")));
+            this.B_Pl_ModelPrevious.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.TLP_Pl_3D.SetColumnSpan(this.B_Pl_ModelPrevious, 4);
+            this.B_Pl_ModelPrevious.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.B_Pl_ModelPrevious.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.B_Pl_ModelPrevious.Location = new System.Drawing.Point(0, 48);
+            this.B_Pl_ModelPrevious.Margin = new System.Windows.Forms.Padding(0);
+            this.B_Pl_ModelPrevious.Name = "B_Pl_ModelPrevious";
+            this.TLP_Pl_3D.SetRowSpan(this.B_Pl_ModelPrevious, 2);
+            this.B_Pl_ModelPrevious.Size = new System.Drawing.Size(324, 49);
+            this.B_Pl_ModelPrevious.TabIndex = 10;
+            this.B_Pl_ModelPrevious.UseVisualStyleBackColor = false;
+            this.B_Pl_ModelPrevious.Click += new System.EventHandler(this.B_Pl_ModelPrevious_Click);
+            // 
+            // B_Pl_ModelNext
+            // 
+            this.B_Pl_ModelNext.BackColor = System.Drawing.Color.Black;
+            this.B_Pl_ModelNext.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("B_Pl_ModelNext.BackgroundImage")));
+            this.B_Pl_ModelNext.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.TLP_Pl_3D.SetColumnSpan(this.B_Pl_ModelNext, 4);
+            this.B_Pl_ModelNext.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.B_Pl_ModelNext.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.B_Pl_ModelNext.Location = new System.Drawing.Point(324, 48);
+            this.B_Pl_ModelNext.Margin = new System.Windows.Forms.Padding(0);
+            this.B_Pl_ModelNext.Name = "B_Pl_ModelNext";
+            this.TLP_Pl_3D.SetRowSpan(this.B_Pl_ModelNext, 2);
+            this.B_Pl_ModelNext.Size = new System.Drawing.Size(330, 49);
+            this.B_Pl_ModelNext.TabIndex = 11;
+            this.B_Pl_ModelNext.UseVisualStyleBackColor = false;
+            this.B_Pl_ModelNext.Click += new System.EventHandler(this.B_Pl_ModelNext_Click);
             // 
             // Pan_Pl_Video
             // 
@@ -2400,14 +2400,14 @@ namespace Stereo_Vision
             this.Pan_Player.ResumeLayout(false);
             this.TLP_Pl_PlayerMain.ResumeLayout(false);
             this.Pan_Pl_Base_forAnyPLCtrls.ResumeLayout(false);
-            this.Pan_Pl_3D.ResumeLayout(false);
-            this.TLP_Pl_3D.ResumeLayout(false);
-            this.TLP_Pl_3D.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.TRB_Pl_ModelsLister)).EndInit();
             this.Pan_Pl_Photo.ResumeLayout(false);
             this.TLP_Pl_Photo.ResumeLayout(false);
             this.TLP_Pl_Photo.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.TRB_Pl_PhotoLister)).EndInit();
+            this.Pan_Pl_3D.ResumeLayout(false);
+            this.TLP_Pl_3D.ResumeLayout(false);
+            this.TLP_Pl_3D.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.TRB_Pl_ModelsLister)).EndInit();
             this.Pan_Pl_Video.ResumeLayout(false);
             this.TLP_Pl_Video.ResumeLayout(false);
             this.TLP_Pl_Video.PerformLayout();
