@@ -1,0 +1,46 @@
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x64\Release\concrt140.dll
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x64\Release\msvcp140.dll
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x64\Release\opencv_ffmpeg341_64.dll
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x64\Release\vcruntime140.dll
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x64\Release\x64\concrt140.dll
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x64\Release\x64\cvextern.dll
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x64\Release\x64\msvcp140.dll
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x64\Release\x64\opencv_ffmpeg341_64.dll
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x64\Release\x64\vcruntime140.dll
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x64\Release\HDVision.exe.config
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x64\Release\HDVision.exe
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x64\Release\Emgu.CV.UI.dll
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x64\Release\Emgu.CV.World.dll
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x64\Release\OpenTK.dll
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x64\Release\OpenTK.GLControl.dll
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x64\Release\ZedGraph.dll
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x64\Release\Emgu.CV.UI.xml
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x64\Release\Emgu.CV.World.xml
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x64\Release\OpenTK.pdb
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x64\Release\OpenTK.xml
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x64\Release\OpenTK.GLControl.pdb
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x64\Release\OpenTK.GLControl.xml
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x64\Release\ZedGraph.xml
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x64\Release\de\ZedGraph.resources.dll
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x64\Release\es\ZedGraph.resources.dll
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x64\Release\fr\ZedGraph.resources.dll
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x64\Release\hu\ZedGraph.resources.dll
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x64\Release\it\ZedGraph.resources.dll
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x64\Release\ja\ZedGraph.resources.dll
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x64\Release\pt\ZedGraph.resources.dll
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x64\Release\ru\ZedGraph.resources.dll
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x64\Release\sk\ZedGraph.resources.dll
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x64\Release\sv\ZedGraph.resources.dll
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x64\Release\tr\ZedGraph.resources.dll
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x64\Release\zh-cn\ZedGraph.resources.dll
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x64\Release\zh-tw\ZedGraph.resources.dll
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\obj\x64\Release\Stereo_Vision.Export_files_form.resources
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\obj\x64\Release\Stereo_Vision.MainWindow.resources
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\obj\x64\Release\Stereo_Vision.Properties.Resources.resources
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\obj\x64\Release\Stereo Vision.csproj.GenerateResource.cache
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\obj\x64\Release\Stereo Vision.csproj.CoreCompileInputs.cache
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\obj\x64\Release\Stereo Vision.csproj.CopyComplete
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\obj\x64\Release\HDVision.exe
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x64\Release\HDVision.pdb
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\obj\x64\Release\HDVision.pdb
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\obj\x64\Release\Stereo Vision.csprojAssemblyReference.cache

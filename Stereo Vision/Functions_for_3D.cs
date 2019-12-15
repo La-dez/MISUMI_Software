@@ -387,11 +387,7 @@ namespace Stereo_Vision
                 catch
                 { }
             }*/
-
-            foreach (Control ctrl in Controls)
-            {
-                ctrl.Visible = false;
-            }
+          
             try
             {
               /*  OTK_3D_Control.Visible = true; ExitBut.Visible = true;
@@ -452,9 +448,190 @@ namespace Stereo_Vision
                 MessageBox.Show(exw.Message);
             }
         }
+
         double sred100X = 0;
         double sred100Y = 0;
         double sred100Z = 0;
+        private MyMesh BuildModel3D(System.ComponentModel.BackgroundWorker bw, Image image,bool IsPrism)
+        {
+            LogMessage("Начало построения 3D...");      
+            bool bDenseStereoCorrTestPassed = true;
+            ICameraPair stereoPair = null;
+            Bitmap img = null;
+            IStereoDenseEstimator stereoEstimator = null;
+            System.Drawing.Imaging.PixelFormat PxForm = System.Drawing.Imaging.PixelFormat.Format24bppRgb;
+            var trPtArray = new TriangPointArray3f();
+            IndexTriplet[] TriangleModelMass;
+            RGBPointOwnType[] RGBPointsMass;
+            string cfgFilePath = IsPrism ? "M5_chess_shiftM11.xml": "M1_chess.xml";
+            MyMesh result = null;
+
+            if (!bw.CancellationPending)
+            {
+                // Load image
+                try
+                {
+                    img = (Bitmap)image;
+                    if (img.PixelFormat != System.Drawing.Imaging.PixelFormat.Format24bppRgb)
+                    { img = img.Clone(new Rectangle(0, 0, img.Width, img.Height), PxForm); }
+                }
+                catch
+                {
+                   throw new Exception("Ошибка на этапе загрузки изображения.\nПостроение 3D модели завершено с ошибкой.");
+                }
+                // Read camera pair parameters from XML file
+
+                try
+                { stereoPair = XMLLoader.ReadCameraPair(cfgFilePath); }
+                catch
+                {
+                   throw new Exception("Ошибка на этапе чтения калибровочного файла.\nПостроение 3D модели завершено с ошибкой.");
+                }
+                LogMessage("Загрузка изображения и калибровки успешна!");
+               // SetProgress(10);
+            }
+
+            if (stereoPair == null)
+            {
+                throw new Exception("Can't read XML file.");              
+            }
+            else
+            {
+                if (!bw.CancellationPending)
+                {
+                    LogMessage("Загрузка файла stereo_params.xml");
+                    // Set ROI (region of interest)
+
+                    int GRPX_x2 = GRPX * 2;
+
+                    int ROI_w = image.Width/2 - GRPX_x2;
+                    int ROI_h = image.Height - GRPX_x2;
+                 /*   var rectROI1 = new Rect2d(GRPX, GRPX, ROI_w, ROI_h);
+                    var rectROI2 = new Rect2d(GRPX, image.Width / 2 + GRPX, ROI_w, ROI_h);*/
+                    var rectROI1 = new Rect2d(40.0, 40.0, 560.0, 640.0);
+                    var rectROI2 = new Rect2d(40.0, 680.0, 550.0, 640.0);
+
+                    // Initialize stereo correspondence finder
+                    if (IsPrism)
+                    {
+                        var zPlane = new Plane3d(new Point3d(0.0, 0.0, 1.0), -14.0);
+                        stereoEstimator = StereoDenseCorrFactory.GetRectifStereoDenseEstimator(stereoPair, rectROI1, rectROI2, zPlane);
+                    }
+                    else
+                    {
+                        stereoEstimator = StereoDenseCorrFactory.GetRectifStereoDenseEstimator(stereoPair, rectROI1, rectROI2);
+                    }
+                    // Load parameters from file
+                    bDenseStereoCorrTestPassed = bDenseStereoCorrTestPassed && stereoEstimator.ReadParam("stereo_params.xml");
+                    // Set distance range (mm)
+                    //  stereoEstimator.SetZDiap(5.0, 15.00);//17+-
+                    stereoEstimator.SetZDiap(10.0, 60.00);//17+-
+                    System.Threading.Thread.Sleep(200);//little fix
+                                                       //  SetProgress(15);
+                }
+                else return null;
+
+                if (!bw.CancellationPending)
+                {
+                    // Find triangle mesh
+                    LogMessage("Построение триангуляционной модели....");
+                    trPtArray = new TriangPointArray3f();
+                    try
+                    {
+                        bDenseStereoCorrTestPassed = bDenseStereoCorrTestPassed && stereoEstimator.Find(img, ref trPtArray);
+                        LogMessage("Модель построена!");
+                        //SetProgress(30);
+                    }//
+                    catch (Exception exc)
+                    {
+                        LogMessage("Ошибка при построении модели");
+                        throw exc;
+                        //return false;
+                    }
+                    // Filter
+                    // Delete triangles with edges longer than 0.2
+                    LogMessage("Применение фильтров...");
+                  //  MeshUtils.FilterLongEdge(ref trPtArray, 0.2);
+                    LogMessage("Фильтры применены!");
+                    // SetProgress(40);
+                }
+                else return null;
+
+                // Save to ply file
+                try
+                {
+                    LogMessage("Сохранение модели в память...");
+                    uint Num_of_Triangles = trPtArray.GetNumberOfTriangles();
+                    uint Num_of_Pts = trPtArray.GetNumberOfPoints();
+                    TriangleModelMass = new IndexTriplet[Num_of_Triangles];
+                    RGBPointsMass = new RGBPointOwnType[Num_of_Pts];
+
+                    RGBPoint3f DataPoint = null;
+                    if (!bw.CancellationPending)
+                    {
+                        for (uint i = 0; i < Num_of_Triangles; i++)
+                        {
+                            TriangleModelMass[i] = trPtArray.GetTriangle(i);
+                        }
+                    }
+                    else return null;
+
+                    if (!bw.CancellationPending)
+                    {
+                        LogMessage("Вычисление цветовых и пространственных координат...");
+                        for (uint i = 0; i < Num_of_Pts; i++)
+                        {
+                            //Написал собственный каст типов. По факту, нужен для перегонки rgb из byte в double
+                            RGBPointsMass[i] = (RGBPointOwnType)trPtArray.GetPoint(i);
+                            RGBPointsMass[i].Z = -RGBPointsMass[i].Z;
+                            //попутно вычисляем центр
+                            sred100X += RGBPointsMass[i].X;
+                            sred100Y += RGBPointsMass[i].Y;
+                            sred100Z += RGBPointsMass[i].Z;
+                        }
+                        //вычисляем....
+                        sred100X = sred100X / Num_of_Pts;
+                        sred100Y = sred100Y / Num_of_Pts;
+                        sred100Z = sred100Z / Num_of_Pts;
+                        //центрируем
+                        for (uint i = 0; i < Num_of_Pts; i++)
+                        {
+                            RGBPointsMass[i].X -= sred100X;
+                            RGBPointsMass[i].Y -= sred100Y;
+                            RGBPointsMass[i].Z -= sred100Z;
+                        }
+                        LogMessage("Вычисление цветовых и пространственных координат...");
+                    }
+
+                    if (!bw.CancellationPending)
+                    {
+                        LogMessage("Создание модели для отрисовки...");
+                        // SetProgress(95);                      
+                        result = new MyMesh(RGBPointsMass, TriangleModelMass);
+                        LogMessage("Запись файла модели(PLY)");
+
+                        string datename = GetTimeString();
+                        PLYWriter.SaveBinary(datename + ".ply", trPtArray);
+                        //bDenseStereoCorrTestPassed = bDenseStereoCorrTestPassed; //&&
+
+                        //SetProgress(100);
+                    }
+                    else return null;
+                }
+                catch (Exception exc)
+                { throw exc; }
+
+                if (bDenseStereoCorrTestPassed)
+                {
+                    LogMessage("Готово");
+                }
+                else
+                {
+                    throw new Exception("Построение 3D модели завершено с ошибкой");
+                }
+            }
+            return result;
+        }
         private void Load3DModel(string way)
         {
             var trPtArrayRead = new TriangPointArray3f();

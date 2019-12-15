@@ -12,16 +12,30 @@ namespace Stereo_Vision
     {
         public Image BasicImage;
         public Size SizeOfCtrl;
-        public List<IMeasurable> Measuremets { get { return _Measuremets; } }
-        private List<IMeasurable> _Measuremets { get; set; }
-        private IMeasurable LastMeasurement;
-        public float Im_Height { get { return BasicImage.Height; } }
-        public float Im_Width { get { return BasicImage.Width; } }
+        public List<Measurement> Measuremets { get { return _Measuremets; } }
+        private List<Measurement> _Measuremets { get; set; }
+        private Measurement LastMeasurement;
+        public int Im_Height { get { return BasicImage.Height; } }
+        public int Im_Width { get { return BasicImage.Width; } }
         public float X_ration = 1;
         public float Y_ration = 1;
         public Point CenterOfImg;
-        //all the math
-        ICameraPair stereoPair = XMLLoader.ReadCameraPair("CalibRes_Model1_GE250216_chess.xml");
+
+        public double DetectionRadius_px
+        {
+            get { return _DetectionRadius_px; }
+            private set { _DetectionRadius_px = value;  DetectionRadius_onCtrl = value * X_ration; }
+        }
+        private double _DetectionRadius_px { get; set; }
+
+
+        public double DetectionRadius_onCtrl { get; private set; } 
+        public dynamic FoundPoint = new { MeasureNumber = -1, PointNumber = -1, isGrabed = false };
+
+
+
+    //all the math
+    ICameraPair stereoPair = XMLLoader.ReadCameraPair("M1_chess.xml");
         ISimpleCorrPointFinder pointFinder;
 
         public StereoImage(System.Drawing.Bitmap BMP, Size pSizeOfCtrl)
@@ -31,7 +45,7 @@ namespace Stereo_Vision
             CenterOfImg = new Point(pSizeOfCtrl.Width / 2, pSizeOfCtrl.Height / 2);
             X_ration = (float)SizeOfCtrl.Width / ((float)BasicImage.Width);
             Y_ration = (float)SizeOfCtrl.Height / ((float)BasicImage.Height);
-            _Measuremets = new List<IMeasurable>();
+            _Measuremets = new List<Measurement>();
             pointFinder = CorrPointFactory.GetSimpleCorrPointFinder(stereoPair);
             // Set distance range (mm)
             pointFinder.SetZDiap(10.0, 40.0, 2.0);
@@ -39,6 +53,8 @@ namespace Stereo_Vision
             pointFinder.SetWindowSize(21, 21);
             // Set search rectangle size
             pointFinder.SetSearchRectAddSize(5, 5);
+
+            DetectionRadius_px = 5;
         }
         public Point2d Transform_Ctrl2Img(float X_ctrl,float Y_ctrl)
         {
@@ -80,6 +96,22 @@ namespace Stereo_Vision
             {
                 result = new Point2d(PT_left.X + SizeOfCtrl.Width/2, PT_left.Y);
             }
+            return result;
+        }
+        public bool FindAnyPointUnderMouse(Point pCursor_coordinates)
+        {
+            bool result = false;
+            var Pt_omg = Transform_Ctrl2Img(pCursor_coordinates.X, pCursor_coordinates.Y);
+            var Pt_2d = new Point2d(pCursor_coordinates.X, pCursor_coordinates.Y);
+            for (int i = 0; i < Measuremets.Count(); i++)
+            {
+                var found_ind = Measuremets[i].Find_Pt_inRadiusOfPt(Pt_2d, DetectionRadius_px);
+                if(found_ind != -1)
+                {
+                    FoundPoint = new { MeasureNumber = i, PointNumber = found_ind, isGrabed = false };
+                }
+            }
+
             return result;
         }
         public void AddPoint_2NewMeasurement(int X_onCtrl_left, int Y_onCtrl_left)
@@ -126,15 +158,15 @@ namespace Stereo_Vision
                 }
             }
         }
-        public bool isMeasureOpened()
+        public bool isLastMeasureOpened()
         {
             return (LastMeasurement != null);
         }
-        public bool isMeasure_supportsClose()
+        public bool isLastMeasure_supportsClose()
         {
             return LastMeasurement.GetType().GetInterfaces().Contains(typeof(IMeasurementClosable));
         }
-        public void EditPoint_inMeasurement_byIndex(int Mes_index, uint Pt_index, int X_onCtrl_left, int Y_onCtrl_left, int X_onCtrl_right, int Y_onCtrl_right)
+        public void Edit_Point_inMeasurement_byIndex(int Mes_index, uint Pt_index, int X_onCtrl_left, int Y_onCtrl_left, int X_onCtrl_right, int Y_onCtrl_right)
         {
             Point2d Data_left_onCtrl = new Point2d(X_onCtrl_left, Y_onCtrl_left);
             Point2d Data_right_onCtrl = new Point2d(X_onCtrl_right, Y_onCtrl_right);
@@ -146,10 +178,14 @@ namespace Stereo_Vision
             Special_3D_pt NewPoint = new Special_3D_pt(Data_left_onCtrl, Data_right_onCtrl, Data_left_onImage, Data_right_onImage, Data3D);
             Measuremets[Mes_index].Edit_Point_byIndex(Pt_index, NewPoint);
         }
+        public void Edit_Grabbed_Point(int Mes_index, uint Pt_index, int X_onCtrl_left, int Y_onCtrl_left, int X_onCtrl_right, int Y_onCtrl_right)
+        {
+           //TODO: 1) Определение, левая или правая координата 2) Автокорреляция , если левая
+        }
 
         public void Make_LastMeasurement_Ready()
         {
-            if(isMeasure_supportsClose()) //Эта строка узнает, реализует ли данное измерение интерфейс IMeasurementClosable
+            if(isLastMeasure_supportsClose()) //Эта строка узнает, реализует ли данное измерение интерфейс IMeasurementClosable
             {
                 (LastMeasurement as IMeasurementClosable).CloseMeasurement();
             }
@@ -193,42 +229,24 @@ namespace Stereo_Vision
         }
     }
     public enum MeasurementTypes { None=0, Distance_2point, Distance_2line, Distance_2plane, Polyline, Perimeter, Area}
-    public interface IMeasurable
+    public abstract class Measurement
     {
-        List<Special_3D_pt> Points { get; }
-        MeasurementTypes TypeOfMeasurement { get; }
-        bool Ready { get; }
-        double CurrentMeasureValue { get; }
-        double Get_Measure();
-        int Point_MAX { get; }
-        bool Add_Point(Special_3D_pt pPoint3D); // true - Measure is closed now, false - Measure is not closed
-        void Edit_Point_byIndex(uint index, Special_3D_pt newValue);
-        // abstract float 
-    }
-    interface IMeasurementClosable
-    {
-        void CloseMeasurement();
-    }
+        public virtual List<Special_3D_pt> Points { get { return _Points; } }
+        protected virtual List<Special_3D_pt> _Points { get; set; }
 
-    public class Distance_2point : IMeasurable
-    {
-        public List<Special_3D_pt> Points { get { return _Points; } }
-        private List<Special_3D_pt> _Points { get; set; }
-        public MeasurementTypes TypeOfMeasurement { get { return MeasurementTypes.Distance_2point; } }
+        public abstract MeasurementTypes TypeOfMeasurement { get; }
 
-        public bool Ready { get { return _Ready; } }
-        private bool _Ready { set; get; }
+        public virtual bool Ready { get { return _Ready; } }
+        protected virtual bool _Ready { set; get; }
 
-        public double CurrentMeasureValue { get { return _CurrentMeasureValue; } }
-        private double _CurrentMeasureValue { get; set; }
+        public virtual double CurrentMeasureValue { get { return _CurrentMeasureValue; } }
+        protected virtual double _CurrentMeasureValue { get; set; }
 
-        public int Point_MAX { get { return 2; } }
+        public abstract double Get_Measure();
 
-        public Distance_2point()
-        {
-            _Points = new List<Special_3D_pt>();
-        }
-        public bool Add_Point(Special_3D_pt pPoint3D)
+        public abstract int Point_MAX { get; }
+
+        public virtual bool Add_Point(Special_3D_pt pPoint3D) // true - Measure is closed now, false - Measure is not closed
         {
             if (!Ready)
             {
@@ -242,11 +260,47 @@ namespace Stereo_Vision
             }
             return Ready;
         }
-        public void Edit_Point_byIndex(uint index, Special_3D_pt newValue)
+        public abstract void Edit_Point_byIndex(uint index, Special_3D_pt newValue);
+        public virtual int Find_Pt_inRadiusOfPt(Point2d pt, double Radius) //-1   - no pts found, else - index
+        {
+            double dist_2_left = -1;
+            double dist_2_right = -1;
+            for(int i =0;i<Points.Count;i++)
+            {
+                dist_2_left = Distance_p2p_2D(Points[i].P_left_OnImage, pt);
+                dist_2_right = Distance_p2p_2D(Points[i].P_right_OnImage, pt);
+                if (dist_2_left < Radius || dist_2_right<Radius) return i;
+            }
+            return -1;
+        }
+        protected double Distance_p2p_2D(Point2d pt1, Point2d pt2)
+        {
+            double result = -1;
+            result = Math.Pow(pt2.X - pt1.X, 2) + Math.Pow(pt2.Y - pt1.Y, 2);
+            result = Math.Pow(result, 0.5);
+            return result;
+        }
+    }
+    interface IMeasurementClosable
+    {
+        void CloseMeasurement();
+    }
+
+    public class Distance_2point : Measurement
+    {
+        public override MeasurementTypes TypeOfMeasurement { get { return MeasurementTypes.Distance_2point; } }
+
+        public override int Point_MAX { get { return 2; } }
+
+        public Distance_2point()
+        {
+            _Points = new List<Special_3D_pt>();
+        }      
+        public override void Edit_Point_byIndex(uint index, Special_3D_pt newValue)
         {
             _Points[(int)index] = newValue;
         }
-        public double Get_Measure()
+        public override double Get_Measure()
         {
             if (Ready)
             {
@@ -259,47 +313,31 @@ namespace Stereo_Vision
     }
 
 
-    public class Perimeter: IMeasurable, IMeasurementClosable
+    public class Perimeter: Measurement, IMeasurementClosable
     {
-        public List<Special_3D_pt> Points { get { return _Points; } }
-        private List<Special_3D_pt> _Points { get; set; }
-        public MeasurementTypes TypeOfMeasurement { get { return MeasurementTypes.Perimeter; } }
+        public override MeasurementTypes TypeOfMeasurement { get { return MeasurementTypes.Perimeter; } }
+
+        public override int Point_MAX { get { return 20; } }
 
         private Polyline3d ThisLine;
-        public bool Ready { get { return _Ready; } }
-        private bool _Ready { set; get; }
-
-        public double CurrentMeasureValue { get { return _CurrentMeasureValue; } }
-        private double _CurrentMeasureValue { get; set; }
-
-        public int Point_MAX { get { return 20; } }
 
         public Perimeter()
         {
             _Points = new List<Special_3D_pt>();
             ThisLine = new Polyline3d();
         }
-        public bool Add_Point(Special_3D_pt pPoint3D)
+        public override bool Add_Point(Special_3D_pt pPoint3D)
         {
-            if (!Ready)
-            {
-                _Points.Add(pPoint3D);
-                ThisLine.AddPoint(pPoint3D.P3D_implementation);
-            }
-            else return Ready;
-
-            if (_Points.Count == Point_MAX)
-            {
-                _Ready = true;
-            }
+            ThisLine.AddPoint(pPoint3D.P3D_implementation);
+            base.Add_Point(pPoint3D);
             return Ready;
         }
-        public void Edit_Point_byIndex(uint index, Special_3D_pt newValue)
+        public override void Edit_Point_byIndex(uint index, Special_3D_pt newValue)
         {
             _Points[(int)index] = newValue;
             ThisLine.ReplacePoint(newValue.P3D_implementation, index);
         }
-        public double Get_Measure()
+        public override double Get_Measure()
         {
             if (Ready)
             {

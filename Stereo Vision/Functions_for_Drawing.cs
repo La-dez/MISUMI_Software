@@ -75,7 +75,7 @@ namespace Stereo_Vision
         }
         public void Draw_closed_Measurements()
         {
-            foreach (IMeasurable m in CurrentStereoImage.Measuremets) Draw_Measurement(m);
+            foreach (Measurement m in CurrentStereoImage.Measuremets) Draw_Measurement(m);
 
         }
         private double PerfectRounding(double val, int CharN)
@@ -123,7 +123,7 @@ namespace Stereo_Vision
 
             return Point_for_Text;
         }
-        public void Draw_Measurement(IMeasurable pMeasurement, double MeasurementValue = -1)
+        public void Draw_Measurement(Measurement pMeasurement, double MeasurementValue = -1)
         {
             double Data = MeasurementValue;
             var Gr = myBuffer.Graphics;
@@ -146,13 +146,13 @@ namespace Stereo_Vision
                 case MeasurementTypes.Distance_2line:
                     {
                         Draw_point_stereo(ptList[0]);
-                        Draw_Polyline_stereo(ptList.GetRange(1, ptList.Count-1), false);
+                        Draw_Polyline_stereo(ptList.GetRange(1, ptList.Count()-1), false);
                         break;
                     }
                 case MeasurementTypes.Distance_2plane:
                     {
                         Draw_point_stereo(ptList[0]);
-                        Draw_Polyline_stereo(ptList.GetRange(1, ptList.Count - 1), true);
+                        Draw_Polyline_stereo(ptList.GetRange(1, ptList.Count() - 1), true);
                         break;
                     }
                 case MeasurementTypes.Polyline:

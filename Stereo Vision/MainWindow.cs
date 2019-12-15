@@ -47,9 +47,18 @@ namespace Stereo_Vision
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            /*bool isPr = false;
+            string img_plane_pre = "pl";
+            string img_cilindric_pre = "cil";
+            string img_real_pre = "real";
+            BuildModel3D(new BackgroundWorker(), new Bitmap("TestImages\\"+ img_plane_pre + "1.tiff"), isPr);
+            return;*/
+
+
             this.Visible = false;
             try
             {
+                
                 Build_Interface();
 
                 MaximizeWindow();
@@ -611,7 +620,8 @@ namespace Stereo_Vision
 
         private void B_Mes_Reconstruct3D_Click(object sender, EventArgs e)
         {
-            Init3M();
+            //Init3M();
+            
         }
         private void B_Ex_3DMode_Click(object sender, EventArgs e)
         {
@@ -671,18 +681,19 @@ namespace Stereo_Vision
 
         private void PB_MeasurementPB_MouseDown(object sender, MouseEventArgs e)
         {
-            if (!CurrentStereoImage.isMeasureOpened()) CurrentStereoImage.NewMeasurement(CurrentMeasureType);
+            if (!CurrentStereoImage.isLastMeasureOpened()) CurrentStereoImage.NewMeasurement(CurrentMeasureType);
+            else CurrentStereoImage.FindAnyPointUnderMouse(e.Location);
         }
 
         private void PB_MeasurementPB_DoubleClick(object sender, EventArgs e)
         {
-            if (CurrentStereoImage.isMeasure_supportsClose()) CurrentStereoImage.Make_LastMeasurement_Ready();
+            if (CurrentStereoImage.isLastMeasure_supportsClose()) CurrentStereoImage.Make_LastMeasurement_Ready();
 
         }
 
         private void PB_MeasurementPB_MouseUp(object sender, MouseEventArgs e)
         {
-            if (CurrentStereoImage.isMeasureOpened())
+            if (CurrentStereoImage.isLastMeasureOpened())
                 CurrentStereoImage.AddPoint_2NewMeasurement(e.X, e.Y);
             DB_Invalidate();
         }
@@ -749,7 +760,10 @@ namespace Stereo_Vision
             }
         }
 
-       
+        private void PB_MeasurementPB_MouseMove(object sender, MouseEventArgs e)
+        {
+
+        }
     }
 }
 
