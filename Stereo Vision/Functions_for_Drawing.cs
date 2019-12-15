@@ -85,7 +85,7 @@ namespace Stereo_Vision
             if ((val - (int)val) > 0.5f) return (((int)val + 1) / mnoj);
             else return ((int)val / mnoj);
         }
-        public PointF Get_free_point_forText(Special_3D_pt pt_0, Special_3D_pt pt_1, Special_3D_pt pt_last)
+        public PointF Get_free_point_forText(Special_3D_pt pt_0, Special_3D_pt pt_1, Special_3D_pt pt_last, int NumOfLetters)
         {
             bool[] quadrants_is_free = new bool[4] { true, true, true, true };
             bool left_busy = (pt_1.P_left_OnCtrl.X - pt_0.P_left_OnCtrl.X < 0); bool right_busy = !left_busy;
@@ -112,28 +112,35 @@ namespace Stereo_Vision
                                                         quadrants_is_free[2] && !III_q_busy,
                                                         quadrants_is_free[3] && !IV_q_busy };
             PointF Point_for_Text;
+            int Shift_per_symb = 12; //11.33
+
+            float x1 = (float)pt_0.P_left_OnCtrl.X + (ediamd2) - 10 + 15;
+            float x2 = (float)pt_0.P_left_OnCtrl.X + (ediamd2) - 10 - (NumOfLetters - 1) * Shift_per_symb - 5 - 25;
+            float y1 = (float)pt_0.P_left_OnCtrl.Y - (ediamd2) - 5 - 10;
+            float y2 = (float)pt_0.P_left_OnCtrl.Y - (ediamd2) - 5 + 10;
+
             if (quadrants_is_free[0])
-                Point_for_Text = new PointF((float)pt_0.P_left_OnCtrl.X + (ediamd2) - 10 + 15, (float)pt_0.P_left_OnCtrl.Y - (ediamd2) - 5 - 10);
+                Point_for_Text = new PointF(x1, y1);
             else if (quadrants_is_free[1])
-                Point_for_Text = new PointF((float)pt_0.P_left_OnCtrl.X + (ediamd2) - 10 - 15, (float)pt_0.P_left_OnCtrl.Y - (ediamd2) - 5 - 10);
+                Point_for_Text = new PointF(x2, y1);
             else if (quadrants_is_free[2])
-                Point_for_Text = new PointF((float)pt_0.P_left_OnCtrl.X + (ediamd2) - 10 - 15, (float)pt_0.P_left_OnCtrl.Y - (ediamd2) - 5 + 10);
+                Point_for_Text = new PointF(x2, y2);
             else
-                Point_for_Text = new PointF((float)pt_0.P_left_OnCtrl.X + (ediamd2) - 10 + 15, (float)pt_0.P_left_OnCtrl.Y - (ediamd2) - 5 + 10);
+                Point_for_Text = new PointF(x1, y2);
 
             return Point_for_Text;
         }
-        public void Draw_Measurement(Measurement pMeasurement, double MeasurementValue = -1)
+        public void Draw_Measurement(Measurement pMeasurement)
         {
-            double Data = MeasurementValue;
+            double Data = pMeasurement.Measurement_CurrentValue;
             var Gr = myBuffer.Graphics;
             var ptList = pMeasurement.Points;
             var Mes_T = pMeasurement.TypeOfMeasurement;
-            if (Data != -1)
+            if ((Data != -1) && (!Double.IsNaN(Data)))
             {
                 Data = PerfectRounding(Data, 2);
-                String Text = String.Format("{0:D2}", Data);
-                Gr.DrawString(Text, drawFont, brush_text, Get_free_point_forText(ptList[0], ptList[1], ptList.Last()));
+                String Text = String.Format("{0:0.00}", Data);
+                Gr.DrawString(Text, drawFont, brush_text, Get_free_point_forText(ptList[0], ptList[1], ptList.Last(), Text.Length));
             }
   
             switch (Mes_T)

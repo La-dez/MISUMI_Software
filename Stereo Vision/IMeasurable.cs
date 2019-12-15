@@ -111,12 +111,14 @@ namespace Stereo_Vision
         }
         public bool FindAnyPointUnderMouse(Point pCursor_coordinates, bool NeedGrab = true)
         {
-            bool result = false;
+            Point_UnderCursor_MeasureNumber = -1;
+            Point_UnderCursor_PointNumber = -1;
+            AnyPointUnderCursor = false;
             var Pt_onImg_cursor_2d = Transform_Ctrl2Img(pCursor_coordinates.X, pCursor_coordinates.Y);
             var Pt_onCtrl_cursor_2d = new Point2d(pCursor_coordinates.X, pCursor_coordinates.Y);
             for (int i = 0; i < Measuremets.Count(); i++)
             {
-                var found_ind = Measuremets[i].Find_Pt_inRadiusOfPt(Pt_onCtrl_cursor_2d, DetectionRadius_px);
+                var found_ind = Measuremets[i].Find_Pt_inRadiusOfPt(Pt_onImg_cursor_2d, DetectionRadius_px);
                 if(found_ind != -1)
                 {
                     AnyPointUnderCursor = true;
@@ -125,8 +127,9 @@ namespace Stereo_Vision
                     if (NeedGrab) Point_Grab();
                 }
             }
+            
 
-            return result;
+            return AnyPointUnderCursor;
         }
         public void Point_Ungrab() => Point_UnderCursor_grabbed = false;
         public void Point_Grab()
@@ -146,7 +149,7 @@ namespace Stereo_Vision
                 Point2d Data_right_onCtrl = Transform_Img2Ctrl(Data_right_onImage.X, Data_right_onImage.Y);
 
                 Point3d Data3D = new Point3d(0,0,0);
-                try { stereoPair.Transform(Data_left_onImage, Data_left_onImage, ref Data3D); } catch { }
+                try { stereoPair.Transform(Data_left_onImage, Data_right_onImage, ref Data3D); } catch { }
 
                 Special_3D_pt NewPoint = new Special_3D_pt(Data_left_onCtrl, Data_right_onCtrl, Data_left_onImage, Data_right_onImage, Data3D);
                 LastMeasurement.Add_Point(NewPoint);
@@ -167,7 +170,7 @@ namespace Stereo_Vision
                 Point2d Data_left_onImage = Transform_Ctrl2Img(X_onCtrl_left, Y_onCtrl_left);
                 Point2d Data_right_onImage = Transform_Ctrl2Img(X_onCtrl_right, Y_onCtrl_right);
                 Point3d Data3D = null;
-                stereoPair.Transform(Data_left_onImage, Data_left_onImage, ref Data3D);
+                stereoPair.Transform(Data_left_onImage, Data_right_onImage, ref Data3D);
 
                 Special_3D_pt NewPoint = new Special_3D_pt(Data_left_onCtrl, Data_right_onCtrl, Data_left_onImage, Data_right_onImage, Data3D);
                 LastMeasurement.Add_Point(NewPoint);
@@ -193,7 +196,7 @@ namespace Stereo_Vision
             Point2d Data_right_onCtrl = new Point2d(X_onCtrl_right, Y_onCtrl_right);
             Point2d Data_left_onImage = Transform_Ctrl2Img(X_onCtrl_left, Y_onCtrl_left);
             Point2d Data_right_onImage = Transform_Ctrl2Img(X_onCtrl_right, Y_onCtrl_right);
-            Point3d Data3D = null;
+            Point3d Data3D = new Point3d(0, 0, 0);
             stereoPair.Transform(Data_left_onImage, Data_right_onImage, ref Data3D);
 
             Special_3D_pt NewPoint = new Special_3D_pt(Data_left_onCtrl, Data_right_onCtrl, Data_left_onImage, Data_right_onImage, Data3D);
@@ -202,7 +205,7 @@ namespace Stereo_Vision
 
         public void Edit_Point_inMeasurement_byIndex(int Mes_index, uint Pt_index, Point2d Pt_onCtrl_left, Point2d Pt_onCtrl_right, Point2d Pt_onIm_left, Point2d Pt_onIm_right)
         {
-            Point3d Data3D = null;
+            Point3d Data3D = new Point3d(0,0,0);
             stereoPair.Transform(Pt_onIm_left, Pt_onIm_right, ref Data3D);
             Special_3D_pt NewPoint = new Special_3D_pt(Pt_onCtrl_left, Pt_onCtrl_right, Pt_onIm_left, Pt_onIm_right, Data3D);
             Measuremets[Mes_index].Edit_Point_byIndex(Pt_index, NewPoint);
@@ -247,7 +250,7 @@ namespace Stereo_Vision
         }
         public double Get_Measurement_byIndex(int pIndex)
         {
-            return Measuremets[pIndex].Get_Measure();
+            return Measuremets[pIndex].Measure();
         }
         public void ClearMEasurements()
         {
@@ -290,10 +293,10 @@ namespace Stereo_Vision
         public virtual bool Ready { get { return _Ready; } }
         protected virtual bool _Ready { set; get; }
 
-        public virtual double CurrentMeasureValue { get { return _CurrentMeasureValue; } }
-        protected virtual double _CurrentMeasureValue { get; set; }
+        public virtual double Measurement_CurrentValue { get { return _Measurement_CurrentValue; } }
+        protected virtual double _Measurement_CurrentValue { get; set; }
 
-        public abstract double Get_Measure();
+        public abstract double Measure();
 
         public abstract int Point_MAX { get; }
 
@@ -308,6 +311,7 @@ namespace Stereo_Vision
             if (Points.Count == Point_MAX)
             {
                 _Ready = true;
+                Measure();
             }
             return Ready;
         }
@@ -346,17 +350,19 @@ namespace Stereo_Vision
         public Distance_2point()
         {
             _Points = new List<Special_3D_pt>();
+            _Measurement_CurrentValue = -1;
         }      
         public override void Edit_Point_byIndex(uint index, Special_3D_pt newValue)
         {
             _Points[(int)index] = newValue;
+            Measure();
         }
-        public override double Get_Measure()
+        public override double Measure()
         {
             if (Ready)
             {
-                _CurrentMeasureValue = GeomUtils.Distance(Points[0].P3D_implementation, Points[1].P3D_implementation);
-                return CurrentMeasureValue;
+                _Measurement_CurrentValue = GeomUtils.Distance(Points[0].P3D_implementation, Points[1].P3D_implementation);
+                return Measurement_CurrentValue;
             }
             else
                 return -1;
@@ -376,6 +382,7 @@ namespace Stereo_Vision
         {
             _Points = new List<Special_3D_pt>();
             ThisLine = new Polyline3d();
+            _Measurement_CurrentValue = -1;
         }
         public override bool Add_Point(Special_3D_pt pPoint3D)
         {
@@ -387,13 +394,14 @@ namespace Stereo_Vision
         {
             _Points[(int)index] = newValue;
             ThisLine.ReplacePoint(newValue.P3D_implementation, index);
+            Measure();
         }
-        public override double Get_Measure()
+        public override double Measure()
         {
             if (Ready)
             {
-                _CurrentMeasureValue = GeomUtils.Distance(Points[0].P3D_implementation, Points[1].P3D_implementation);
-                return CurrentMeasureValue;
+                _Measurement_CurrentValue = GeomUtils.Distance(Points[0].P3D_implementation, Points[1].P3D_implementation);
+                return Measurement_CurrentValue;
             }
             else
                 return -1;

@@ -689,7 +689,7 @@ namespace Stereo_Vision
             }
             else
             {
-                
+                //MouseUp will add a new point
             }
         }
 
