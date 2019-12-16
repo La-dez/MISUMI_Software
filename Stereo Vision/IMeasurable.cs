@@ -84,9 +84,29 @@ namespace Stereo_Vision
                         LastMeasurement = new Distance_2point();
                         break;
                     }
+                case MeasurementTypes.Distance_2line:
+                    {
+                        LastMeasurement = new Distance_2line();
+                        break;
+                    }
+                case MeasurementTypes.Distance_2plane:
+                    {
+                        LastMeasurement = new Distance_2plane();
+                        break;
+                    }
+                case MeasurementTypes.Polyline:
+                    {
+                        LastMeasurement = new Polyline();
+                        break;
+                    }
                 case MeasurementTypes.Perimeter:
                     {
                         LastMeasurement = new Perimeter();
+                        break;
+                    }
+                case MeasurementTypes.Area:
+                    {
+                        LastMeasurement = new Area();
                         break;
                     }
                 default:
@@ -187,7 +207,9 @@ namespace Stereo_Vision
         }
         public bool isLastMeasure_supportsClose()
         {
-            return LastMeasurement.GetType().GetInterfaces().Contains(typeof(IMeasurementClosable));
+            if (LastMeasurement != null)
+                return LastMeasurement.GetType().GetInterfaces().Contains(typeof(IMeasurementClosable));
+            else return false;
         }
         public void Edit_Point_inMeasurement_byIndex(int Mes_index, uint Pt_index, int X_onCtrl_left, int Y_onCtrl_left, int X_onCtrl_right, int Y_onCtrl_right)
         {
@@ -307,7 +329,7 @@ namespace Stereo_Vision
             }
             else return Ready;
 
-            if (Points.Count == Point_MAX)
+            if ((Points.Count == Point_MAX) || Ready)
             {
                 _Ready = true;
                 Measure();
@@ -371,7 +393,7 @@ namespace Stereo_Vision
     public class Distance_2line : Measurement
     {
         private Line3d ThisLine = new Line3d();
-        public override MeasurementTypes TypeOfMeasurement { get { return MeasurementTypes.Distance_2point; } }
+        public override MeasurementTypes TypeOfMeasurement { get { return MeasurementTypes.Distance_2line; } }
 
         public override int Point_MAX { get { return 3; } }
 
@@ -410,7 +432,7 @@ namespace Stereo_Vision
     public class Distance_2plane : Measurement
     {
         private Plane3d ThisPlane = new Plane3d();
-        public override MeasurementTypes TypeOfMeasurement { get { return MeasurementTypes.Distance_2point; } }
+        public override MeasurementTypes TypeOfMeasurement { get { return MeasurementTypes.Distance_2plane; } }
 
         public override int Point_MAX { get { return 4; } }
 
@@ -425,6 +447,7 @@ namespace Stereo_Vision
             if (Points.Count == Point_MAX)
             {
                 ThisPlane = GeomUtils.PlaneByThreePts(Points[1].P3D_implementation, Points[2].P3D_implementation, Points[3].P3D_implementation);
+                Measure();
             }
             return Ready;
         }
@@ -443,6 +466,49 @@ namespace Stereo_Vision
             }
             else
                 return -1;
+        }
+    }
+
+    public class Polyline : Measurement, IMeasurementClosable
+    {
+        public override MeasurementTypes TypeOfMeasurement { get { return MeasurementTypes.Polyline; } }
+
+        public override int Point_MAX { get { return 20; } }
+
+        private Polyline3d ThisLine;
+
+        public Polyline()
+        {
+            _Points = new List<Special_3D_pt>();
+            ThisLine = new Polyline3d();
+            _Measurement_CurrentValue = -1;
+        }
+        public override bool Add_Point(Special_3D_pt pPoint3D)
+        {
+            ThisLine.AddPoint(pPoint3D.P3D_implementation);
+            base.Add_Point(pPoint3D);
+            return Ready;
+        }
+        public override void Edit_Point_byIndex(uint index, Special_3D_pt newValue)
+        {
+            _Points[(int)index] = newValue;
+            ThisLine.ReplacePoint(newValue.P3D_implementation, index);
+            Measure();
+        }
+        public override double Measure()
+        {
+            if (Ready)
+            {
+                _Measurement_CurrentValue = ThisLine.GetLength();
+                return Measurement_CurrentValue;
+            }
+            else
+                return -1;
+        }
+        public void CloseMeasurement()
+        {
+            _Ready = true;
+            Measure();
         }
     }
 
@@ -476,6 +542,7 @@ namespace Stereo_Vision
         {
             if (Ready)
             {
+                ThisLine.IsClosed = true;
                 _Measurement_CurrentValue = ThisLine.GetLength();
                 return Measurement_CurrentValue;
             }
@@ -485,12 +552,13 @@ namespace Stereo_Vision
         public void CloseMeasurement()
         {
             _Ready = true;
+            Measure();
         }
     }
 
     public class Area : Measurement, IMeasurementClosable
     {
-        public override MeasurementTypes TypeOfMeasurement { get { return MeasurementTypes.Perimeter; } }
+        public override MeasurementTypes TypeOfMeasurement { get { return MeasurementTypes.Area; } }
 
         public override int Point_MAX { get { return 20; } }
 
@@ -527,6 +595,8 @@ namespace Stereo_Vision
         public void CloseMeasurement()
         {
             _Ready = true;
+            ThisLine.IsClosed = true;
+            Measure();
         }
     }
 }

@@ -579,38 +579,87 @@ namespace Stereo_Vision
 
         private void ChB_Mes_p2p_CheckedChanged(object sender, EventArgs e)
         {
-            if (ChB_Mes_p2p.Checked) Init_Measurements_byType(MeasurementTypes.Distance_2point);
-            else Disable_Measurements();
+
+            if (ChB_Mes_p2p.Checked)
+            {
+                Toogle_all_measurements_silent(true, false, false, false, false, false);
+                Init_Measurements_byType(MeasurementTypes.Distance_2point);
+            }
+            else
+            {
+                Toogle_all_measurements_silent(false, false, false, false, false, false);
+                Disable_Measurements();
+            }
         }
 
         private void ChB_Mes_p2l_CheckedChanged(object sender, EventArgs e)
         {
-            if (ChB_Mes_p2l.Checked) Init_Measurements_byType(MeasurementTypes.Distance_2line);
-            else Disable_Measurements();
+            if (ChB_Mes_p2l.Checked)
+            {
+                Toogle_all_measurements_silent(false, true, false, false, false, false);
+                Init_Measurements_byType(MeasurementTypes.Distance_2line);
+            }
+            else
+            {
+                Toogle_all_measurements_silent(false, false, false, false, false, false);
+                Disable_Measurements();
+            }
         }
 
         private void ChB_Mes_p2pl_CheckedChanged(object sender, EventArgs e)
         {
-            if (ChB_Mes_p2pl.Checked) Init_Measurements_byType(MeasurementTypes.Distance_2plane);
-            else Disable_Measurements();
+            if (ChB_Mes_p2pl.Checked)
+            {
+                Toogle_all_measurements_silent(false, false, true, false, false, false);
+                Init_Measurements_byType(MeasurementTypes.Distance_2plane);
+            }
+            else
+            {
+                Toogle_all_measurements_silent(false, false, false, false, false, false);
+                Disable_Measurements();
+            }
         }
 
         private void ChB_Mes_LenghtOfBroken_CheckedChanged(object sender, EventArgs e)
         {
-            if (ChB_Mes_LenghtOfBroken.Checked) Init_Measurements_byType(MeasurementTypes.Polyline);
-            else Disable_Measurements();
+            if (ChB_Mes_LenghtOfBroken.Checked)
+            {
+                Toogle_all_measurements_silent(false, false, false, true, false, false);
+                Init_Measurements_byType(MeasurementTypes.Polyline);
+            }
+            else
+            {
+                Toogle_all_measurements_silent(false, false, false, false, false, false);
+                Disable_Measurements();
+            }
         }
 
         private void ChB_Mes_Perimeter_CheckedChanged(object sender, EventArgs e)
         {
-            if (ChB_Mes_Perimeter.Checked) Init_Measurements_byType(MeasurementTypes.Perimeter);
-            else Disable_Measurements();
+            if (ChB_Mes_Perimeter.Checked)
+            {
+                Toogle_all_measurements_silent(false, false, false, false, true, false);
+                Init_Measurements_byType(MeasurementTypes.Perimeter);
+            }
+            else
+            {
+                Toogle_all_measurements_silent(false, false, false, false, false, false);
+                Disable_Measurements();
+            }
         }
 
         private void ChB_Mes_Area_CheckedChanged(object sender, EventArgs e)
         {
-            if (ChB_Mes_Area.Checked) Init_Measurements_byType(MeasurementTypes.Area);
-            else Disable_Measurements();
+            if (ChB_Mes_Area.Checked)
+            {
+                Toogle_all_measurements_silent(false, false, false, false, false, true);
+                Init_Measurements_byType(MeasurementTypes.Area);
+            }
+            else
+            {
+                Toogle_all_measurements_silent(false, false, false, false, false, false);
+                Disable_Measurements();
+            }
         }
 
         private void B_Mes_DeleteAll_Click(object sender, EventArgs e)
@@ -715,6 +764,7 @@ namespace Stereo_Vision
         private void PB_MeasurementPB_MouseMove(object sender, MouseEventArgs e)
         {
             CurrentStereoImage.Edit_Grabbed_Point(e.Location);
+            DB_Invalidate();
         }
 
         private void TLP_UserMainPanel_Paint(object sender, PaintEventArgs e)

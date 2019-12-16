@@ -47,6 +47,30 @@ namespace Stereo_Vision
         {
             CurrentMeasureType = MeasurementTypes.None;
         }
+        public void Toogle_all_measurements_silent(params bool[] states)
+        {
+            ChB_Mes_p2p.CheckedChanged -= ChB_Mes_p2p_CheckedChanged;
+            ChB_Mes_p2l.CheckedChanged -= ChB_Mes_p2l_CheckedChanged;
+            ChB_Mes_p2pl.CheckedChanged -= ChB_Mes_p2pl_CheckedChanged;
+            ChB_Mes_LenghtOfBroken.CheckedChanged -= ChB_Mes_LenghtOfBroken_CheckedChanged;
+            ChB_Mes_Perimeter.CheckedChanged -= ChB_Mes_Perimeter_CheckedChanged;
+            ChB_Mes_Area.CheckedChanged -= ChB_Mes_Area_CheckedChanged;
+
+            ChB_Mes_p2p.Checked = states[0];
+            ChB_Mes_p2l.Checked = states[1];
+            ChB_Mes_p2pl.Checked = states[2];
+            ChB_Mes_LenghtOfBroken.Checked = states[3];
+            ChB_Mes_Perimeter.Checked = states[4];
+            ChB_Mes_Area.Checked = states[5];
+
+            ChB_Mes_p2p.CheckedChanged += ChB_Mes_p2p_CheckedChanged;
+            ChB_Mes_p2l.CheckedChanged += ChB_Mes_p2l_CheckedChanged;
+            ChB_Mes_p2pl.CheckedChanged += ChB_Mes_p2pl_CheckedChanged;
+            ChB_Mes_LenghtOfBroken.CheckedChanged += ChB_Mes_LenghtOfBroken_CheckedChanged;
+            ChB_Mes_Perimeter.CheckedChanged += ChB_Mes_Perimeter_CheckedChanged;
+            ChB_Mes_Area.CheckedChanged += ChB_Mes_Area_CheckedChanged;
+
+        }
         public void DB_Invalidate()
         {
             myBuffer = currentContext.Allocate(PB_MeasurementPB.CreateGraphics(), PB_MeasurementPB.DisplayRectangle); //необходимо выделять память каждый раз после dispose
