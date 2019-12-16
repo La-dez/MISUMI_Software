@@ -25,7 +25,7 @@ namespace Stereo_Vision
         bool throwed_to_hiber = false;
         bool isArduino_closed = true;
         int ticks = 0;
-        string User_Name = "PNTZ";
+        string User_Name = "MPEI";
         
 
         int Saving_ShowLabel_time = 3;

@@ -61,7 +61,7 @@ namespace Stereo_Vision
             // Set search rectangle size
             pointFinder.SetSearchRectAddSize(5, 5);
 
-            DetectionRadius_px = 5;
+            DetectionRadius_px = 15;
             AnyPointUnderCursor = false;
             Point_UnderCursor_grabbed = false;
             Point_UnderCursor_MeasureNumber = -1;
@@ -91,7 +91,6 @@ namespace Stereo_Vision
                     }
                 default:
                     {
-                        LastMeasurement = new Distance_2point();
                         break;
                     }
             }
@@ -369,6 +368,83 @@ namespace Stereo_Vision
         }
     }
 
+    public class Distance_2line : Measurement
+    {
+        private Line3d ThisLine = new Line3d();
+        public override MeasurementTypes TypeOfMeasurement { get { return MeasurementTypes.Distance_2point; } }
+
+        public override int Point_MAX { get { return 3; } }
+
+        public Distance_2line()
+        {
+            _Points = new List<Special_3D_pt>();
+            _Measurement_CurrentValue = -1;
+        }
+        public override bool Add_Point(Special_3D_pt pPoint3D)
+        {
+            base.Add_Point(pPoint3D);
+            if(Points.Count== Point_MAX)
+            {
+                ThisLine = new Line3d(Points[1].P3D_implementation, Points[2].P3D_implementation);
+            }
+            return Ready;
+        }
+        public override void Edit_Point_byIndex(uint index, Special_3D_pt newValue)
+        {
+            _Points[(int)index] = newValue;
+            if(index!=0) ThisLine = new Line3d(Points[1].P3D_implementation, Points[2].P3D_implementation);
+            Measure();
+        }
+        public override double Measure()
+        {
+            if (Ready)
+            {
+                _Measurement_CurrentValue = GeomUtils.Distance(Points[0].P3D_implementation, ThisLine);
+                return Measurement_CurrentValue;
+            }
+            else
+                return -1;
+        }
+    }
+
+    public class Distance_2plane : Measurement
+    {
+        private Plane3d ThisPlane = new Plane3d();
+        public override MeasurementTypes TypeOfMeasurement { get { return MeasurementTypes.Distance_2point; } }
+
+        public override int Point_MAX { get { return 4; } }
+
+        public Distance_2plane()
+        {
+            _Points = new List<Special_3D_pt>();
+            _Measurement_CurrentValue = -1;
+        }
+        public override bool Add_Point(Special_3D_pt pPoint3D)
+        {
+            base.Add_Point(pPoint3D);
+            if (Points.Count == Point_MAX)
+            {
+                ThisPlane = GeomUtils.PlaneByThreePts(Points[1].P3D_implementation, Points[2].P3D_implementation, Points[3].P3D_implementation);
+            }
+            return Ready;
+        }
+        public override void Edit_Point_byIndex(uint index, Special_3D_pt newValue)
+        {
+            _Points[(int)index] = newValue;
+            if (index != 0) ThisPlane = GeomUtils.PlaneByThreePts(Points[1].P3D_implementation, Points[2].P3D_implementation, Points[3].P3D_implementation);
+            Measure();
+        }
+        public override double Measure()
+        {
+            if (Ready)
+            {
+                _Measurement_CurrentValue = GeomUtils.Distance(Points[0].P3D_implementation, ThisPlane);
+                return Measurement_CurrentValue;
+            }
+            else
+                return -1;
+        }
+    }
 
     public class Perimeter: Measurement, IMeasurementClosable
     {
@@ -400,7 +476,49 @@ namespace Stereo_Vision
         {
             if (Ready)
             {
-                _Measurement_CurrentValue = GeomUtils.Distance(Points[0].P3D_implementation, Points[1].P3D_implementation);
+                _Measurement_CurrentValue = ThisLine.GetLength();
+                return Measurement_CurrentValue;
+            }
+            else
+                return -1;
+        }
+        public void CloseMeasurement()
+        {
+            _Ready = true;
+        }
+    }
+
+    public class Area : Measurement, IMeasurementClosable
+    {
+        public override MeasurementTypes TypeOfMeasurement { get { return MeasurementTypes.Perimeter; } }
+
+        public override int Point_MAX { get { return 20; } }
+
+        private Polyline3d ThisLine;
+
+        public Area()
+        {
+            _Points = new List<Special_3D_pt>();
+            ThisLine = new Polyline3d();
+            _Measurement_CurrentValue = -1;
+        }
+        public override bool Add_Point(Special_3D_pt pPoint3D)
+        {
+            ThisLine.AddPoint(pPoint3D.P3D_implementation);
+            base.Add_Point(pPoint3D);
+            return Ready;
+        }
+        public override void Edit_Point_byIndex(uint index, Special_3D_pt newValue)
+        {
+            _Points[(int)index] = newValue;
+            ThisLine.ReplacePoint(newValue.P3D_implementation, index);
+            Measure();
+        }
+        public override double Measure()
+        {
+            if (Ready)
+            {
+                _Measurement_CurrentValue = ThisLine.GetSquare();
                 return Measurement_CurrentValue;
             }
             else
