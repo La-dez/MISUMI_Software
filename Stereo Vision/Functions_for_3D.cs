@@ -84,6 +84,10 @@ namespace Stereo_Vision
                     viewMatrixFF[4], viewMatrixFF[5], viewMatrixFF[6], viewMatrixFF[7],
                     viewMatrixFF[8], viewMatrixFF[9], viewMatrixFF[10], viewMatrixFF[11],
                     viewMatrixFF[12], viewMatrixFF[13], viewMatrixFF[14], viewMatrixFF[15]));
+
+            M3D_loaded = true;
+            GL.ClearColor(Color.White);
+            OTK_3D_Control.BackColor = Color.SkyBlue;
         }
         private void LoadShaders()
         {
@@ -635,10 +639,21 @@ namespace Stereo_Vision
         private void Load3DModel(string way)
         {
             var trPtArrayRead = new TriangPointArray3f();
-            try { PLYReader.ReadBinary(way, ref trPtArrayRead); }
-            catch { }
+
+            System.Threading.Thread.Sleep(200);
+            bool result = true;
+            result = System.IO.File.Exists("demo.ply");
+            try
+            {
+                result = PLYReader.ReadBinary("demo.ply", ref trPtArrayRead);
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show(exc.Message);
+            }
+
            // BCalculateQD.Enabled = false;
-            MeshUtils.FilterLongEdge(ref trPtArrayRead, 0.2);
+           // MeshUtils.FilterLongEdge(ref trPtArrayRead, 0.2);
             IndexTriplet indexTr = null;
             uint localMAX1 = trPtArrayRead.GetNumberOfTriangles();
             uint localMAX2 = trPtArrayRead.GetNumberOfPoints();

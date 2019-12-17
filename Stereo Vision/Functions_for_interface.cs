@@ -225,6 +225,8 @@ namespace Stereo_Vision
         private void SwitchAdminMode(bool isAdmin)
         {
             LBConsole.Visible = isAdmin;
+            if (isAdmin) LBConsole.BringToFront();
+            else LBConsole.SendToBack();
             if (!isAdmin)
             {
                 adminPages = new TabPage[] { /*TABC_Settings.TabPages[2], */TABC_Settings.TabPages[3], TABC_Settings.TabPages[4] };

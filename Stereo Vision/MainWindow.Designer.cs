@@ -938,6 +938,7 @@ namespace Stereo_Vision
             this.B_Pl_3DMode.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("B_Pl_3DMode.BackgroundImage")));
             this.B_Pl_3DMode.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.B_Pl_3DMode.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.B_Pl_3DMode.Enabled = false;
             this.B_Pl_3DMode.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.B_Pl_3DMode.Location = new System.Drawing.Point(92, 3);
             this.B_Pl_3DMode.Margin = new System.Windows.Forms.Padding(0, 3, 0, 3);
@@ -1274,6 +1275,7 @@ namespace Stereo_Vision
             this.B_Ex_3DMode.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("B_Ex_3DMode.BackgroundImage")));
             this.B_Ex_3DMode.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.B_Ex_3DMode.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.B_Ex_3DMode.Enabled = false;
             this.B_Ex_3DMode.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.B_Ex_3DMode.Location = new System.Drawing.Point(68, 0);
             this.B_Ex_3DMode.Margin = new System.Windows.Forms.Padding(0);
@@ -1523,7 +1525,7 @@ namespace Stereo_Vision
             this.TLP_Settings_Camera.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 75F));
             this.TLP_Settings_Camera.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 232F));
             this.TLP_Settings_Camera.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.TLP_Settings_Camera.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 81F));
+            this.TLP_Settings_Camera.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 82F));
             this.TLP_Settings_Camera.Controls.Add(this.TrBContrast, 1, 1);
             this.TLP_Settings_Camera.Controls.Add(this.L_Settings_l1, 0, 0);
             this.TLP_Settings_Camera.Controls.Add(this.TrBBrightness, 1, 0);
@@ -2134,6 +2136,8 @@ namespace Stereo_Vision
             this.ChB_Mes_Area.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.ChB_Mes_Area.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ChB_Mes_Area.FlatAppearance.BorderSize = 0;
+            this.ChB_Mes_Area.FlatAppearance.CheckedBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(150)))), ((int)(((byte)(150)))), ((int)(((byte)(150)))));
+            this.ChB_Mes_Area.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(100)))), ((int)(((byte)(100)))));
             this.ChB_Mes_Area.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.ChB_Mes_Area.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.ChB_Mes_Area.ForeColor = System.Drawing.SystemColors.ButtonFace;
@@ -2155,6 +2159,8 @@ namespace Stereo_Vision
             this.ChB_Mes_Perimeter.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.ChB_Mes_Perimeter.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ChB_Mes_Perimeter.FlatAppearance.BorderSize = 0;
+            this.ChB_Mes_Perimeter.FlatAppearance.CheckedBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(150)))), ((int)(((byte)(150)))), ((int)(((byte)(150)))));
+            this.ChB_Mes_Perimeter.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(100)))), ((int)(((byte)(100)))));
             this.ChB_Mes_Perimeter.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.ChB_Mes_Perimeter.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.ChB_Mes_Perimeter.ForeColor = System.Drawing.SystemColors.ButtonFace;
@@ -2176,6 +2182,8 @@ namespace Stereo_Vision
             this.ChB_Mes_LenghtOfBroken.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.ChB_Mes_LenghtOfBroken.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ChB_Mes_LenghtOfBroken.FlatAppearance.BorderSize = 0;
+            this.ChB_Mes_LenghtOfBroken.FlatAppearance.CheckedBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(150)))), ((int)(((byte)(150)))), ((int)(((byte)(150)))));
+            this.ChB_Mes_LenghtOfBroken.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(100)))), ((int)(((byte)(100)))));
             this.ChB_Mes_LenghtOfBroken.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.ChB_Mes_LenghtOfBroken.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.ChB_Mes_LenghtOfBroken.ForeColor = System.Drawing.SystemColors.ButtonFace;
@@ -2197,6 +2205,8 @@ namespace Stereo_Vision
             this.ChB_Mes_p2pl.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.ChB_Mes_p2pl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ChB_Mes_p2pl.FlatAppearance.BorderSize = 0;
+            this.ChB_Mes_p2pl.FlatAppearance.CheckedBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(150)))), ((int)(((byte)(150)))), ((int)(((byte)(150)))));
+            this.ChB_Mes_p2pl.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(100)))), ((int)(((byte)(100)))));
             this.ChB_Mes_p2pl.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.ChB_Mes_p2pl.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.ChB_Mes_p2pl.ForeColor = System.Drawing.SystemColors.ButtonFace;
@@ -2218,6 +2228,8 @@ namespace Stereo_Vision
             this.ChB_Mes_p2l.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.ChB_Mes_p2l.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ChB_Mes_p2l.FlatAppearance.BorderSize = 0;
+            this.ChB_Mes_p2l.FlatAppearance.CheckedBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(150)))), ((int)(((byte)(150)))), ((int)(((byte)(150)))));
+            this.ChB_Mes_p2l.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(100)))), ((int)(((byte)(100)))));
             this.ChB_Mes_p2l.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.ChB_Mes_p2l.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.ChB_Mes_p2l.ForeColor = System.Drawing.SystemColors.ButtonFace;
@@ -2239,9 +2251,8 @@ namespace Stereo_Vision
             this.ChB_Mes_p2p.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.ChB_Mes_p2p.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ChB_Mes_p2p.FlatAppearance.BorderSize = 0;
-            this.ChB_Mes_p2p.FlatAppearance.CheckedBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
-            this.ChB_Mes_p2p.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.ChB_Mes_p2p.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Transparent;
+            this.ChB_Mes_p2p.FlatAppearance.CheckedBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(150)))), ((int)(((byte)(150)))), ((int)(((byte)(150)))));
+            this.ChB_Mes_p2p.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(100)))), ((int)(((byte)(100)))));
             this.ChB_Mes_p2p.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.ChB_Mes_p2p.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.ChB_Mes_p2p.ForeColor = System.Drawing.SystemColors.ButtonFace;
@@ -2339,6 +2350,7 @@ namespace Stereo_Vision
             this.PB_MeasurementPB.Size = new System.Drawing.Size(753, 446);
             this.PB_MeasurementPB.TabIndex = 10;
             this.PB_MeasurementPB.TabStop = false;
+            this.PB_MeasurementPB.Click += new System.EventHandler(this.PB_MeasurementPB_Click_1);
             this.PB_MeasurementPB.DoubleClick += new System.EventHandler(this.PB_MeasurementPB_DoubleClick);
             this.PB_MeasurementPB.MouseDown += new System.Windows.Forms.MouseEventHandler(this.PB_MeasurementPB_MouseDown);
             this.PB_MeasurementPB.MouseMove += new System.Windows.Forms.MouseEventHandler(this.PB_MeasurementPB_MouseMove);

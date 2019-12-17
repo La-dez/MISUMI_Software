@@ -24,10 +24,9 @@ namespace Stereo_Vision
 
         private void Initialize_Player_Controls(Modes pPlayMode_2set)
         {
-
             CV_ImBox_Capture.Visible = false;
             CV_ImBox_VidPhoto_Player.Visible = true;
-            PB_MeasurementPB.Visible = true;
+            PB_MeasurementPB.Visible = false;
             Toogle_Play_Mode(pPlayMode_2set);
 
         }
@@ -225,8 +224,7 @@ namespace Stereo_Vision
         }
         private void View_Model_byIndex(int pIndex)
         {
-            System.Windows.Forms.MessageBox.Show(":aaaaa");
-            Load3DModel(Path.Combine(System.Windows.Forms.Application.StartupPath,"Models","demo.ply"));
+            Load3DModel("D:\\Models\\demo.ply");
         }
         private void View_Video_Prev()
         {

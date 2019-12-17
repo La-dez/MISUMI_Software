@@ -37,11 +37,11 @@ namespace Stereo_Vision
         public bool Point_UnderCursor_grabbed { get; protected set; }
         protected int Point_UnderCursor_MeasureNumber { set; get; }
         protected int Point_UnderCursor_PointNumber { set; get; }
+        protected bool Point_UnderCursor_isLeft { set; get; }
 
 
-
-    //all the math
-    ICameraPair stereoPair = XMLLoader.ReadCameraPair("M1_chess.xml");
+        //all the math
+        ICameraPair stereoPair = XMLLoader.ReadCameraPair("M5_chess.xml");
         ISimpleCorrPointFinder pointFinder;
 
         public StereoImage(System.Drawing.Bitmap BMP, Size pSizeOfCtrl)
@@ -57,15 +57,16 @@ namespace Stereo_Vision
             // Set distance range (mm)
             pointFinder.SetZDiap(10.0, 40.0, 2.0);
             // Set window size for descriptor (pixel)
-            pointFinder.SetWindowSize(21, 21);
+            pointFinder.SetWindowSize(15, 15);
             // Set search rectangle size
-            pointFinder.SetSearchRectAddSize(5, 5);
+            pointFinder.SetSearchRectAddSize(10,10);
 
-            DetectionRadius_px = 15;
+            DetectionRadius_px = 30;
             AnyPointUnderCursor = false;
             Point_UnderCursor_grabbed = false;
             Point_UnderCursor_MeasureNumber = -1;
             Point_UnderCursor_PointNumber = -1;
+            Point_UnderCursor_isLeft = false;
         }
         public Point2d Transform_Ctrl2Img(float X_ctrl,float Y_ctrl)
         {
@@ -132,23 +133,29 @@ namespace Stereo_Vision
         {
             Point_UnderCursor_MeasureNumber = -1;
             Point_UnderCursor_PointNumber = -1;
+            Point_UnderCursor_isLeft = false;
             AnyPointUnderCursor = false;
             var Pt_onImg_cursor_2d = Transform_Ctrl2Img(pCursor_coordinates.X, pCursor_coordinates.Y);
             var Pt_onCtrl_cursor_2d = new Point2d(pCursor_coordinates.X, pCursor_coordinates.Y);
+            bool Local_isLeft = false;
             for (int i = 0; i < Measuremets.Count(); i++)
             {
-                var found_ind = Measuremets[i].Find_Pt_inRadiusOfPt(Pt_onImg_cursor_2d, DetectionRadius_px);
+                var found_ind = Measuremets[i].Find_Pt_inRadiusOfPt(Pt_onImg_cursor_2d, DetectionRadius_px, ref Local_isLeft);
                 if(found_ind != -1)
                 {
                     AnyPointUnderCursor = true;
+                    Point_UnderCursor_isLeft = Local_isLeft;
                     Point_UnderCursor_MeasureNumber = i;
                     Point_UnderCursor_PointNumber = found_ind;
                     if (NeedGrab) Point_Grab();
                 }
             }
-            
-
             return AnyPointUnderCursor;
+        }
+        public List<Special_3D_pt> Get_Pts_info_inCurMes()
+        {
+            if (LastMeasurement != null) return LastMeasurement.Points;
+            else return new List<Special_3D_pt>();
         }
         public void Point_Ungrab() => Point_UnderCursor_grabbed = false;
         public void Point_Grab()
@@ -238,9 +245,8 @@ namespace Stereo_Vision
             //TODO: 2) Автокорреляция , если левая
             if (Point_UnderCursor_grabbed)
             {
-                bool OnLeftPart = true;
+                bool OnLeftPart = Point_UnderCursor_isLeft;
                 var Pt_on_img = Transform_Ctrl2Img(NewPosition_ctrl.X, NewPosition_ctrl.Y);
-                if (Pt_on_img.X > CenterOfImg.X) OnLeftPart = false;
 
                 if (OnLeftPart)
                 {
@@ -253,7 +259,16 @@ namespace Stereo_Vision
                 }
                 else
                 {
+                    var Pt_left_onCtrl = _Measuremets[Point_UnderCursor_MeasureNumber].Points[Point_UnderCursor_PointNumber].P_left_OnCtrl;
 
+                    var Pt_left_onImg = _Measuremets[Point_UnderCursor_MeasureNumber].Points[Point_UnderCursor_PointNumber].P_left_OnImage;
+
+                    var Pt_right_onCtrl = new Point2d(NewPosition_ctrl.X, NewPosition_ctrl.Y);
+
+                    var Pt_right_onImg = Pt_on_img;
+
+                    Edit_Point_inMeasurement_byIndex(Point_UnderCursor_MeasureNumber, (uint)Point_UnderCursor_PointNumber,
+                        Pt_left_onCtrl, Pt_right_onCtrl, Pt_left_onImg, Pt_right_onImg);
                 }
             }
         }
@@ -337,7 +352,7 @@ namespace Stereo_Vision
             return Ready;
         }
         public abstract void Edit_Point_byIndex(uint index, Special_3D_pt newValue);
-        public virtual int Find_Pt_inRadiusOfPt(Point2d pt, double Radius) //-1   - no pts found, else - index
+        public virtual int Find_Pt_inRadiusOfPt(Point2d pt, double Radius,ref bool isLeft) //-1   - no pts found, else - index
         {
             double dist_2_left = -1;
             double dist_2_right = -1;
@@ -345,7 +360,7 @@ namespace Stereo_Vision
             {
                 dist_2_left = Distance_p2p_2D(Points[i].P_left_OnImage, pt);
                 dist_2_right = Distance_p2p_2D(Points[i].P_right_OnImage, pt);
-                if (dist_2_left < Radius || dist_2_right<Radius) return i;
+                if (dist_2_left < Radius || dist_2_right < Radius) { isLeft= (dist_2_left < Radius); return i; }
             }
             return -1;
         }

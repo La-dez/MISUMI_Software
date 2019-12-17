@@ -53,6 +53,7 @@ namespace Stereo_Vision
             string img_real_pre = "real";
             BuildModel3D(new BackgroundWorker(), new Bitmap("TestImages\\"+ img_plane_pre + "1.tiff"), isPr);
             return;*/
+            //Load3DModel("demo.ply"); return;
 
 
             this.Visible = false;
@@ -91,6 +92,7 @@ namespace Stereo_Vision
                 myBuffer.Render();
                 myBuffer.Dispose();
 
+                MyInit();
                 // Width_for_Resizing = CV_ImBox_Capture.Width;
                 //  Height_for_Resizing = CV_ImBox_Capture.Height;
                 // Size_for_Resizing = new Size(Width_for_Resizing, Height_for_Resizing);
@@ -664,13 +666,21 @@ namespace Stereo_Vision
 
         private void B_Mes_DeleteAll_Click(object sender, EventArgs e)
         {
+            try
+            {
+                CurrentStereoImage.ClearMEasurements();
+            }
+            catch
+            {
 
+            }
         }
 
         private void B_Mes_Reconstruct3D_Click(object sender, EventArgs e)
         {
-            //Init3M();
-            
+            Playing_mode = Modes.Models3D;
+            OpenPlayPanel();
+            Draw();
         }
         private void B_Ex_3DMode_Click(object sender, EventArgs e)
         {
@@ -685,6 +695,7 @@ namespace Stereo_Vision
         Action ActivatePreviousMode = null;
         private void B_Pl_Photo_Measure_Click(object sender, EventArgs e)
         {
+            //CurrentStereoImage = new StereoImage()
             ActivatePreviousMode = (Action)OpenPlayPanel;
             Init_all_for_Measurements(FilesToView[CurrentIndex]);
             OpenMeasurementsPanel();
@@ -720,6 +731,7 @@ namespace Stereo_Vision
         private void Timer_InvalidateAfter_EnteringMes_Tick(object sender, EventArgs e)
         {
             DB_Invalidate();
+            Pan_Measurements.Invalidate();
             Timer_InvalidateAfter_EnteringMes.Stop();
         }
 
@@ -763,7 +775,11 @@ namespace Stereo_Vision
         }
         private void PB_MeasurementPB_MouseMove(object sender, MouseEventArgs e)
         {
-            CurrentStereoImage.Edit_Grabbed_Point(e.Location);
+            try
+            {
+                CurrentStereoImage.Edit_Grabbed_Point(e.Location);
+            }
+            catch { }
             DB_Invalidate();
         }
 
@@ -829,7 +845,10 @@ namespace Stereo_Vision
             }
         }
 
- 
+        private void PB_MeasurementPB_Click_1(object sender, EventArgs e)
+        {
+
+        }
     }
 }
 

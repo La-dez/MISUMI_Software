@@ -37,7 +37,13 @@ namespace Stereo_Vision
             catch(Exception exc)
             {
                 LogError(exc.Message);
+                try
+                {
+                    CurrentStereoImage = new StereoImage(resizedim.Bitmap, PB_MeasurementPB.Size);
+                }
+                catch { }
             }
+            
         }
         public void Init_Measurements_byType(MeasurementTypes MesType)
         {
@@ -69,17 +75,29 @@ namespace Stereo_Vision
             ChB_Mes_LenghtOfBroken.CheckedChanged += ChB_Mes_LenghtOfBroken_CheckedChanged;
             ChB_Mes_Perimeter.CheckedChanged += ChB_Mes_Perimeter_CheckedChanged;
             ChB_Mes_Area.CheckedChanged += ChB_Mes_Area_CheckedChanged;
-
+            Pan_Measurements.Update();
         }
+        System.Diagnostics.Stopwatch stw_dbi = new System.Diagnostics.Stopwatch();
         public void DB_Invalidate()
         {
-            myBuffer = currentContext.Allocate(PB_MeasurementPB.CreateGraphics(), PB_MeasurementPB.DisplayRectangle); //необходимо выделять память каждый раз после dispose
-            myBuffer.Graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
-            Draw_Base(true);
-            Draw_closed_Measurements();
-            //if()
-            myBuffer.Render();
-            myBuffer.Dispose();
+            try
+            {
+                stw_dbi.Restart();
+                myBuffer = currentContext.Allocate(PB_MeasurementPB.CreateGraphics(), PB_MeasurementPB.DisplayRectangle); //необходимо выделять память каждый раз после dispose
+                myBuffer.Graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
+                Draw_Base(true);
+                Draw_closed_Measurements();
+              //  Draw_opened_Measurement();
+                //if()
+                myBuffer.Render();
+                myBuffer.Dispose();
+                stw_dbi.Stop();
+                LogMessage("Время на отрисовку: " + stw_dbi.Elapsed.TotalMilliseconds.ToString());
+            }
+            catch
+            {
+                LogMessage("Ошибка при отрисовке");
+            }
         }
         public void Draw_Base(bool UseImage)
         {
@@ -101,6 +119,14 @@ namespace Stereo_Vision
         {
             foreach (Measurement m in CurrentStereoImage.Measuremets) Draw_Measurement(m);
 
+        }
+        private void Draw_opened_Measurement()
+        {
+            var pts_3d = CurrentStereoImage.Get_Pts_info_inCurMes();
+            foreach (Special_3D_pt pt3d in pts_3d)
+            {
+                Draw_point_stereo(pt3d);
+            }
         }
         private double PerfectRounding(double val, int CharN)
         {
@@ -177,13 +203,13 @@ namespace Stereo_Vision
                 case MeasurementTypes.Distance_2line:
                     {
                         Draw_point_stereo(ptList[0]);
-                        Draw_Polyline_stereo(ptList.GetRange(1, ptList.Count()-1), false);
+                        Draw_Polyline_stereo(ptList.GetRange(1, 2), false);
                         break;
                     }
                 case MeasurementTypes.Distance_2plane:
                     {
                         Draw_point_stereo(ptList[0]);
-                        Draw_Polyline_stereo(ptList.GetRange(1, ptList.Count() - 1), true);
+                        Draw_Polyline_stereo(ptList.GetRange(1, 3), true);
                         break;
                     }
                 case MeasurementTypes.Polyline:
