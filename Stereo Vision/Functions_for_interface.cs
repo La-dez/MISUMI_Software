@@ -200,6 +200,21 @@ namespace Stereo_Vision
             Initialize_Player_Controls(Playing_mode);
             
         }
+        private void OpenPlayPanel(bool Build3D)
+        {
+            TogglePanelsVisability(false, false, false, true);
+            bool AsyncBuilding = false;
+            StopCapture();
+            if (Build3D)
+            {
+                if (AsyncBuilding)
+                    BWorkerForLoad3D.RunWorkerAsync();//BuildModel3D();
+                else
+                    BuildModel3D(null, CurrentStereoImage.BasicImage, true);
+            }
+            Initialize_Player_Controls(Playing_mode);
+
+        }
         private void OpenMeasurementsPanel()
         {
             StopCapture();

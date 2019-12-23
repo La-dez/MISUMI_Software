@@ -33,18 +33,30 @@ namespace Stereo_Vision
         int FramesToGot = 60 * 30;
         string Rec_Videos_path = Path.Combine(/*System.Windows.Forms.Application.StartupPath*/"D:\\", "Video");
         string Rec_Photos_path = Path.Combine(/*System.Windows.Forms.Application.StartupPath*/"D:\\", "Photo");
-        string Rec_Models_path = Path.Combine(/*System.Windows.Forms.Application.StartupPath*/System.Windows.Forms.Application.StartupPath,"Models");
+        string Rec_Models_path = Path.Combine(/*System.Windows.Forms.Application.StartupPath*/"D:\\","Models");
+
         string Export_Vid_from = Path.Combine(/*System.Windows.Forms.Application.StartupPath*/"D:\\", "Video");
         string Export_Photos_from = Path.Combine(/*System.Windows.Forms.Application.StartupPath*/"D:\\", "Photo");
+        string Export_3D_from = Path.Combine(/*System.Windows.Forms.Application.StartupPath*/"D:\\", "Models");
+
         string Export_Vid_to = null;
         string Export_Photos_to = null;
+        string Export_3D_to = null;
+
         string Current_Extension_video = ".mp4";
         string Current_Extension_photo = ".jpeg";
+        string Current_Extension_model = ".ply";
+
         string Video_name = "Video_";
         string Snapshot_name = "Snapshot_";
+        string Model_name = "Model_";
+
         string Video_name_lastcaptured = "Video_00.mp4";
         string Photo_name_lastcaptured = "Snapshot_000.jpeg";
+        string Model_name_lastcaptured = "Model_000.ply";
+
         string Photo_name_lastcaptured_fullpath = null;
+        string Model_name_lastbuild_fullpath = null;
         int Brightness_Value = 0;
         int Contrast_Value = 0;
         int Saturation_Value = 0;
@@ -63,8 +75,10 @@ namespace Stereo_Vision
         int Number_of_FilesorHours = 0;
         int Count_of_Digits_vid = 2;
         int Count_of_Digits_snap = 3;
+        int Count_of_Digits_mod = 3;
         int LastNumber_Vid = 4;
         int LastNumber_Photo = 0;
+        int LastNumber_Model = 0;
 
         DateTime LastNumber_Vid_forExport ;
         DateTime LastNumber_Photo_forExport ;
@@ -418,6 +432,15 @@ namespace Stereo_Vision
             while (Digit_PostFix.Length < Count_of_Digits_snap) Digit_PostFix += "0";//Заполняем нулями до нужной кондиции
             Digit_PostFix = String.Format(("{0:d" + Count_of_Digits_snap.ToString() + "}"), LastNumber_Photo);
             string resultivename = Snapshot_name + Digit_PostFix + Current_Extension_photo;
+            return resultivename;
+        }
+        private string CalculatenName_forNewModel()
+        {
+            string Digit_PostFix = "";
+            if (LastNumber_Model > Math.Pow(10, Count_of_Digits_mod) - 1) LastNumber_Model = 0;
+            while (Digit_PostFix.Length < Count_of_Digits_mod) Digit_PostFix += "0";//Заполняем нулями до нужной кондиции
+            Digit_PostFix = String.Format(("{0:d" + Count_of_Digits_mod.ToString() + "}"), LastNumber_Model);
+            string resultivename = Model_name + Digit_PostFix + Current_Extension_model;
             return resultivename;
         }
         private void SetResolution(int w,int h)

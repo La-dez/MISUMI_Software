@@ -8,6 +8,8 @@ using Emgu.CV;
 
 using Emgu.CV.CvEnum;
 
+using OpenTK_3DMesh;
+
 namespace Stereo_Vision
 {
     partial class MainWindow
@@ -25,8 +27,17 @@ namespace Stereo_Vision
         private void Initialize_Player_Controls(Modes pPlayMode_2set)
         {
             CV_ImBox_Capture.Visible = false;
-            CV_ImBox_VidPhoto_Player.Visible = true;
             PB_MeasurementPB.Visible = false;
+            if(pPlayMode_2set==Modes.Models3D)
+            {
+                CV_ImBox_VidPhoto_Player.Visible = false ;
+                OTK_3D_Control.Visible = true;
+            }
+            else
+            {
+                OTK_3D_Control.Visible = false;
+                CV_ImBox_VidPhoto_Player.Visible = true;
+            }
             Toogle_Play_Mode(pPlayMode_2set);
 
         }
@@ -145,13 +156,13 @@ namespace Stereo_Vision
 
                 if (!string.IsNullOrWhiteSpace(Path_to_files))
                 {
-                    Find_and_Resort_Files(ppPlayMode_2set, Path_to_files);
+                    Find_and_Resort_Files(ppPlayMode_2set, Path_to_files); //пересортировка по дате
                 }
                 else { }
                 if ((Playing_mode==Modes.Video) && isPlayingVideoNow) View_Video_Stop();
 
 
-                Load_File_onControls(ppPlayMode_2set);
+                Load_File_onControls(ppPlayMode_2set); //
                 Playing_mode = ppPlayMode_2set;
                 Pan_Pl_Video.Visible = (ppPlayMode_2set == Modes.Video);
                 Pan_Pl_Photo.Visible = (ppPlayMode_2set == Modes.Photo);
@@ -224,7 +235,25 @@ namespace Stereo_Vision
         }
         private void View_Model_byIndex(int pIndex)
         {
+
+            M3D_Figure = new MyMesh();
+            M3D_BasicMesh = new MyMesh();
+
+            //Load3DModel(Model_name_lastbuild_fullpath);
             Load3DModel("D:\\Models\\demo.ply");
+            //MyMesh.CreateCilindricMesh(out Figure, ConvertText(TBRadius.Text), 360.0f, 2.0f, 0.1f, Color.FromArgb(0, 255, 0));
+            //MyMesh.CreateCilindricMesh(out M3D_BasicMesh, 2, 360.0f, 2.0f, 0.1f, Color.FromArgb(0, 0, 0));
+            //MyMesh.CreatePlainMesh(out M3D_BasicMesh, 20.0f, 0.1f, Color.Black);
+            //MyMesh.CreateSphereMesh(out M3D_BasicMesh, 2, 0.1f, Color.FromArgb(0, 0, 0));
+
+            //MyMesh.CreateNullMesh(out M3D_Figure);
+            BindTextures();
+
+            M3D_BasicMesh.TranslationZ = -10;
+
+            Allow3DInvalidate = true;
+            Draw_3D_graphics();
+            Timer_3DRenderer.Start();
         }
         private void View_Video_Prev()
         {

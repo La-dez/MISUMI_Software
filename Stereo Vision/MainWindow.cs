@@ -12,6 +12,7 @@ using Emgu.CV.Structure;
 using Emgu.Util;
 using System.IO;
 using Microsoft.Win32;
+using OpenTK_3DMesh;
 
 namespace Stereo_Vision
 {
@@ -102,7 +103,15 @@ namespace Stereo_Vision
         }
         private void Build_Interface()
         {
-            //MainPanelRestruct
+            //Pan_pl_Base Restruct
+            this.Pan_Pl_Base_forAnyPLCtrls.Controls.Add(this.Pan_Pl_Photo);
+            this.Pan_Pl_Base_forAnyPLCtrls.Controls.Add(this.Pan_Pl_3D);
+            this.Pan_Pl_Base_forAnyPLCtrls.Controls.Add(this.Pan_Pl_Video);
+            Pan_Pl_Photo.Dock = DockStyle.Fill;
+            Pan_Pl_Video.Dock = DockStyle.Fill;
+            Pan_Pl_3D.Dock = DockStyle.Fill;
+
+            //MainPanel Restruct
             Pan_BASE_BackgroundPanel.Controls.Add(this.Pan_Settings);
             Pan_BASE_BackgroundPanel.Controls.Add(this.Pan_Export);
             Pan_BASE_BackgroundPanel.Controls.Add(this.Pan_Player);
@@ -569,14 +578,23 @@ namespace Stereo_Vision
 
         }
 
+
+        float Rrrot = 0;
         private void B_Pl_ModelPrevious_Click(object sender, EventArgs e)
         {
-
+            Rrrot -= (float)(22.5*Math.PI)/180.0f;
+            //M3D_BasicMesh.SetGetElementRotation(Rrrot, 0);
+            M3D_BasicMesh.SetGetElementRotation(Rrrot, 1);
+            // M3D_Figure.TranslationZ = -10;
+            Draw_3D_graphics();
         }
-
         private void B_Pl_ModelNext_Click(object sender, EventArgs e)
         {
-
+            Rrrot += (float)(22.5 * Math.PI) / 180.0f;
+            //M3D_BasicMesh.SetGetElementRotation(Rrrot, 0);
+            M3D_BasicMesh.SetGetElementRotation(Rrrot, 1);
+            // M3D_Figure.TranslationZ = -10;
+            Draw_3D_graphics();
         }
 
         private void ChB_Mes_p2p_CheckedChanged(object sender, EventArgs e)
@@ -678,9 +696,10 @@ namespace Stereo_Vision
 
         private void B_Mes_Reconstruct3D_Click(object sender, EventArgs e)
         {
+            Allow3DInvalidate = false;
             Playing_mode = Modes.Models3D;
-            OpenPlayPanel();
-            Draw();
+            OpenPlayPanel(true);
+            
         }
         private void B_Ex_3DMode_Click(object sender, EventArgs e)
         {
@@ -790,8 +809,8 @@ namespace Stereo_Vision
        
         private void Timer_3DRenderer_Tick(object sender, EventArgs e)
         {
-            if (is3DViewing)
-                try { Draw(); }
+            if (Playing_mode == Modes.Models3D)
+                try { Draw_3D_graphics(); }
                 catch
                 { /*RenderTimer.Stop(); */}
         }
@@ -803,17 +822,38 @@ namespace Stereo_Vision
             else OTK_3D_Control.Invalidate();
         }
 
+        Point RV_Start = new Point(); //RV - RotationVector
+        Point RV_Finish = new Point();//RV - RotationVector
+        bool Rotating = false;
+        double Rotation_power = 0;
+        double Rotation_powerX = 0;
+        double Rotation_powerY = 0;       
+        double Power2Angle = ((490.0*Math.PI/180.0)/1.0)/Math.Sqrt(1920 * 1920 + 1080 * 1080); //Максимально - 45гр/с
+
         private void OTK_3D_Control_MouseDown(object sender, MouseEventArgs e)
         {
             int ObjectN = FindAnObject(e.X, e.Y);
+            if(ObjectN==-1)
+            {
+                RV_Start = new Point(e.X, OTK_3D_Control.Height - e.Y);
+                Rotating = true;
+                if(!BGW_3DRotator.IsBusy) BGW_3DRotator.RunWorkerAsync();
+            }
+           
         }
 
         private void OTK_3D_Control_MouseUp(object sender, MouseEventArgs e)
         {
-            if ((BasicMesh.IsGrabed()) || (Figure.IsGrabed()))
+            if ((M3D_BasicMesh.IsGrabed()) || (M3D_Figure.IsGrabed()))
             {
-                BasicMesh.SetGrabParameters(false, 0, 0); Figure.SetGrabParameters(false, 0, 0);
+                M3D_BasicMesh.SetGrabParameters(false, 0, 0);
+                M3D_Figure.SetGrabParameters(false, 0, 0);
             }
+
+            RV_Finish = new Point(e.X, OTK_3D_Control.Height - e.Y);
+
+       
+            Rotating = false;
 
         }
 
@@ -822,25 +862,49 @@ namespace Stereo_Vision
             var Fig = new OpenTK_3DMesh.MyMesh();
             if (MeshesFixedByEachOther)
             {
-                if ((BasicMesh.IsGrabed()) || (Figure.IsGrabed()))
-                    if (BasicMesh.IsGrabed()) Fig = BasicMesh;
-                    else Fig = Figure;
+                if ((M3D_BasicMesh.IsGrabed()) || (M3D_Figure.IsGrabed()))
+                    if (M3D_BasicMesh.IsGrabed()) Fig = M3D_BasicMesh;
+                    else Fig = M3D_Figure;
                 if (!Fig.IsGrabed()) return;
-                trans = 1.925f * (-Fig.MoveZ) * 0.001f; //эмпирическая формула
-                Fig.MoveX += (e.X - remX) * trans; Fig.MoveY -= (e.Y - remY) * trans;
+                trans = 1.925f * (-Fig.TranslationZ) * 0.001f; //эмпирическая формула
+                Fig.TranslationX += (e.X - remX) * trans; Fig.TranslationY -= (e.Y - remY) * trans;
                 remX = e.X; remY = e.Y;
             }
             else
             {
-                if (!BasicMesh.IsGrabed()) return;
+                
+                if (M3D_BasicMesh.IsGrabed())
+                {
+                    Fig = M3D_BasicMesh;
+                    trans = 1.925f * (-Fig.TranslationZ) * 0.001f; //эмпирическая формула
+                    Fig.TranslationX += (e.X - remX) * trans; Fig.TranslationY -= (e.Y - remY) * trans;
+                    Fig = M3D_Figure;
+                    Fig.TranslationX += (e.X - remX) * trans; Fig.TranslationY -= (e.Y - remY) * trans;
+                    remX = e.X; remY = e.Y;
+                }
                 else
                 {
-                    Fig = BasicMesh;
-                    trans = 1.925f * (-Fig.MoveZ) * 0.001f; //эмпирическая формула
-                    Fig.MoveX += (e.X - remX) * trans; Fig.MoveY -= (e.Y - remY) * trans;
-                    Fig = Figure;
-                    Fig.MoveX += (e.X - remX) * trans; Fig.MoveY -= (e.Y - remY) * trans;
-                    remX = e.X; remY = e.Y;
+                    if (Rotating)
+                    {
+                        RV_Finish = new Point(e.X, OTK_3D_Control.Height - e.Y);
+                        double RP_dX = ((double)(RV_Finish.X - RV_Start.X));
+                        double RP_dY = ((double)(RV_Finish.Y - RV_Start.Y));
+                        Rotation_power = Math.Sqrt(Math.Pow(RP_dX, 2) + Math.Pow(RP_dY, 2));
+                        double RP_cos = RP_dX / Rotation_power;
+                        double RP_sin = RP_dY / Rotation_power;
+                        Rotation_powerY = RP_dX;
+                        Rotation_powerX = -RP_dY;
+
+
+                        RotX = M3D_BasicMesh.GetElementRotationX();
+                        RotY = M3D_BasicMesh.GetElementRotationY();
+                        double New_RotX = RotX + Rotation_powerX * Power2Angle;
+                        double New_RotY = RotY + Rotation_powerY * Power2Angle;
+                        this.BeginInvoke((Action)(() => M3D_BasicMesh.SetGetElementRotation(New_RotX, 0)));
+                        this.BeginInvoke((Action)(() => M3D_BasicMesh.SetGetElementRotation(New_RotY, 1)));
+                        RV_Start = new Point(e.X, OTK_3D_Control.Height - e.Y);
+                    }
+
                 }
             }
         }
@@ -848,6 +912,25 @@ namespace Stereo_Vision
         private void PB_MeasurementPB_Click_1(object sender, EventArgs e)
         {
 
+        }
+        double RotX = 0;
+        double RotY = 0;
+        private void BGW_3DRotator_DoWork(object sender, DoWorkEventArgs e)
+        {
+           /* while (Rotating)
+            {
+                
+                // Draw_3D_graphics();
+            }*/
+
+        }
+
+        private void BWorkerForLoad3D_DoWork(object sender, DoWorkEventArgs e)
+        {
+            BackgroundWorker bw = sender as BackgroundWorker;
+            // Start the time-consuming operation.
+            Bitmap dataBMP = CurrentStereoImage.BasicImage as Bitmap;
+            BuildModel3D(bw, dataBMP, true);
         }
     }
 }

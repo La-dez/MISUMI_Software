@@ -21,26 +21,38 @@ namespace OpenTK_3DMesh
         public float CenterX = 0, CenterY = 0, CenterZ = 0;
         // кол-во информации на вершину. 3 float на координаты, 3 float - на каналы R,G,B
         private float[] Rotation = { 0.0f, 0.0f, 0.0f };
-        private float[] RotationX = { 0.0f, 0.0f, 0.0f };
         public float[] remrot = { 0.0f, 0.0f, 0.0f };
-        private int axisVertex = 0;
+        private int axisVertex_count = 0;
         private float topRadius = 0;
         private int topNumber = 0;
-        public float MoveX = 0, MoveY = 0, MoveZ = 0;
+        public float TranslationX = 0, TranslationY = 0, TranslationZ = 0;
         public float UserCX = 0, UserCY = 0, UserCZ = 0;
         public float[] modelMatrix = new float[16];
-        private PointF grabedpoints = new PointF();
-        private string[] TypesOfMesh = new string[5] { "Sphere", "Cilindric", "Plane", "Model", "UserStyle" };
+        private PointF grabedpoint = new PointF();
+        private string[] TypesOfMesh = new string[6] { "Sphere", "Cilindric", "Plane", "Model", "UserStyle","NULL" };
         private string TypeOfMesh = null;
         public float rTopRadius = 0;
         bool grab = false;
         bool databasewasloaded = false;
         public bool IsRecalculated = true;
         bool AutoCorr = false;
+        public static double Grad2Rad = Math.PI / 180.0;
+        public static double Rad2Grad = 180.0 / Math.PI;
+
 
         public MyMesh()
         {
 
+        }
+        public static float NormalizeAngle(double pRad)
+        {
+            if (pRad >= 2 * Math.PI)
+                return (float)(pRad % (2 * Math.PI));
+            else return (float)pRad;
+        }
+        public static float RevertAngle(double pRad)
+        {
+            return (float)(2 * Math.PI - NormalizeAngle(pRad));
         }
         public MyMesh(float[] InData, float ZoomFact)
         {
@@ -120,12 +132,13 @@ namespace OpenTK_3DMesh
         public int GetNumberOfVertices() { return vertexCount; }
         public float GetTopRadius() { return topRadius; }
         public float GetZoomFactor() { return ZoomFactor; }
-        public int GetAxis() { return axisVertex; }
+        public int GetAxisVertexCount() { return axisVertex_count; }
         public bool IsGrabed() { return grab; }
         public void SetUserCenter(float XC, float YC, float ZC, MyMesh Fig)
         {
             IsRecalculated = false;
             Matrix4 xr, yr, zr; Matrix3 res; Matrix4 promres; //реализовать поворот для var Fig
+            float[] RotationX = { 0.0f, 0.0f, 0.0f };
 
             if (!((XC == 0.0f) && (YC == 0.0f) && (ZC == 0.0f)))
             {
@@ -188,7 +201,7 @@ namespace OpenTK_3DMesh
                 Data[i6 + 5] = Data[i6 + 5];
             }
             if (!((XC == 0.0f) && (YC == 0.0f) && (ZC == 0.0f)))
-            { UserCX = -MoveX / ZoomFactor + XC; UserCY = -MoveY / ZoomFactor + YC; UserCZ = -MoveZ / ZoomFactor + ZC; }
+            { UserCX = -TranslationX / ZoomFactor + XC; UserCY = -TranslationY / ZoomFactor + YC; UserCZ = -TranslationZ / ZoomFactor + ZC; }
             else { UserCX = 0.0f; UserCY = 0.0f; UserCZ = 0.0f; }
             for (int i = 0; i < vertexCount; i++)
             {
@@ -237,11 +250,11 @@ namespace OpenTK_3DMesh
             IsRecalculated = true;
         }
         public void SetNullCenter() { SetUserCenter(0.0f, 0.0f, 0.0f, null); }
-        public void SetAxis(int Vert) { axisVertex = Vert; }
+        public void SetAxisVertexCount(int Vert) { axisVertex_count = Vert; }
         public void SetGrabParameters(bool state, float t1, float t2)
         {
-            grabedpoints.X = t1;
-            grabedpoints.Y = t2;
+            grabedpoint.X = t1;
+            grabedpoint.Y = t2;//судя по всему, это не Х и У. Просто записал пересечения
             grab = state;
         }
         public void SetZoomFactor(float Zoom)
@@ -253,20 +266,26 @@ namespace OpenTK_3DMesh
                 topRadius = rTopRadius;
             }
         }
-        public float SetGetElementRotation(float Rot, int position)
+        public float SetGetElementRotation(double pRad, int position)
         {
-            if (position <= 2) Rotation[position] = Rot;
+            if (position <= 2) Rotation[position] = (float)pRad; //в текущем коде оси получились инвертированными. Почему - хз. Поэтому сделал 2*Math.PI - pRad
             else throw new Exception("Несоответствие размеров массивов поворота. Используйте второй параметр как 0,1 или 2");
             return Rotation[position];
         }
         public float GetElementRotation(int position) { return Rotation[position]; }
+        public float GetElementRotationX() { return Rotation[0]; }
+        public float GetElementRotationY() { return Rotation[1]; }
+        public float GetElementRotationZ() { return Rotation[2]; }
+
+
+
         public float GetElementRemRotation(int position) { return remrot[position]; }
         public void SetRealRadius(float radius) { rTopRadius = radius; }
         public float GetRealRadius() { return rTopRadius; }
         public int GetBufferSize() { return vertexCount * vertexSize; }
-        public void SetType(int num) { if (num > 4) num = 4; TypeOfMesh = TypesOfMesh[num]; }
+        public void SetType(int num) { if (num > 5) num = 5; TypeOfMesh = TypesOfMesh[num]; }
         private string GetType() { return TypeOfMesh; }
-        public int GetTypeID() { int ID; for (ID = 0; ID < 5; ID++) if (TypeOfMesh == TypesOfMesh[ID]) break; return (ID > 4 ? 4 : ID); }
+        public int GetTypeID() { int ID; for (ID = 0; ID < 6; ID++) if (TypeOfMesh == TypesOfMesh[ID]) break; return (ID > 5 ? 5 : ID); }
         public float[] GetMeshData()
         {
             var ptr = Data;
@@ -277,30 +296,38 @@ namespace OpenTK_3DMesh
             if (num - ((int)num) < 0.5f) return (int)num;
             else return (int)num + 1;
         }
-        public static void CreteCilindricMesh(out MyMesh Finalmesh, float radius, float angle, float height, float accuracy, Color color)
+       // public static 
+        public static void CreateCilindricMesh(out MyMesh Finalmesh, float radius, float angle, float height, float accuracy, Color color)
         {
-            float transconst = (float)Math.PI / 180.0f;
             float DrawStep = accuracy;
             //radius/ = 2.0f;
-            float realstep = 180.0f * DrawStep / (radius * (float)Math.PI);
+            float realstep = (DrawStep / radius)*(float)Rad2Grad;
             float stepgra = angle * (realstep) / (angle - (angle) % realstep),
                 r = color.R / 255.0f, g = color.G / 255.0f, b = color.B / 255.0f;
             int VertexInLine = right(angle / stepgra) + 1;
             int VertCount = VertexInLine * (int)(height / DrawStep + 1);
             float[] DataMass = new float[VertCount * 6 + (int)((height / DrawStep) + 1) * 6];
             int i6 = 0;
-            for (int i = 0; i < VertCount; i++)
+            for (int i = 0; i < VertCount; i++) //Cilynder itself
             {
                 i6 = i * 6;
-                DataMass[i6] = radius * (float)Math.Cos(transconst * (double)(stepgra * (i % VertexInLine)));
-                DataMass[i6 + 1] = radius * (float)Math.Sin(transconst * (double)(stepgra * (i % VertexInLine)));
+                DataMass[i6] = radius * (float)Math.Cos(Grad2Rad * (double)(stepgra * (i % VertexInLine)));
+                DataMass[i6 + 1] = radius * (float)Math.Sin(Grad2Rad * (double)(stepgra * (i % VertexInLine)));
                 DataMass[i6 + 2] = DrawStep * (int)(i / (right(angle / stepgra) + 1));
                 DataMass[i6 + 3] = r;
                 DataMass[i6 + 4] = g;
                 DataMass[i6 + 5] = b;
             }
 
-            for (int i = VertCount; i < VertCount + (int)((height / DrawStep) + 1); i++)
+            i6 = VertCount * 6; //red pt
+            DataMass[i6] = 0;
+            DataMass[i6 + 1] = 0;
+            DataMass[i6 + 2] = DrawStep * (VertCount - VertCount);
+            DataMass[i6 + 3] = 255;
+            DataMass[i6 + 4] = 0;
+            DataMass[i6 + 5] = 0;
+
+            for (int i = VertCount+1; i < VertCount + (int)((height / DrawStep) + 1); i++) //axis
             {
                 i6 = i * 6;
                 DataMass[i6] = 0;
@@ -311,15 +338,14 @@ namespace OpenTK_3DMesh
                 DataMass[i6 + 5] = b;
             }
             Finalmesh = new MyMesh(DataMass, 2);
-            Finalmesh.axisVertex = (int)((height / DrawStep) + 1);
+            Finalmesh.axisVertex_count = (int)((height / DrawStep) + 1);
             Finalmesh.SetType(1);
             Finalmesh.SetRealRadius(radius);
         }
-        public static void CreteSphereMesh(out MyMesh Finalmesh, float radius, float accuracy, Color color)
-        {
-            float transconst = (float)Math.PI / 180.0f;
+        public static void CreateSphereMesh(out MyMesh Finalmesh, float radius, float accuracy, Color color)
+        {           
             float DrawStep = accuracy;
-            float realstep = 180.0f * DrawStep / (radius * (float)Math.PI);
+            float realstep = (DrawStep / radius)*(float)Rad2Grad;
             float stepgra = 360.0f * (realstep) / (360.0f - (360.0f) % realstep),
                 x = 0, y = 0, z = 0, r = color.R / 255.0f, g = color.G / 255.0f, b = color.B / 255.0f;
             int VertexInLine = right(360.0f / stepgra) + 1;
@@ -329,8 +355,8 @@ namespace OpenTK_3DMesh
             for (int i = 0; i < VertCount; i++)
             {
                 i6 = i * 6;
-                factor = transconst * (double)(stepgra * (i % VertexInLine));
-                factor2 = transconst * stepgra * (i / VertexInLine);
+                factor = Grad2Rad * (double)(stepgra * (i % VertexInLine));
+                factor2 = Grad2Rad * stepgra * (i / VertexInLine);
                 DataMass[i6] = radius * (float)Math.Sin(factor2) * (float)Math.Cos(factor);
                 DataMass[i6 + 1] = radius * (float)Math.Sin(factor2) * (float)Math.Sin(factor);
                 DataMass[i6 + 2] = radius * (float)Math.Cos(factor2);
@@ -342,7 +368,7 @@ namespace OpenTK_3DMesh
             Finalmesh.SetType(0);
             Finalmesh.SetRealRadius(radius);
         }
-        public static void CretePlainMesh(out MyMesh Finalmesh, float XYPar, float accuracy, Color color)
+        public static void CreatePlainMesh(out MyMesh Finalmesh, float XYPar, float accuracy, Color color)
         {
             float r = color.R / 255.0f, g = color.G / 255.0f, b = color.B / 255.0f;
             float DrawStep = XYPar * (accuracy / (XYPar - (XYPar % accuracy)));
@@ -381,11 +407,11 @@ namespace OpenTK_3DMesh
             Finalmesh = new MyMesh(DataMass, 1);
             Finalmesh.SetType(2);
         }
-        public static void CreteNullMesh(out MyMesh Finalmesh)
+        public static void CreateNullMesh(out MyMesh Finalmesh)
         {
             float[] DataMass = new float[0];
             Finalmesh = new MyMesh(DataMass, 1);
-            Finalmesh.SetType(3);
+            Finalmesh.SetType(5);
         }
     }
     public class RGBPointOwnType

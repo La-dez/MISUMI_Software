@@ -9,6 +9,7 @@ using OpenTK.Graphics.OpenGL;
 using System.Drawing;
 using System.Windows.Forms;
 using CameraMath.Wrapper;
+using OpenTK_3DMesh;
 
 
 namespace Stereo_Vision
@@ -16,22 +17,21 @@ namespace Stereo_Vision
     partial class MainWindow
     {
         bool M3D_loaded = false;
-        int vertex = 0;
-        int fragment = 0;
-        int program = 0;
-        static float[] projectionMatrix = new float[16];
-        static float[] dataMatrix2 = new float[16];
-        static float[] ViewProjectionMatrix = new float[16];
-        static float[] viewMatrix = new float[16];
-        static float[] dataMatrix = new float[16];
-        static float[] modelMatrix = new float[16];
-        static float[] modelViewProjectionMatrix = new float[16];
-        static float[] CameraPosition = new float[3] { 0.0f, 0.0f, 0.0f };
-        static float[] viewDirection = new float[3] { 0.0f, 0.0f, -1.0f };
-        static float[] UPvector = new float[3] { 0.0f, 1.0f, 0.0f };
+        int M3D_program = 0;
+        static float[] M3D_projectionMatrix_MF4 = new float[16];
+        Matrix4 M3D_projectionMatrix_M4 = new Matrix4();
+        static float[] M3D_dataMatrix2 = new float[16]; //used for 3D drawing, so global
+        static float[] M3D_viewProjectionMatrix = new float[16];
+        static float[] M3D_viewMatrix_MF4 = new float[16];
+        Matrix4 M3D_viewMatrix_M4 = new Matrix4();
+        static float[] M3D_dataMatrix = new float[16];
+        static float[] M3D_modelMatrix = new float[16];
+        static float[] M3D_modelViewProjectionMatrix = new float[16];
+        static float[] M3D_CameraPosition = new float[3] { 0.0f, 0.0f, 0.0f };
+        static float[] M3D_viewDirection = new float[3] { 0.0f, 0.0f, -1.0f };
+        static float[] M3D_UPvector = new float[3] { 0.0f, 1.0f, 0.0f };
         bool firstfix = false;
-        Matrix4 projectionMatrixi = new Matrix4();
-        Matrix4 viewMatrixi = new Matrix4();
+        
         float remX = 0, remY = 0, trans = 0.05f;
         static int modelViewProjectionMatrixLocation = -1, positionLocation = -1, colorLocation = -1;
         float deltaTime = 0.002f;
@@ -41,12 +41,12 @@ namespace Stereo_Vision
                                                                  /* 2 вершина, позиция: */ 0.0f, 0.0f, 0.0f, /* цвет: */ 0.0f, 1.0f, 0.0f, 
                                                                  /* 3 вершина, позиция: */ -1.0f, 0.5f, 0.0f, /* цвет: */ 0.0f, 0.0f, 1.0f  , 
                                                                  /* 2 вершина, позиция: */ -1.0f, -0.5f, 0.0f, /* цвет: */ 0.0f, 1.0f, 0.0f};
-        MyMesh Figure = null;
-        MyMesh BasicMesh = null;
-        static int[] meshVAO = new int[2];
-        static int meshVBO = 0;
+        MyMesh M3D_Figure = null;
+        MyMesh M3D_BasicMesh = null;
+        static int[] M3D_meshVAO = new int[2]; //потому что будет базово юзать 2 фигуры. На самом деле одну, поэтому посмотрим.
+        static int M3D_meshVBO = 0;
 
-        bool AllowInvalidate = true;
+        bool Allow3DInvalidate = true;
 
         bool MeshesFixedByEachOther = false;
 
@@ -56,171 +56,197 @@ namespace Stereo_Vision
             LoadFigures();
             CreateBuffers();
             BindTextures();
-            // создадим перспективную матрицу проекции 
-            float aspectRatio = (float)OTK_3D_Control.Width / (float)OTK_3D_Control.Height;
-            Matrix4Perspective(projectionMatrix, 60.0f, aspectRatio, 0.1f, 200.0f);//перспектива 
-            Matrix4Trans(ref viewMatrix, Matrix4.LookAt
-             (new Vector3(CameraPosition[0], CameraPosition[1], CameraPosition[2]),
-              new Vector3(/*CameraPosition[0] + */viewDirection[0],
-                /*CameraPosition[1] + */viewDirection[1],
-                /*CameraPosition[2] +*/ viewDirection[2]),
-              new Vector3(UPvector[0], UPvector[1], UPvector[2]))); //мировая матрица - зависимость от точки обзора
-            Matrix4Mul(ViewProjectionMatrix, projectionMatrix, viewMatrix);// совместим матрицу проекции и матрицу наблюдателя 
-
-            projectionMatrixi = Matrix4.Invert(new Matrix4(
-               projectionMatrix[0], projectionMatrix[1], projectionMatrix[2], projectionMatrix[3],
-               projectionMatrix[4], projectionMatrix[5], projectionMatrix[6], projectionMatrix[7],
-               projectionMatrix[8], projectionMatrix[9], projectionMatrix[10], projectionMatrix[11],
-               projectionMatrix[12], projectionMatrix[13], projectionMatrix[14], projectionMatrix[15]));
-
-            float[] viewMatrixFF = new float[16];
-            Matrix4Trans(ref viewMatrixFF, Matrix4.LookAt
-             (new Vector3(CameraPosition[0], CameraPosition[1], CameraPosition[2]),
-              new Vector3(-viewDirection[0], -viewDirection[1], viewDirection[2]),
-              new Vector3(UPvector[0], UPvector[1], UPvector[2])));
-
-            viewMatrixi = Matrix4.Invert(new Matrix4(
-                    viewMatrixFF[0], viewMatrixFF[1], viewMatrixFF[2], viewMatrixFF[3],
-                    viewMatrixFF[4], viewMatrixFF[5], viewMatrixFF[6], viewMatrixFF[7],
-                    viewMatrixFF[8], viewMatrixFF[9], viewMatrixFF[10], viewMatrixFF[11],
-                    viewMatrixFF[12], viewMatrixFF[13], viewMatrixFF[14], viewMatrixFF[15]));
-
+            M3D_CreateProjectionMatrix();
             M3D_loaded = true;
+
             GL.ClearColor(Color.White);
             OTK_3D_Control.BackColor = Color.SkyBlue;
         }
         private void LoadShaders()
         {
+
+            int M3D_vertex = 0;
+            int M3D_fragment = 0;
+
             try
             {
                 int length = 0;
                 System.IO.StreamReader sr;
                 string[] shadertext1 = new string[1], shadertext2 = new string[1];
-                program = GL.CreateProgram();
-                vertex = GL.CreateShader(ShaderType.VertexShader);
-                fragment = GL.CreateShader(ShaderType.FragmentShader);
+
+                M3D_program = GL.CreateProgram();
+                M3D_vertex = GL.CreateShader(ShaderType.VertexShader);
+                M3D_fragment = GL.CreateShader(ShaderType.FragmentShader);
+                //load vertex shader
                 try
                 {
                     using (sr = new System.IO.StreamReader("lesson.vs"))
                     {
-                        shadertext1[0] = sr.ReadToEnd(); length = shadertext1[0].Count();
-                        GL.ShaderSource(vertex, 1, shadertext1, ref length);
+                        shadertext1[0] = sr.ReadToEnd();
+                        length = shadertext1[0].Count();
+                        GL.ShaderSource(M3D_vertex, 1, shadertext1, ref length);
                         sr.Close();
                     }
                 }
                 catch (Exception e)
                 {
+                    MessageBox.Show("Vertex шейдер не загружен. Оригинальный текст ошибки: " +
+                       e.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     MessageBox.Show(e.Message);
                 }
+                //load fragment shader
                 try
                 {
                     using (sr = new System.IO.StreamReader("lesson.fs"))
                     {
-                        shadertext2[0] = sr.ReadToEnd(); length = shadertext2[0].Count();
-                        GL.ShaderSource(fragment, 1, shadertext2, ref length);
+                        shadertext2[0] = sr.ReadToEnd();
+                        length = shadertext2[0].Count();
+                        GL.ShaderSource(M3D_fragment, 1, shadertext2, ref length);
                         sr.Close();
                     }
                 }
                 catch (Exception e)
                 {
-                    MessageBox.Show("Фрагментный шейдер не найден. Ориинальный текст ошибки: " +
+                    MessageBox.Show("Фрагментный шейдер не загружен. Оригинальный текст ошибки: " +
                         e.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
+
+
                 try
                 {
+                    //shaders compiling
                     int datalenght = 1000, datalenght2 = 1000;
                     // StringBuilder datasbuild = new StringBuilder(1000), datasbuild2 = new StringBuilder(1000);
                     string datasbuild =""; string datasbuild2 = "";
-                    GL.GetShaderSource(vertex, 1000, out datalenght, out datasbuild);
-                    GL.CompileShader(vertex);
-                    GL.GetShaderSource(fragment, 1000, out datalenght2, out datasbuild2);
-                    GL.CompileShader(fragment);
-                    GL.AttachShader(program, vertex);
-                    GL.AttachShader(program, fragment);
-                    GL.LinkProgram(program);
+                    GL.GetShaderSource(M3D_vertex, 1000, out datalenght, out datasbuild);
+                    GL.CompileShader(M3D_vertex);
+
+                    GL.GetShaderSource(M3D_fragment, 1000, out datalenght2, out datasbuild2);
+                    GL.CompileShader(M3D_fragment);
+
+                    //attachment and linking the program
+                    GL.AttachShader(M3D_program, M3D_vertex);
+                    GL.AttachShader(M3D_program, M3D_fragment);
+                    GL.LinkProgram(M3D_program);
+
+                    //checking link status
                     sr = null;
                     int link_ok;
-                    GL.GetProgram(program, GetProgramParameterName.LinkStatus, out link_ok);
+                    GL.GetProgram(M3D_program, GetProgramParameterName.LinkStatus, out link_ok);
 
-                    string error = null;
-                    GL.GetProgramInfoLog(program, out error);
-                    if (link_ok != (int)All.True) throw new Exception("Ошибка:" + error + "Проверочные значения: Link_ok=" +
-                        link_ok + ", True=" + ((int)All.True).ToString());
-                    GL.UseProgram(program);
-                    GL.ValidateProgram(program);
-                    GL.GetProgram(program, GetProgramParameterName.ValidateStatus, out link_ok);
-                    if (link_ok != (int)All.True) throw new Exception();
+
+                    string error_log = null;
+                    GL.GetProgramInfoLog(M3D_program, out error_log);
+                    if (link_ok != (int)All.True) throw new Exception("Ошибка:" + error_log + "Проверочные значения: Link_ok=" +
+                        link_ok + ", isTrue=" + ((int)All.True).ToString());
+
+                    GL.UseProgram(M3D_program);
+                    GL.ValidateProgram(M3D_program);
+                    GL.GetProgram(M3D_program, GetProgramParameterName.ValidateStatus, out link_ok);
+
+                    if (link_ok != (int)All.True) throw new Exception("Ошибка:" + error_log + "Проверочные значения: Link_ok=" +
+                        link_ok + ", isTrue=" + ((int)All.True).ToString());
                 }
-                catch (Exception exceptio)
+                catch (Exception exc)
                 {
-                    MessageBox.Show("Ошибка: " + exceptio.Message);
+                    MessageBox.Show("Ошибка: " + exc.Message);
                 }
             }
-            catch (Exception exception)
+            catch (Exception exc)
             {
-                MessageBox.Show("Ошибка: " + exception.Message);
+                MessageBox.Show("Ошибка: " + exc.Message);
             }
         }
         private void LoadFigures()
         {
-            Figure = new MyMesh();
-            BasicMesh = new MyMesh();
+            M3D_Figure = new MyMesh();
+            M3D_BasicMesh = new MyMesh();
             // MyMesh.CreteCilindricMesh(out Figure, 1.5f, 360.0f, 1.0f, 0.1f, Color.FromArgb(0, 255, 0));
             // MyMesh.CreteSphereMesh(out Figure, 2.0f, 0.1f, Color.FromArgb(0, 255, 0));
-            MyMesh.CretePlainMesh(out BasicMesh, 2.0f, 0.09f, Color.FromArgb(0, 255, 0));
-            MyMesh.CreteSphereMesh(out Figure, 2.0f, 0.1f, Color.FromArgb(0, 255, 0));
-            BasicMesh.SetZoomFactor(1.0f);
-            Figure.SetZoomFactor(1.0f);
-            BasicMesh.MoveX = 0.5f; BasicMesh.MoveY = 0.0f; BasicMesh.MoveZ = -5.0f;
-            Figure.MoveX = -0.5f; Figure.MoveY = 0.0f; Figure.MoveZ = -5.0f;
+            /*MyMesh.CreatePlainMesh(out M3D_BasicMesh, 2.0f, 0.09f, Color.FromArgb(0, 255, 0));
+            MyMesh.CreateSphereMesh(out M3D_Figure, 2.0f, 0.1f, Color.FromArgb(0, 255, 0));*/
+
+            M3D_BasicMesh.SetZoomFactor(1.0f);
+            M3D_Figure.SetZoomFactor(1.0f);
+            M3D_BasicMesh.TranslationX = 0.5f; M3D_BasicMesh.TranslationY = 0.0f; M3D_BasicMesh.TranslationZ = -5.0f;
+            M3D_Figure.TranslationX = -0.5f; M3D_Figure.TranslationY = 0.0f; M3D_Figure.TranslationZ = -5.0f;
+
         }
         private void CreateBuffers()
         {
-            GL.GenBuffers(1, out meshVBO);
-            GL.GenVertexArrays(1, out meshVAO[0]);
-            GL.GenVertexArrays(1, out meshVAO[1]);
+            GL.GenBuffers(1, out M3D_meshVBO);
+            GL.GenVertexArrays(1, out M3D_meshVAO[0]);
+            GL.GenVertexArrays(1, out M3D_meshVAO[1]);
         }
         private void BindTextures()
         {
-            AllowInvalidate = false;
-            int bufsize = Figure.GetBufferSize();
-            GL.BindBuffer(BufferTarget.ArrayBuffer, meshVBO);
-            GL.BufferData(BufferTarget.ArrayBuffer, new IntPtr(Figure.GetBufferSize() + BasicMesh.GetBufferSize()),
+            Allow3DInvalidate = false;
+            int bufsize = M3D_Figure.GetBufferSize();
+            GL.BindBuffer(BufferTarget.ArrayBuffer, M3D_meshVBO);
+            GL.BufferData(BufferTarget.ArrayBuffer, new IntPtr(M3D_Figure.GetBufferSize() + M3D_BasicMesh.GetBufferSize()),
                 new IntPtr(0), BufferUsageHint.StaticDraw);
-            GL.BufferSubData(BufferTarget.ArrayBuffer, new IntPtr(0), new IntPtr(Figure.GetBufferSize()), Figure.GetMeshData());
-            GL.BufferSubData(BufferTarget.ArrayBuffer, new IntPtr(Figure.GetBufferSize()),
-                new IntPtr(BasicMesh.GetBufferSize()), BasicMesh.GetMeshData());
+            GL.BufferSubData(BufferTarget.ArrayBuffer, new IntPtr(0), new IntPtr(M3D_Figure.GetBufferSize()), M3D_Figure.GetMeshData());
+            GL.BufferSubData(BufferTarget.ArrayBuffer, new IntPtr(M3D_Figure.GetBufferSize()),
+                new IntPtr(M3D_BasicMesh.GetBufferSize()), M3D_BasicMesh.GetMeshData());
 
-            positionLocation = GL.GetAttribLocation(program, "position");
-            colorLocation = GL.GetAttribLocation(program, "color");
+            positionLocation = GL.GetAttribLocation(M3D_program, "position");
+            colorLocation = GL.GetAttribLocation(M3D_program, "color");
             // смещения данных внутри вершинного буфера 
 
             if (positionLocation == -1) positionLocation = 1;// получим индекс атрибута 'position' из шейдера 
             if (colorLocation == -1) colorLocation = 0;// получим индекс атрибута 'color' из шейдера 
 
-            GL.BindVertexArray(meshVAO[0]);
+            GL.BindVertexArray(M3D_meshVAO[0]);
             GL.EnableVertexAttribArray(0);
             GL.EnableVertexAttribArray(1);
-            GL.BindBuffer(BufferTarget.ArrayBuffer, meshVBO);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, M3D_meshVBO);
             GL.VertexAttribPointer(positionLocation, 3, VertexAttribPointerType.Float, false, MyMesh.vertexSize, MyMesh.vertexOffsetPosition);
             GL.VertexAttribPointer(colorLocation, 3, VertexAttribPointerType.Float, false, MyMesh.vertexSize, MyMesh.vertexOffsetColor);
 
-            GL.BindVertexArray(meshVAO[1]);
+            GL.BindVertexArray(M3D_meshVAO[1]);
             GL.EnableVertexAttribArray(0);
             GL.EnableVertexAttribArray(1);
-            GL.BindBuffer(BufferTarget.ArrayBuffer, meshVBO);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, M3D_meshVBO);
             GL.VertexAttribPointer(positionLocation, 3, VertexAttribPointerType.Float, false, MyMesh.vertexSize,
-                Figure.GetBufferSize() + MyMesh.vertexOffsetPosition);
+                M3D_Figure.GetBufferSize() + MyMesh.vertexOffsetPosition);
             GL.VertexAttribPointer(colorLocation, 3, VertexAttribPointerType.Float, false, MyMesh.vertexSize,
-                Figure.GetBufferSize() + MyMesh.vertexOffsetColor);
+                M3D_Figure.GetBufferSize() + MyMesh.vertexOffsetColor);
 
             GL.VertexAttribPointer(positionLocation, 3, VertexAttribPointerType.Float, false, MyMesh.vertexSize, MyMesh.vertexOffsetPosition);
             GL.VertexAttribPointer(colorLocation, 3, VertexAttribPointerType.Float, false, MyMesh.vertexSize, MyMesh.vertexOffsetColor);
             /*  BasicMesh.MoveZ = -(TrBZModifier.Value / 100.0f);
               Figure.MoveZ = -(TrBZModifier.Value / 100.0f);*/
-            Figure.MoveZ = -(200 / 100.0f);
-            BasicMesh.MoveZ = -(200 / 100.0f);
-            AllowInvalidate = true;
+            /*M3D_Figure.TranslationZ = -(20 / 100.0f);
+            M3D_BasicMesh.TranslationZ = -(20 / 100.0f);*/
+
+            M3D_Figure.TranslationZ = 0;
+            M3D_BasicMesh.TranslationZ = 0;
+
+            Allow3DInvalidate = true;
+        }
+        private void M3D_CreateProjectionMatrix()
+        {// создадим перспективную матрицу проекции 
+            float aspectRatio = (float)OTK_3D_Control.Width / (float)OTK_3D_Control.Height;
+            MF4_PerspectiveMatrix_Create(M3D_projectionMatrix_MF4, 60.0f, aspectRatio, 0.1f, 200.0f);//перспектива 
+
+            M3D_viewMatrix_MF4 = M4_to_MF4(Matrix4.LookAt
+            (new Vector3(M3D_CameraPosition[0], M3D_CameraPosition[1], M3D_CameraPosition[2]),
+            new Vector3(  /*CameraPosition[0] + */M3D_viewDirection[0],
+                        /*CameraPosition[1] + */M3D_viewDirection[1],
+                        /*CameraPosition[2] +*/ M3D_viewDirection[2]),
+            new Vector3(M3D_UPvector[0], M3D_UPvector[1], M3D_UPvector[2]))); //мировая матрица - зависимость от точки обзора
+
+            MF4_Multiply(M3D_viewProjectionMatrix, M3D_projectionMatrix_MF4, M3D_viewMatrix_MF4);// совместим матрицу проекции и матрицу наблюдателя 
+
+            M3D_projectionMatrix_M4 = MF4_to_M4(M3D_projectionMatrix_MF4);
+
+            float[] viewMatrixFF = M4_to_MF4(Matrix4.LookAt
+             (new Vector3(M3D_CameraPosition[0], M3D_CameraPosition[1], M3D_CameraPosition[2]),
+              new Vector3(-M3D_viewDirection[0], -M3D_viewDirection[1], M3D_viewDirection[2]),
+              new Vector3(M3D_UPvector[0], M3D_UPvector[1], M3D_UPvector[2])));
+
+            M3D_viewMatrix_M4 = MF4_to_M4(viewMatrixFF);
+
         }
         private Vector3 GetNormalizedRayWor(float MouseX3D, int MouseY3D)
         {
@@ -229,70 +255,80 @@ namespace Stereo_Vision
             float z = 1.0f;
             Vector3 ray_nds = new Vector3(x, y, z);
             Vector4 ray_clip = new Vector4(ray_nds.X, ray_nds.Y, -1.0f, 1.0f);
-            Vector4 ray_eye = Vector4.Transform(ray_clip, projectionMatrixi);
+            Vector4 ray_eye = Vector4.Transform(ray_clip, M3D_projectionMatrix_M4);
             ray_eye = new Vector4(ray_eye.X, ray_eye.Y, -1.0f, 0.0f);
-            return Vector3.Normalize(new Vector3(Vector4.Transform(ray_eye, viewMatrixi)));
+            return Vector3.Normalize(new Vector3(Vector4.Transform(ray_eye, M3D_viewMatrix_M4)));
         }
-        private void Draw()
+        private void Draw_3D_graphics()
         {
-            if (AllowInvalidate)
+            if (Allow3DInvalidate)
             {
                 GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-                GL.Enable(EnableCap.DepthTest);
+                GL.Enable(EnableCap.DepthTest);//убирает херню с наложением 3D моделей
                 GL.Viewport(0, 0, OTK_3D_Control.Width, OTK_3D_Control.Height);
                 GL.EnableClientState(ArrayCap.VertexArray);
-                GL.UseProgram(program);
+                GL.UseProgram(M3D_program);
+
+
                 Matrix4 xr, yr, zr;
-                Matrix4Translation(dataMatrix2, BasicMesh.MoveX, BasicMesh.MoveY, BasicMesh.MoveZ);//перенос        
+                M3D_dataMatrix2 = MF4_TranslationMatrix_Create(M3D_BasicMesh.TranslationX, M3D_BasicMesh.TranslationY, M3D_BasicMesh.TranslationZ);//перенос        
 
-                xr = Matrix4.CreateRotationX(BasicMesh.GetElementRotation(0));
-                yr = Matrix4.CreateRotationY(BasicMesh.GetElementRotation(1));
-                zr = Matrix4.CreateRotationZ(BasicMesh.GetElementRotation(2));
-                Matrix4Mul(ref dataMatrix2, Matrix4Trans(zr * yr * xr)); // поворот
+                xr = Matrix4.CreateRotationX(MyMesh.RevertAngle(M3D_BasicMesh.GetElementRotationX()));
+                yr = Matrix4.CreateRotationY(MyMesh.RevertAngle(M3D_BasicMesh.GetElementRotationY()));
+                zr = Matrix4.CreateRotationZ(MyMesh.RevertAngle(M3D_BasicMesh.GetElementRotationZ()));
+                var M4_rotation = zr * yr * xr;
+                MF4_Multiply(ref M3D_dataMatrix2, M4_to_MF4(M4_rotation)); // поворот
 
-                float zf = BasicMesh.GetZoomFactor();
-                Matrix4Mul(ref dataMatrix2, Matrix4Trans(Matrix4.CreateScale(zf, zf, zf))); // увеличение
-                Matrix4Mul(modelViewProjectionMatrix, ViewProjectionMatrix, dataMatrix2);
+                float zf = M3D_BasicMesh.GetZoomFactor();
 
-                modelViewProjectionMatrixLocation = GL.GetUniformLocation(program, "modelViewProjectionMatrix");
-                GL.UniformMatrix4(modelViewProjectionMatrixLocation, 1, Convert.ToBoolean(All.True), modelViewProjectionMatrix);
-                GL.DrawArrays(PrimitiveType.LineStrip, Figure.GetNumberOfVertices(), BasicMesh.GetNumberOfVertices() - BasicMesh.GetAxis());
+
+                MF4_Multiply(ref M3D_dataMatrix2, M4_to_MF4(Matrix4.CreateScale(zf, zf, zf))); // увеличение
+                MF4_Multiply(M3D_modelViewProjectionMatrix, M3D_viewProjectionMatrix, M3D_dataMatrix2); //матрица проекций
+
+                modelViewProjectionMatrixLocation = GL.GetUniformLocation(M3D_program, "modelViewProjectionMatrix");
+                //отрисовка опорной модели
+                GL.UniformMatrix4(modelViewProjectionMatrixLocation, 1, Convert.ToBoolean(All.True), M3D_modelViewProjectionMatrix);
+                //отрисовывает все(что касается опорной фигуры), что в буфере , начиная со следующей вершины после окончания вершин Figure
+                GL.DrawArrays(PrimitiveType.LineStrip, M3D_Figure.GetNumberOfVertices(), M3D_BasicMesh.GetNumberOfVertices() - M3D_BasicMesh.GetAxisVertexCount());
                 GL.PointSize(2.0f);
-                GL.DrawArrays(PrimitiveType.Points, Figure.GetNumberOfVertices() + BasicMesh.GetNumberOfVertices() - BasicMesh.GetAxis(), BasicMesh.GetAxis());
+                //отрисовывает саму ось
+                GL.DrawArrays(PrimitiveType.Points, M3D_Figure.GetNumberOfVertices() + M3D_BasicMesh.GetNumberOfVertices() - M3D_BasicMesh.GetAxisVertexCount(), M3D_BasicMesh.GetAxisVertexCount());
 
                 
                 if (!MeshesFixedByEachOther)
                 {
-                    if (Figure.IsRecalculated)
+                    if (M3D_Figure.IsRecalculated)
                     {
-                        Matrix4Translation(dataMatrix2, Figure.MoveX, Figure.MoveY, Figure.MoveZ);//перенос
-                        xr = Matrix4.CreateRotationX(Figure.GetElementRotation(0));
-                        yr = Matrix4.CreateRotationY(Figure.GetElementRotation(1));
-                        zr = Matrix4.CreateRotationZ(Figure.GetElementRotation(2));
+                        M3D_dataMatrix2 = MF4_TranslationMatrix_Create(M3D_Figure.TranslationX, M3D_Figure.TranslationY, M3D_Figure.TranslationZ);//перенос
                     }
                 }
                 else
                 {
-                    Figure.SetGetElementRotation(BasicMesh.GetElementRotation(0), 0);
-                    Figure.SetGetElementRotation(BasicMesh.GetElementRotation(1), 1);
-                    Figure.SetGetElementRotation(BasicMesh.GetElementRotation(2), 2);
-                    xr = Matrix4.CreateRotationX(Figure.GetElementRotation(0));
-                    yr = Matrix4.CreateRotationY(Figure.GetElementRotation(1));
-                    zr = Matrix4.CreateRotationZ(Figure.GetElementRotation(2));
-                    Matrix4Translation(dataMatrix2, BasicMesh.MoveX, BasicMesh.MoveY, BasicMesh.MoveZ);//перенос  
+                    //В поворот построенной модели записываем поворот опорной
+                    M3D_Figure.SetGetElementRotation(M3D_BasicMesh.GetElementRotation(0), 0);
+                    M3D_Figure.SetGetElementRotation(M3D_BasicMesh.GetElementRotation(1), 1);
+                    M3D_Figure.SetGetElementRotation(M3D_BasicMesh.GetElementRotation(2), 2);
+                    M3D_dataMatrix2 = MF4_TranslationMatrix_Create(M3D_BasicMesh.TranslationX, M3D_BasicMesh.TranslationY, M3D_BasicMesh.TranslationZ);//перенос  
                 }
 
-                Matrix4Mul(ref dataMatrix2, Matrix4Trans(zr * yr * xr));
+                //отрисовка самой модели
+                xr = Matrix4.CreateRotationX(MyMesh.RevertAngle(M3D_Figure.GetElementRotationX()));
+                yr = Matrix4.CreateRotationY(MyMesh.RevertAngle(M3D_Figure.GetElementRotationY()));
+                zr = Matrix4.CreateRotationZ(MyMesh.RevertAngle(M3D_Figure.GetElementRotationZ()));
 
-                zf = Figure.GetZoomFactor();
-                Matrix4Mul(ref dataMatrix2, Matrix4Trans(Matrix4.CreateScale(zf, zf, zf))); // увеличение
-                Matrix4Mul(modelViewProjectionMatrix, ViewProjectionMatrix, dataMatrix2);
+                MF4_Multiply(ref M3D_dataMatrix2, M4_to_MF4(zr * yr * xr)); //поворот
 
-                modelViewProjectionMatrixLocation = GL.GetUniformLocation(program, "modelViewProjectionMatrix");
-                GL.UniformMatrix4(modelViewProjectionMatrixLocation, 1, Convert.ToBoolean(All.True), modelViewProjectionMatrix);
-                if (Figure.GetTypeID() != 4)
-                    GL.DrawArrays(PrimitiveType.Triangles, 0, Figure.GetNumberOfVertices());
-              /*  else //Это отрисовка измерений. Надо переписать под чистую
+                zf = M3D_Figure.GetZoomFactor();
+                MF4_Multiply(ref M3D_dataMatrix2, M4_to_MF4(Matrix4.CreateScale(zf, zf, zf))); // увеличение
+                MF4_Multiply(M3D_modelViewProjectionMatrix, M3D_viewProjectionMatrix, M3D_dataMatrix2); //матрица проекций
+
+                modelViewProjectionMatrixLocation = GL.GetUniformLocation(M3D_program, "modelViewProjectionMatrix");
+                GL.UniformMatrix4(modelViewProjectionMatrixLocation, 1, Convert.ToBoolean(All.True), M3D_modelViewProjectionMatrix);
+                if (M3D_Figure.GetTypeID() != 4) // если не измерения
+                    //посколько Figure находится в конце буфера, рисуем буфер до конца 
+                    GL.DrawArrays(PrimitiveType.Triangles, 0, M3D_Figure.GetNumberOfVertices());
+
+              /*  else //а если измерения...//Это отрисовка измерений. Надо переписать под чистую
                 {
                     GL.PointSize(3.0f);
                     int i = 0;
@@ -458,6 +494,11 @@ namespace Stereo_Vision
         double sred100Z = 0;
         private MyMesh BuildModel3D(System.ComponentModel.BackgroundWorker bw, Image image,bool IsPrism)
         {
+            if (bw == null)
+            {
+                bw = new System.ComponentModel.BackgroundWorker();
+                bw.RunWorkerAsync();
+            }
             LogMessage("Начало построения 3D...");      
             bool bDenseStereoCorrTestPassed = true;
             ICameraPair stereoPair = null;
@@ -503,7 +544,7 @@ namespace Stereo_Vision
             {
                 if (!bw.CancellationPending)
                 {
-                    LogMessage("Загрузка файла stereo_params.xml");
+                    LogMessage("Загрузка файла stereo_params_new.xml");
                     // Set ROI (region of interest)
 
                     int GRPX_x2 = GRPX * 2;
@@ -518,18 +559,18 @@ namespace Stereo_Vision
                     // Initialize stereo correspondence finder
                     if (IsPrism)
                     {
-                        var zPlane = new Plane3d(new Point3d(0.0, 0.0, 1.0), -14.0);
-                        stereoEstimator = StereoDenseCorrFactory.GetRectifStereoDenseEstimator(stereoPair, rectROI1, rectROI2, zPlane);
+                        var zPlane = new Plane3d(new Point3d(0.0, 0.0, 1.0), -17.0);
+                        stereoEstimator = StereoDenseCorrFactory.GetPrismRectifStereoDenseEstimator(stereoPair, rectROI1, rectROI2, zPlane);
                     }
                     else
                     {
-                        stereoEstimator = StereoDenseCorrFactory.GetRectifStereoDenseEstimator(stereoPair, rectROI1, rectROI2);
+                        stereoEstimator = StereoDenseCorrFactory.GetProjRectifStereoDenseEstimator(stereoPair, rectROI1, rectROI2);
                     }
                     // Load parameters from file
-                    bDenseStereoCorrTestPassed = bDenseStereoCorrTestPassed && stereoEstimator.ReadParam("stereo_params.xml");
+                    bDenseStereoCorrTestPassed = bDenseStereoCorrTestPassed && stereoEstimator.ReadParam("stereo_params_new.xml");
                     // Set distance range (mm)
                     //  stereoEstimator.SetZDiap(5.0, 15.00);//17+-
-                    stereoEstimator.SetZDiap(10.0, 60.00);//17+-
+                    stereoEstimator.SetZDiap(10.0, 70.00);//17+-
                     System.Threading.Thread.Sleep(200);//little fix
                                                        //  SetProgress(15);
                 }
@@ -615,7 +656,11 @@ namespace Stereo_Vision
                         LogMessage("Запись файла модели(PLY)");
 
                         string datename = GetTimeString();
-                        PLYWriter.SaveBinary(datename + ".ply", trPtArray);
+                        CalculatenName_forNewPhoto_withoutPath();
+                        string FileName = CalculatenName_forNewModel();
+                        string FullPath = System.IO.Path.Combine(Rec_Models_path, FileName);
+                        PLYWriter.SaveBinary(FullPath, trPtArray);
+                        Model_name_lastbuild_fullpath = FullPath;
                         //bDenseStereoCorrTestPassed = bDenseStereoCorrTestPassed; //&&
 
                         //SetProgress(100);
@@ -642,10 +687,10 @@ namespace Stereo_Vision
 
             System.Threading.Thread.Sleep(200);
             bool result = true;
-            result = System.IO.File.Exists("demo.ply");
+            result = System.IO.File.Exists(way);
             try
             {
-                result = PLYReader.ReadBinary("demo.ply", ref trPtArrayRead);
+                result = PLYReader.ReadBinary(way, ref trPtArrayRead);
             }
             catch (Exception exc)
             {
@@ -690,37 +735,47 @@ namespace Stereo_Vision
                 RGBPointsMass[i].Y -= sred100Y;
                 RGBPointsMass[i].Z -= sred100Z;
             }
-            Figure = new MyMesh(RGBPointsMass, TriangleModelMass);
+            M3D_Figure = new MyMesh(RGBPointsMass, TriangleModelMass);
             BindTextures();
            // NeedLoader = false; ChkBModel.Checked = true;
         }
         private int FindAnObject(float MouseX3D, int MouseY3D)
         {
+            bool mB_isNull = (M3D_BasicMesh.GetTypeID() == 5);
+            bool mF_isNull = (M3D_Figure.GetTypeID() == 5);
             Vector3 ray_wor = GetNormalizedRayWor(MouseX3D, MouseY3D);
-            Vector3 O_C = new Vector3(-BasicMesh.MoveX + CameraPosition[0],
-                                      -BasicMesh.MoveY + CameraPosition[1],
-                                      -BasicMesh.MoveZ + CameraPosition[2]);
-            float b2 = ray_wor.X * O_C.X + ray_wor.Y * O_C.Y + ray_wor.Z * O_C.Z;
-            float TR2 = BasicMesh.GetTopRadius() * BasicMesh.GetZoomFactor();
-            float c2 = (float)(O_C.X * O_C.X + O_C.Y * O_C.Y + O_C.Z * O_C.Z) - TR2 * TR2;
+            Vector3 OC_mB = new Vector3(-M3D_BasicMesh.TranslationX + M3D_CameraPosition[0],
+                                      -M3D_BasicMesh.TranslationY + M3D_CameraPosition[1],
+                                      -M3D_BasicMesh.TranslationZ + M3D_CameraPosition[2]);
+            float M_Basic_b = ray_wor.X * OC_mB.X + ray_wor.Y * OC_mB.Y + ray_wor.Z * OC_mB.Z;
+            float M_Basic_TR = M3D_BasicMesh.GetTopRadius() * M3D_BasicMesh.GetZoomFactor();
+            float M_Basic_c = (float)(OC_mB.X * OC_mB.X + OC_mB.Y * OC_mB.Y + OC_mB.Z * OC_mB.Z) - M_Basic_TR * M_Basic_TR;
 
-            O_C = new Vector3(-Figure.MoveX + CameraPosition[0],
-                                      -Figure.MoveY + CameraPosition[1],
-                                      -Figure.MoveZ + CameraPosition[2]);
+            Vector3 OC_mF = new Vector3(-M3D_Figure.TranslationX + M3D_CameraPosition[0],
+                                       -M3D_Figure.TranslationY + M3D_CameraPosition[1],
+                                       -M3D_Figure.TranslationZ + M3D_CameraPosition[2]);
+            float M_Figure_b = ray_wor.X * OC_mF.X + ray_wor.Y * OC_mF.Y + ray_wor.Z * OC_mF.Z;
+            float M_Figure_TR = M3D_Figure.GetTopRadius() * M3D_Figure.GetZoomFactor();
+            float M_Figure_c = (float)(OC_mF.X * OC_mF.X + OC_mF.Y * OC_mF.Y + OC_mF.Z * OC_mF.Z) - M_Figure_TR * M_Figure_TR;
 
-            float b = ray_wor.X * O_C.X + ray_wor.Y * O_C.Y + ray_wor.Z * O_C.Z;
-            float TR = Figure.GetTopRadius() * Figure.GetZoomFactor();
-            float c = (float)(O_C.X * O_C.X + O_C.Y * O_C.Y + O_C.Z * O_C.Z) - TR * TR;
-            float Discr2 = b2 * b2 - c2, Discr1 = b * b - c;
-            float sDiscr1 = (float)Math.Sqrt(Discr1), sDiscr2 = (float)Math.Sqrt(Discr2);
-            float t1 = -b - sDiscr1, t2 = -b + sDiscr1, t3 = -b2 - sDiscr2, t4 = -b2 + sDiscr2;
-            if ((Discr1 < 0) && (Discr2 < 0)) return -1;
-            else if ((Discr2 >= 0) && (Discr1 >= 0))
+            float M_Basic_Discr = M_Basic_b * M_Basic_b - M_Basic_c;
+            float M_Basic_sD = (float)Math.Sqrt(M_Basic_Discr);
+
+            float M_Figure_Discr = M_Figure_b * M_Figure_b - M_Figure_c;
+            float M_Figure_sD = (float)Math.Sqrt(M_Figure_Discr);
+
+            float t1 = -M_Figure_b - M_Figure_sD, t2 = -M_Figure_b + M_Figure_sD; 
+            
+            float t3 = -M_Basic_b - M_Basic_sD, t4 = -M_Basic_b + M_Basic_sD;
+
+            if (((M_Figure_Discr < 0) && (M_Basic_Discr < 0))||((mB_isNull)&&(mF_isNull))) return -1; //Пересечений не найдено
+
+            else if ((M_Basic_Discr >= 0) && (M_Figure_Discr >= 0) && (!mB_isNull) && (!mF_isNull))
             {
                 if ((t1 < t2 ? t1 : t2) < (t3 < t4 ? t3 : t4))
                 {
-                    var Figu = Figure;
-                    Figure.SetGrabParameters(true, t1, t2);
+                    var Figu = M3D_Figure;
+                    M3D_Figure.SetGrabParameters(true, t1, t2);
                     // MessageBox.Show("Найдено 2 объекта, первый(треугольник) ближе "
                     //   + Triangle.GetGrabPart().ToString());
                     remX = MouseX3D; remY = MouseY3D;
@@ -728,25 +783,25 @@ namespace Stereo_Vision
                 }
                 else
                 {
-                    var Figu = BasicMesh;
-                    BasicMesh.SetGrabParameters(true, t3, t4);
+                    var Figu = M3D_BasicMesh;
+                    M3D_BasicMesh.SetGrabParameters(true, t3, t4);
                     // MessageBox.Show("Найдено 2 объекта, второй(фигура) ближе "+
                     //     Figure.GetGrabPart().ToString());
                     remX = MouseX3D; remY = MouseY3D;
                     return 2;
                 }
             }
-            else if (b * b - c >= 0)
+            else if ((M_Figure_Discr >= 0)&&(!mF_isNull))
             {
-                var Figu = Figure;
-                Figure.SetGrabParameters(true, t1, t2);
+                var Figu = M3D_Figure;
+                M3D_Figure.SetGrabParameters(true, t1, t2);
                 remX = MouseX3D; remY = MouseY3D;
                 return 1;
             }
-            else if (b2 * b2 - c2 >= 0)
+            else if ((M_Basic_Discr >= 0)&&(!mB_isNull))
             {
-                var Figu = BasicMesh;
-                BasicMesh.SetGrabParameters(true, t3, t4);
+                var Figu = M3D_BasicMesh;
+                M3D_BasicMesh.SetGrabParameters(true, t3, t4);
                 remX = MouseX3D; remY = MouseY3D;
                 return 2;
             }
@@ -754,7 +809,7 @@ namespace Stereo_Vision
             else return -1;
         }
         #region MatrixShit
-        static void Matrix4Perspective(float[] M, float fovy, float aspect, float znear, float zfar)
+        static void MF4_PerspectiveMatrix_Create(float[] M, float fovy, float aspect, float znear, float zfar)
         {
             float f = 1.00f / (float)Math.Tan(fovy * Math.PI / 360),//конвертация в радианы
                   A = (zfar + znear) / (znear - zfar),
@@ -765,25 +820,35 @@ namespace Stereo_Vision
             M[8] = 0; M[9] = 0; M[10] = A; M[11] = B;
             M[12] = 0; M[13] = 0; M[14] = -1; M[15] = 0;
         }
-        static void Matrix4Translation(float[] M, float x, float y, float z)
+        static float[] MF4_TranslationMatrix_Create(float x, float y, float z)
         {
+            float[] M = new float[16];
             M[0] = 1; M[1] = 0; M[2] = 0; M[3] = x;
             M[4] = 0; M[5] = 1; M[6] = 0; M[7] = y;
             M[8] = 0; M[9] = 0; M[10] = 1; M[11] = z;
             M[12] = 0; M[13] = 0; M[14] = 0; M[15] = 1;
+            return M;
         }
-        static void Matrix4Trans(ref float[] res, Matrix4 wM)
+        static void M4_to_MF4(ref float[] res, Matrix4 pM4)
         {
-            res[0] = wM[0, 0]; res[1] = wM[0, 1]; res[2] = wM[0, 2]; res[3] = wM[0, 3];
-            res[4] = wM[1, 0]; res[5] = wM[1, 1]; res[6] = wM[1, 2]; res[7] = wM[1, 3];
-            res[8] = wM[2, 0]; res[9] = wM[2, 1]; res[10] = wM[2, 2]; res[11] = wM[2, 3];
-            res[12] = wM[3, 0]; res[13] = wM[3, 1]; res[14] = wM[3, 2]; res[15] = wM[3, 3];
+            res[0] = pM4[0, 0]; res[1] = pM4[0, 1]; res[2] = pM4[0, 2]; res[3] = pM4[0, 3];
+            res[4] = pM4[1, 0]; res[5] = pM4[1, 1]; res[6] = pM4[1, 2]; res[7] = pM4[1, 3];
+            res[8] = pM4[2, 0]; res[9] = pM4[2, 1]; res[10] = pM4[2, 2]; res[11] = pM4[2, 3];
+            res[12] = pM4[3, 0]; res[13] = pM4[3, 1]; res[14] = pM4[3, 2]; res[15] = pM4[3, 3];
         }
-        static float[] Matrix4Trans(Matrix4 wM)
+        static float[] M4_to_MF4(Matrix4 pM4)
         {
-            float[] res = new float[16]; Matrix4Trans(ref res, wM); return res;
+            float[] res = new float[16]; M4_to_MF4(ref res, pM4); return res;
         }
-        static void Matrix4Mul(float[] M, float[] A, float[] B)
+        static Matrix4 MF4_to_M4(float[] pFloat_Matrix_4x4)
+        {
+            return Matrix4.Invert(new Matrix4(
+                    pFloat_Matrix_4x4[0],  pFloat_Matrix_4x4[1],  pFloat_Matrix_4x4[2],  pFloat_Matrix_4x4[3],
+                    pFloat_Matrix_4x4[4],  pFloat_Matrix_4x4[5],  pFloat_Matrix_4x4[6],  pFloat_Matrix_4x4[7],
+                    pFloat_Matrix_4x4[8],  pFloat_Matrix_4x4[9],  pFloat_Matrix_4x4[10], pFloat_Matrix_4x4[11],
+                    pFloat_Matrix_4x4[12], pFloat_Matrix_4x4[13], pFloat_Matrix_4x4[14], pFloat_Matrix_4x4[15]));
+        }
+        static void MF4_Multiply(float[] M, float[] A, float[] B)
         {
             M[0] = A[0] * B[0] + A[1] * B[4] + A[2] * B[8] + A[3] * B[12];
             M[1] = A[0] * B[1] + A[1] * B[5] + A[2] * B[9] + A[3] * B[13];
@@ -802,9 +867,9 @@ namespace Stereo_Vision
             M[14] = A[12] * B[2] + A[13] * B[6] + A[14] * B[10] + A[15] * B[14];
             M[15] = A[12] * B[3] + A[13] * B[7] + A[14] * B[11] + A[15] * B[15];
         }
-        static void Matrix4Mul(ref float[] A, float[] B)
+        static void MF4_Multiply(ref float[] A, float[] B)
         {
-            float[] M = new float[16]; Matrix4Mul(M, A, B); A = M;
+            float[] M = new float[16]; MF4_Multiply(M, A, B); A = M;
         }
         #endregion
     }
