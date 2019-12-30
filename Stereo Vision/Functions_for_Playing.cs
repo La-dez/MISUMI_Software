@@ -154,6 +154,9 @@ namespace Stereo_Vision
                         }
                 }
 
+                OTK_3D_Control.Visible = (ppPlayMode_2set == Modes.Models3D);
+                CV_ImBox_VidPhoto_Player.Visible = !OTK_3D_Control.Visible;
+
                 if (!string.IsNullOrWhiteSpace(Path_to_files))
                 {
                     Find_and_Resort_Files(ppPlayMode_2set, Path_to_files); //пересортировка по дате
@@ -211,9 +214,12 @@ namespace Stereo_Vision
         }
         private void View_Image_byIndex(int pIndex)
         {
-            var VisibleImage = new Mat(FilesToView[pIndex]);
-            CvInvoke.Resize(VisibleImage, resizedim, Size_for_Resizing, 0, 0, Inter.Linear);
-            CV_ImBox_VidPhoto_Player.Image = resizedim;
+            if (FilesToView.Count != 0)
+            {
+                var VisibleImage = new Mat(FilesToView[pIndex]);
+                CvInvoke.Resize(VisibleImage, resizedim, Size_for_Resizing, 0, 0, Inter.Linear);
+                CV_ImBox_VidPhoto_Player.Image = resizedim;
+            }
         }
         private void View_Video_byIndex(int pIndex)
         {
@@ -240,16 +246,18 @@ namespace Stereo_Vision
             M3D_BasicMesh = new MyMesh();
 
             //Load3DModel(Model_name_lastbuild_fullpath);
-            Load3DModel("D:\\Models\\demo.ply");
+            Load3DModel(FilesToView[pIndex]);
             //MyMesh.CreateCilindricMesh(out Figure, ConvertText(TBRadius.Text), 360.0f, 2.0f, 0.1f, Color.FromArgb(0, 255, 0));
             //MyMesh.CreateCilindricMesh(out M3D_BasicMesh, 2, 360.0f, 2.0f, 0.1f, Color.FromArgb(0, 0, 0));
             //MyMesh.CreatePlainMesh(out M3D_BasicMesh, 20.0f, 0.1f, Color.Black);
             //MyMesh.CreateSphereMesh(out M3D_BasicMesh, 2, 0.1f, Color.FromArgb(0, 0, 0));
 
             //MyMesh.CreateNullMesh(out M3D_Figure);
+
             BindTextures();
 
-            M3D_BasicMesh.TranslationZ = -10;
+            M3D_Figure.TranslationZ = -10;
+            M3D_Figure.SetZoomFactor(0.5f);
 
             Allow3DInvalidate = true;
             Draw_3D_graphics();

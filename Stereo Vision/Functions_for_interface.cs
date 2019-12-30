@@ -411,6 +411,12 @@ namespace Stereo_Vision
                                 Rec_Photos_path = toObject;
                                 break;
                             }
+                        case "Path_2save_Models":
+                            {
+                                string toObject = CutFromEdges(AllLines[i]);
+                                Rec_Models_path = toObject;
+                                break;
+                            }
                         case "Last_export_path_Video":
                             {
                                 string toObject = CutFromEdges(AllLines[i]);
@@ -421,6 +427,12 @@ namespace Stereo_Vision
                             {
                                 string toObject = CutFromEdges(AllLines[i]);
                                 Export_Photos_from = toObject;
+                                break;
+                            }
+                        case "Last_export_path_Models":
+                            {
+                                string toObject = CutFromEdges(AllLines[i]);
+                                Export_Models_from = toObject;
                                 break;
                             }
                         case "Last_export_path_Video_to":
@@ -435,11 +447,18 @@ namespace Stereo_Vision
                                 Export_Photos_to = toObject;
                                 break;
                             }
+                        case "Last_export_path_Models_to":
+                            {
+                                string toObject = CutFromEdges(AllLines[i]);
+                                Export_Models_to = toObject;
+                                break;
+                            }
                     }
 
                 }
                 LastNumber_Photo_forExport = DateTime.Now;
                 LastNumber_Vid_forExport = DateTime.Now;
+                LastNumber_Models_forExport = DateTime.Now;
                 Load_Settings();
             }
             catch
@@ -470,12 +489,19 @@ namespace Stereo_Vision
             Loaded_Height = 720;
             Rec_Videos_path = Path.Combine("C:\\", "Video");
             Rec_Photos_path = Path.Combine("C:\\", "Photo");
+            Rec_Models_path = Path.Combine("C:\\", "Models");
+
             Export_Vid_from = Path.Combine("C:\\", "Video");
             Export_Photos_from = Path.Combine("C:\\", "Photo");
-            Export_Vid_to = Path.Combine("C:\\", "Video" + " export " + User_Name); ;
-            Export_Photos_to = Path.Combine("C:\\", "Photo" + " export " + User_Name); ;
+            Export_Models_from = Path.Combine("C:\\", "Models");
+
+            Export_Vid_to = Path.Combine("C:\\", "Video" + " export " + User_Name); 
+            Export_Photos_to = Path.Combine("C:\\", "Photo" + " export " + User_Name);
+            Export_Models_to = Path.Combine("C:\\", "Models" + " export " + User_Name);
+
             LastNumber_Photo_forExport = DateTime.Now;
             LastNumber_Vid_forExport = DateTime.Now;
+            LastNumber_Models_forExport = DateTime.Now;
             Load_Settings();
         }
         private void Load_Settings()
@@ -559,37 +585,42 @@ namespace Stereo_Vision
         private void SaveSettings()
         {
             string ExactFileName = "App_prop.cfg";
-                using (StreamWriter sw = new StreamWriter(new FileStream(ExactFileName, FileMode.Create, FileAccess.Write)))
-                {
-                    sw.WriteLine("<LenghtOfOneFileInSeconds>" + Lenght_secs+ "</LenghtOfOneFileInSeconds>");
-                    sw.WriteLine("<FPStoWrite>" + Fps_toWrite+"</FPStoWrite>");
-                    sw.WriteLine("<FpsMax_toTranslate>" + FpsMax_toTranslate + "</FpsMax_toTranslate>");
+            using (StreamWriter sw = new StreamWriter(new FileStream(ExactFileName, FileMode.Create, FileAccess.Write)))
+            {
+                sw.WriteLine("<LenghtOfOneFileInSeconds>" + Lenght_secs+ "</LenghtOfOneFileInSeconds>");
+                sw.WriteLine("<FPStoWrite>" + Fps_toWrite+"</FPStoWrite>");
+                sw.WriteLine("<FpsMax_toTranslate>" + FpsMax_toTranslate + "</FpsMax_toTranslate>");
 
-                    sw.WriteLine("<LastFileDigit_vid>" + LastNumber_Vid+"</LastFileDigit_vid>");
-                    sw.WriteLine("<LastFileDigit_Photo>" + LastNumber_Photo + "</LastFileDigit_Photo>");
-                    sw.WriteLine("<Count_of_files_Vid>" + Count_of_Digits_vid + "</Count_of_files_Vid>");
-                    sw.WriteLine("<Count_of_files_Photo>" + Count_of_Digits_snap + "</Count_of_files_Photo>");
-                    sw.WriteLine("<Export_style>" + Export_style + "</Export_style>");
-                    sw.WriteLine("<Number_of_FilesorHours>" + Number_of_FilesorHours + "</Number_of_FilesorHours>");
-                    sw.WriteLine("<LastChargeLevel>" + LastChargeLevel + "</LastChargeLevel>");
+                sw.WriteLine("<LastFileDigit_vid>" + LastNumber_Vid+"</LastFileDigit_vid>");
+                sw.WriteLine("<LastFileDigit_Photo>" + LastNumber_Photo + "</LastFileDigit_Photo>");
+                sw.WriteLine("<Count_of_files_Vid>" + Count_of_Digits_vid + "</Count_of_files_Vid>");
+                sw.WriteLine("<Count_of_files_Photo>" + Count_of_Digits_snap + "</Count_of_files_Photo>");
+                sw.WriteLine("<Export_style>" + Export_style + "</Export_style>");
+                sw.WriteLine("<Number_of_FilesorHours>" + Number_of_FilesorHours + "</Number_of_FilesorHours>");
+                sw.WriteLine("<LastChargeLevel>" + LastChargeLevel + "</LastChargeLevel>");
 
-                    sw.WriteLine("<Brightness>" + Brightness_Value + "</Brightness>");
-                    sw.WriteLine("<Contrast>" + Contrast_Value + "</Contrast>");
-                    sw.WriteLine("<Saturation>" + Saturation_Value + "</Saturation>");
-                    sw.WriteLine("<Gamma>" + Gamma_Value + "</Gamma>");
-                    sw.WriteLine("<Gain>" + Gain_Value + "</Gain>");
-                   // sw.WriteLine("<Width>" + (_capture.GetCaptureProperty(CapProp.FrameWidth)).ToString() + "</Width>");
-                   // sw.WriteLine("<Height>" + (_capture.GetCaptureProperty(CapProp.FrameHeight)).ToString() + "</Height>");
-                    sw.WriteLine("<Width>" + (1280).ToString() + "</Width>");
-                    sw.WriteLine("<Height>" + (720).ToString() + "</Height>");
+                sw.WriteLine("<Brightness>" + Brightness_Value + "</Brightness>");
+                sw.WriteLine("<Contrast>" + Contrast_Value + "</Contrast>");
+                sw.WriteLine("<Saturation>" + Saturation_Value + "</Saturation>");
+                sw.WriteLine("<Gamma>" + Gamma_Value + "</Gamma>");
+                sw.WriteLine("<Gain>" + Gain_Value + "</Gain>");
+                // sw.WriteLine("<Width>" + (_capture.GetCaptureProperty(CapProp.FrameWidth)).ToString() + "</Width>");
+                // sw.WriteLine("<Height>" + (_capture.GetCaptureProperty(CapProp.FrameHeight)).ToString() + "</Height>");
+                sw.WriteLine("<Width>" + (1280).ToString() + "</Width>");
+                sw.WriteLine("<Height>" + (720).ToString() + "</Height>");
 
-                    sw.WriteLine("<Path_2save_Video>" + Rec_Videos_path + "</Path_2save_Video>");
-                    sw.WriteLine("<Path_2save_Photo>" + Rec_Photos_path + "</Path_2save_Photo>");
-                    sw.WriteLine("<Last_export_path_Video>" + Export_Vid_from + "</Last_export_path_Video>");
-                    sw.WriteLine("<Last_export_path_Photo>" + Export_Photos_from + "</Last_export_path_Photo>");
-                    sw.WriteLine("<Last_export_path_Video_to>" + Export_Vid_to + "</Last_export_path_Photo>");
-                    sw.WriteLine("<Last_export_path_Photo_to>" + Export_Photos_to + "</Last_export_path_Photo_to>");
-                }
+                sw.WriteLine("<Path_2save_Video>" + Rec_Videos_path + "</Path_2save_Video>");
+                sw.WriteLine("<Path_2save_Photo>" + Rec_Photos_path + "</Path_2save_Photo>");
+                sw.WriteLine("<Path_2save_Models>" + Rec_Models_path + "</Path_2save_Models>");
+
+                sw.WriteLine("<Last_export_path_Video>" + Export_Vid_from + "</Last_export_path_Video>");
+                sw.WriteLine("<Last_export_path_Photo>" + Export_Photos_from + "</Last_export_path_Photo>");
+                sw.WriteLine("<Last_export_path_Models>" + Export_Models_from + "</Last_export_path_Models>");
+
+                sw.WriteLine("<Last_export_path_Video_to>" + Export_Vid_to + "</Last_export_path_Photo>");
+                sw.WriteLine("<Last_export_path_Photo_to>" + Export_Photos_to + "</Last_export_path_Photo_to>");
+                sw.WriteLine("<Last_export_path_Models_to>" + Export_Models_to + "</Last_export_path_Photo_to>");
+            }
         }
 
         void SystemEvents_SessionSwitch(object sender, SessionSwitchEventArgs e)
@@ -638,6 +669,7 @@ namespace Stereo_Vision
 
                 LastNumber_Photo_forExport = DateTime.Now;
                 LastNumber_Vid_forExport = DateTime.Now;
+                LastNumber_Models_forExport = DateTime.Now;
 
                 Set_ChargeBMP(BMP2set_chargelev);
                 Set_ChargeTEXT(Text2set);

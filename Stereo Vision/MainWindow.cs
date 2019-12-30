@@ -687,6 +687,7 @@ namespace Stereo_Vision
             try
             {
                 CurrentStereoImage.ClearMEasurements();
+                DB_Invalidate();
             }
             catch
             {
@@ -862,23 +863,23 @@ namespace Stereo_Vision
             var Fig = new OpenTK_3DMesh.MyMesh();
             if (MeshesFixedByEachOther)
             {
-                if ((M3D_BasicMesh.IsGrabed()) || (M3D_Figure.IsGrabed()))
-                    if (M3D_BasicMesh.IsGrabed()) Fig = M3D_BasicMesh;
-                    else Fig = M3D_Figure;
-                if (!Fig.IsGrabed()) return;
-                trans = 1.925f * (-Fig.TranslationZ) * 0.001f; //эмпирическая формула
-                Fig.TranslationX += (e.X - remX) * trans; Fig.TranslationY -= (e.Y - remY) * trans;
+                Fig = M3D_Figure.IsGrabed() ? M3D_Figure : M3D_BasicMesh;
+                trans = 1.925f * (-Fig.TranslationZ) * 0.001f; //эмпирическая формула, коэффициент передвижения в зависимости от удаленности
+                Fig.TranslationX += (e.X - remX) * trans;
+                Fig.TranslationY -= (e.Y - remY) * trans;
+                    
+                Fig.TranslationX += (e.X - remX) * trans;
+                Fig.TranslationY -= (e.Y - remY) * trans;
                 remX = e.X; remY = e.Y;
+                
             }
             else
             {
-                
-                if (M3D_BasicMesh.IsGrabed())
+
+                if ((M3D_BasicMesh.IsGrabed()) || (M3D_Figure.IsGrabed()))
                 {
-                    Fig = M3D_BasicMesh;
+                    Fig = M3D_Figure.IsGrabed() ? M3D_Figure : M3D_BasicMesh;
                     trans = 1.925f * (-Fig.TranslationZ) * 0.001f; //эмпирическая формула
-                    Fig.TranslationX += (e.X - remX) * trans; Fig.TranslationY -= (e.Y - remY) * trans;
-                    Fig = M3D_Figure;
                     Fig.TranslationX += (e.X - remX) * trans; Fig.TranslationY -= (e.Y - remY) * trans;
                     remX = e.X; remY = e.Y;
                 }
@@ -896,12 +897,12 @@ namespace Stereo_Vision
                         Rotation_powerX = -RP_dY;
 
 
-                        RotX = M3D_BasicMesh.GetElementRotationX();
-                        RotY = M3D_BasicMesh.GetElementRotationY();
+                        RotX = M3D_Figure.GetElementRotationX();
+                        RotY = M3D_Figure.GetElementRotationY();
                         double New_RotX = RotX + Rotation_powerX * Power2Angle;
                         double New_RotY = RotY + Rotation_powerY * Power2Angle;
-                        this.BeginInvoke((Action)(() => M3D_BasicMesh.SetGetElementRotation(New_RotX, 0)));
-                        this.BeginInvoke((Action)(() => M3D_BasicMesh.SetGetElementRotation(New_RotY, 1)));
+                        this.BeginInvoke((Action)(() => M3D_Figure.SetGetElementRotation(New_RotX, 0)));
+                        this.BeginInvoke((Action)(() => M3D_Figure.SetGetElementRotation(New_RotY, 1)));
                         RV_Start = new Point(e.X, OTK_3D_Control.Height - e.Y);
                     }
 

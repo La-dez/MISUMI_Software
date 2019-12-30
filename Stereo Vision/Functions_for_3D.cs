@@ -508,7 +508,8 @@ namespace Stereo_Vision
             var trPtArray = new TriangPointArray3f();
             IndexTriplet[] TriangleModelMass;
             RGBPointOwnType[] RGBPointsMass;
-            string cfgFilePath = IsPrism ? "M5_chess_shiftM11.xml": "M1_chess.xml";
+            //string cfgFilePath = IsPrism ? "M5_chess_shiftM11.xml": "M1_chess.xml";
+            string cfgFilePath = IsPrism ? "M5_chess.xml" : "M1_chess.xml";
             MyMesh result = null;
 
             if (!bw.CancellationPending)
@@ -596,7 +597,7 @@ namespace Stereo_Vision
                     // Filter
                     // Delete triangles with edges longer than 0.2
                     LogMessage("Применение фильтров...");
-                  //  MeshUtils.FilterLongEdge(ref trPtArray, 0.2);
+                    MeshUtils.FilterLongEdge(ref trPtArray, 0.2);
                     LogMessage("Фильтры применены!");
                     // SetProgress(40);
                 }
@@ -624,6 +625,9 @@ namespace Stereo_Vision
                     if (!bw.CancellationPending)
                     {
                         LogMessage("Вычисление цветовых и пространственных координат...");
+                        MyMesh data;
+                        MyMesh.CreateCilindricMesh(out data, 1.5f, 360.0f, 1.0f, 0.1f, Color.FromArgb(0, 255, 0));
+
                         for (uint i = 0; i < Num_of_Pts; i++)
                         {
                             //Написал собственный каст типов. По факту, нужен для перегонки rgb из byte в double
@@ -698,7 +702,7 @@ namespace Stereo_Vision
             }
 
            // BCalculateQD.Enabled = false;
-           // MeshUtils.FilterLongEdge(ref trPtArrayRead, 0.2);
+            MeshUtils.FilterLongEdge(ref trPtArrayRead, 0.2);
             IndexTriplet indexTr = null;
             uint localMAX1 = trPtArrayRead.GetNumberOfTriangles();
             uint localMAX2 = trPtArrayRead.GetNumberOfPoints();
@@ -755,7 +759,7 @@ namespace Stereo_Vision
                                        -M3D_Figure.TranslationY + M3D_CameraPosition[1],
                                        -M3D_Figure.TranslationZ + M3D_CameraPosition[2]);
             float M_Figure_b = ray_wor.X * OC_mF.X + ray_wor.Y * OC_mF.Y + ray_wor.Z * OC_mF.Z;
-            float M_Figure_TR = M3D_Figure.GetTopRadius() * M3D_Figure.GetZoomFactor();
+            float M_Figure_TR = M3D_Figure.GetTopRadius() * M3D_Figure.GetZoomFactor() /5.0f; //top radius
             float M_Figure_c = (float)(OC_mF.X * OC_mF.X + OC_mF.Y * OC_mF.Y + OC_mF.Z * OC_mF.Z) - M_Figure_TR * M_Figure_TR;
 
             float M_Basic_Discr = M_Basic_b * M_Basic_b - M_Basic_c;

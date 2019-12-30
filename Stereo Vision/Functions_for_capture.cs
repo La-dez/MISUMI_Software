@@ -37,11 +37,11 @@ namespace Stereo_Vision
 
         string Export_Vid_from = Path.Combine(/*System.Windows.Forms.Application.StartupPath*/"D:\\", "Video");
         string Export_Photos_from = Path.Combine(/*System.Windows.Forms.Application.StartupPath*/"D:\\", "Photo");
-        string Export_3D_from = Path.Combine(/*System.Windows.Forms.Application.StartupPath*/"D:\\", "Models");
+        string Export_Models_from = Path.Combine(/*System.Windows.Forms.Application.StartupPath*/"D:\\", "Models");
 
         string Export_Vid_to = null;
         string Export_Photos_to = null;
-        string Export_3D_to = null;
+        string Export_Models_to = null;
 
         string Current_Extension_video = ".mp4";
         string Current_Extension_photo = ".jpeg";
@@ -82,6 +82,7 @@ namespace Stereo_Vision
 
         DateTime LastNumber_Vid_forExport ;
         DateTime LastNumber_Photo_forExport ;
+        DateTime LastNumber_Models_forExport;
 
         bool All_isPrepared_forCapture = false;
         VideoWriter VidWriter = null;
