@@ -31,13 +31,17 @@ namespace Stereo_Vision
         //Var's for videorecord
         double Lenght_secs = 10;
         int FramesToGot = 60 * 30;
-        string Rec_Videos_path = Path.Combine(/*System.Windows.Forms.Application.StartupPath*/"D:\\", "Video");
-        string Rec_Photos_path = Path.Combine(/*System.Windows.Forms.Application.StartupPath*/"D:\\", "Photo");
-        string Rec_Models_path = Path.Combine(/*System.Windows.Forms.Application.StartupPath*/"D:\\","Models");
+        string Rec_Videos_path = Path.Combine(/*System.Windows.Forms.Application.StartupPath*/"C:\\", "Video");
+        string Rec_Photos_path = Path.Combine(/*System.Windows.Forms.Application.StartupPath*/"C:\\", "Photo");
+        string Rec_Models_path = Path.Combine(/*System.Windows.Forms.Application.StartupPath*/"C:\\","Models");
 
-        string Export_Vid_from = Path.Combine(/*System.Windows.Forms.Application.StartupPath*/"D:\\", "Video");
-        string Export_Photos_from = Path.Combine(/*System.Windows.Forms.Application.StartupPath*/"D:\\", "Photo");
-        string Export_Models_from = Path.Combine(/*System.Windows.Forms.Application.StartupPath*/"D:\\", "Models");
+        string Rec_Videos_path_def = Path.Combine(/*System.Windows.Forms.Application.StartupPath*/"C:\\", "Video");
+        string Rec_Photos_path_def = Path.Combine(/*System.Windows.Forms.Application.StartupPath*/"C:\\", "Photo");
+        string Rec_Models_path_def = Path.Combine(/*System.Windows.Forms.Application.StartupPath*/"C:\\", "Models");
+
+        string Export_Vid_from = Path.Combine(/*System.Windows.Forms.Application.StartupPath*/"C:\\", "Video");
+        string Export_Photos_from = Path.Combine(/*System.Windows.Forms.Application.StartupPath*/"C:\\", "Photo");
+        string Export_Models_from = Path.Combine(/*System.Windows.Forms.Application.StartupPath*/"C:\\", "Models");
 
         string Export_Vid_to = null;
         string Export_Photos_to = null;
@@ -213,6 +217,7 @@ namespace Stereo_Vision
 
                     //   Refresh_image_Invoke(resizedim);
                     CV_ImBox_Capture.Image = resizedim;
+                    //CV_ImBox_Capture.Image = CurrentFrame;
                     FramesDrawen++;
                     STW_Resizing.Stop();
                     FrameDrawen = true;
@@ -283,7 +288,6 @@ namespace Stereo_Vision
                             LastNumber_Photo++;
                             isSnapShot_needed = false;
                             UpdateTextBox("Кадр " + Photo_name_lastcaptured + " сохранен!" , L_SnapShotSaved);
-                          //  L_SnapShotSaved.Text = "Кадр "+ FinalSnapShotName  + " сохранен!";
                       //  }
                     }
                     if(L_SnapShotSaved.Visible)
@@ -316,8 +320,53 @@ namespace Stereo_Vision
         }
         private void Restore_CaptureDirectory()
         {
-            if (!Directory.Exists("C:\\Video")) Directory.CreateDirectory("C:\\Video");
-            if (!Directory.Exists("C:\\Photo")) Directory.CreateDirectory("C:\\Photo");
+            try
+            {
+                if (!String.IsNullOrEmpty(Rec_Models_path))
+                {
+                    Directory.CreateDirectory(Rec_Models_path);
+                }
+                else throw new Exception();
+            }
+            catch
+            {
+                System.Windows.Forms.MessageBox.Show("Путь "+ Rec_Models_path+ " не может быть создан! Сохранение моделей будет производиться в "+ Rec_Models_path_def, "Предупреждение", 
+                    System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Exclamation);
+                Rec_Models_path = Rec_Models_path_def;
+                Directory.CreateDirectory(Rec_Models_path_def);
+            }
+
+            try
+            {
+                if (!String.IsNullOrEmpty(Rec_Photos_path))
+                {
+                    Directory.CreateDirectory(Rec_Photos_path);
+                }
+                else throw new Exception();
+            }
+            catch
+            {
+                System.Windows.Forms.MessageBox.Show("Путь " + Rec_Photos_path + " не может быть создан! Сохранение моделей будет производиться в "+ Rec_Photos_path_def, "Предупреждение",
+                    System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Exclamation);
+                Rec_Photos_path = Rec_Photos_path_def;
+                Directory.CreateDirectory(Rec_Photos_path_def);
+            }
+
+            try
+            {
+                if (!String.IsNullOrEmpty(Rec_Videos_path))
+                {
+                    Directory.CreateDirectory(Rec_Videos_path);
+                }
+                else throw new Exception();
+            }
+            catch
+            {
+                System.Windows.Forms.MessageBox.Show("Путь " + Rec_Videos_path + " не может быть создан! Сохранение моделей будет производиться в "+ Rec_Videos_path_def, "Предупреждение",
+                    System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Exclamation);
+                Rec_Videos_path = Rec_Videos_path_def;
+                Directory.CreateDirectory(Rec_Videos_path_def);
+            }
         }
         private void StartCapture()
         {

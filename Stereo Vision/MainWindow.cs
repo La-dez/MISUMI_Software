@@ -70,13 +70,13 @@ namespace Stereo_Vision
                 SwitchAdminMode(AdminMode);
                 OpenMainPanel();
                 HideSomeThings();
-                Restore_CaptureDirectory();
                 Read_and_Load_Settings();
+                Restore_CaptureDirectory();
                 System.Threading.Thread.CurrentThread.Priority = System.Threading.ThreadPriority.Highest;
                 BGWR_ChargeLev.WorkerSupportsCancellation = true;
                 BGWR_ChargeLev.RunWorkerAsync();
                 Set_ChargeBMP(BMP2set_chargelev);
-                Set_ChargeTEXT(Text2set);
+                Set_ChargeTEXT(Text2set);                
                 StartCapture();
 
 
@@ -85,7 +85,7 @@ namespace Stereo_Vision
                 CurrentFrame2 = new Mat();
                 resizedim = new Mat();
                 if(FullScrin) Size_for_Resizing = new Size(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height - 185);
-                else Size_for_Resizing = new Size(this.Width, this.Height - 150);
+                else Size_for_Resizing = new Size(this.Width, this.Height - 185);
 
 
                 myBuffer = currentContext.Allocate(PB_MeasurementPB.CreateGraphics(), PB_MeasurementPB.DisplayRectangle);
