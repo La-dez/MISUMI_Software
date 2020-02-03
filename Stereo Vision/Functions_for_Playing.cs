@@ -99,7 +99,7 @@ namespace Stereo_Vision
                 case Modes.Models3D:
                     {
                         TRB_Pl_ModelsLister.Minimum = 0;
-                        TRB_Pl_ModelsLister.Maximum = 0;
+                        TRB_Pl_ModelsLister.Maximum = FilesToView.Count-1;
                         TRB_Pl_ModelsLister.Value = 0;
 
                         L_Pl_Models_All.Text = (FilesToView.Count).ToString();

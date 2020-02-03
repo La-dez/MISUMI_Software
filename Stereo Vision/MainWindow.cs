@@ -595,19 +595,28 @@ namespace Stereo_Vision
         float Rrrot = 0;
         private void B_Pl_ModelPrevious_Click(object sender, EventArgs e)
         {
-            Rrrot -= (float)(22.5*Math.PI)/180.0f;
-            //M3D_BasicMesh.SetGetElementRotation(Rrrot, 0);
-            M3D_BasicMesh.SetGetElementRotation(Rrrot, 1);
-            // M3D_Figure.TranslationZ = -10;
-            Draw_3D_graphics();
+            /* Rrrot -= (float)(22.5*Math.PI)/180.0f;
+             //M3D_BasicMesh.SetGetElementRotation(Rrrot, 0);
+             M3D_BasicMesh.SetGetElementRotation(Rrrot, 1);
+             // M3D_Figure.TranslationZ = -10;
+             Draw_3D_graphics();*/
+            if (CurrentIndex - 1 == -1) CurrentIndex = FilesToView.Count - 1;
+            else CurrentIndex--;
+            TRB_Pl_ModelsLister.Value = CurrentIndex;
+            View_Model_byIndex(CurrentIndex);
         }
         private void B_Pl_ModelNext_Click(object sender, EventArgs e)
         {
-            Rrrot += (float)(22.5 * Math.PI) / 180.0f;
-            //M3D_BasicMesh.SetGetElementRotation(Rrrot, 0);
-            M3D_BasicMesh.SetGetElementRotation(Rrrot, 1);
-            // M3D_Figure.TranslationZ = -10;
-            Draw_3D_graphics();
+            /* Rrrot += (float)(22.5 * Math.PI) / 180.0f;
+             //M3D_BasicMesh.SetGetElementRotation(Rrrot, 0);
+             M3D_BasicMesh.SetGetElementRotation(Rrrot, 1);
+             // M3D_Figure.TranslationZ = -10;
+             Draw_3D_graphics();*/
+            if (CurrentIndex + 1 == FilesToView.Count) CurrentIndex = 0;
+            else CurrentIndex++;
+            TRB_Pl_ModelsLister.Value = CurrentIndex;
+            View_Model_byIndex(CurrentIndex);
+
         }
 
         private void ChB_Mes_p2p_CheckedChanged(object sender, EventArgs e)
@@ -973,7 +982,7 @@ namespace Stereo_Vision
 
         private void B_WB_Calculate_Click(object sender, EventArgs e)
         {
-            if (!DigitalWB_Active)
+          /*  if (!DigitalWB_Active)
             {
                 WhiteBalance.InitializeMatrix(1, ref CMatrix, 3, Height_Current, Width_Current);//CMatrix
                 CurNumOfImages_forWB = 1; Camulating_isActive = true;
@@ -982,7 +991,7 @@ namespace Stereo_Vision
             {
                 if (CurNumOfImages_forWB != NumOfImages_WB) WhiteBalance.InitializeMatrix(1, ref CMatrix, 3, Height_Current, Width_Current);
                 CurNumOfImages_forWB = NumOfImages_WB; Camulating_isActive = false;
-            }
+            }*/
         }
 
         private void tableLayoutPanel1_Paint_1(object sender, PaintEventArgs e)
