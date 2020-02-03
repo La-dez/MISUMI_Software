@@ -13,11 +13,12 @@ namespace Stereo_Vision
         StereoImage CurrentStereoImage = null;
         BufferedGraphicsContext currentContext = BufferedGraphicsManager.Current;// Gets a reference to the current BufferedGraphicsContext
         BufferedGraphics myBuffer;
-        Pen PencilForDraw2 = new Pen(Color.FromArgb(255, 50, 255, 50));
-        Pen PencilForDraw = new Pen(Color.FromArgb(255, 50, 255, 50), 2);
-        SolidBrush PencilPodsv = new SolidBrush(Color.FromArgb(100, 50, 255, 50));
+        static Pen PencilForDraw_yellow_1px = new Pen(Color.FromArgb(255, 255, 255, 0));
+        static Pen PencilForDraw_green_1px = new Pen(Color.FromArgb(255, 50, 255, 50));
+        static Pen PencilForDraw_green_2px = new Pen(Color.FromArgb(255, 50, 255, 50), 2);
+        static SolidBrush PencilPodsv = new SolidBrush(Color.FromArgb(100, 50, 255, 50));
 
-        Brush brush_text = new SolidBrush(Color.FromArgb(50, 255, 50));
+        static Brush brush_text = new SolidBrush(Color.FromArgb(50, 255, 50));
         System.Drawing.Font drawFont = new System.Drawing.Font("Arial", 18);
 
         const int GRPX = 25;
@@ -31,15 +32,19 @@ namespace Stereo_Vision
 
         MeasurementTypes CurrentMeasureType = MeasurementTypes.None;
 
-        public void Init_all_for_Measurements(string PathToImg)
+        public void Init_Stereoimage(string PathToImg)
         {
-            try { CurrentStereoImage = new StereoImage(new Bitmap(PathToImg), PB_MeasurementPB.Size); }
-            catch(Exception exc)
+            try
+            {
+                if (String.IsNullOrEmpty(PathToImg)) throw new Exception();
+                CurrentStereoImage = new StereoImage(new Bitmap(PathToImg), PB_MeasurementPB.Size);
+            }
+            catch (Exception exc)
             {
                 LogError(exc.Message);
                 try
                 {
-                    CurrentStereoImage = new StereoImage(resizedim.Bitmap, PB_MeasurementPB.Size);
+                    CurrentStereoImage = new StereoImage(CurrentFrame.Bitmap, PB_MeasurementPB.Size);
                 }
                 catch { }
             }
@@ -87,7 +92,7 @@ namespace Stereo_Vision
                 myBuffer.Graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
                 Draw_Base(true);
                 Draw_closed_Measurements();
-              //  Draw_opened_Measurement();
+                Draw_opened_Measurement();
                 //if()
                 myBuffer.Render();
                 myBuffer.Dispose();
@@ -104,15 +109,15 @@ namespace Stereo_Vision
             int CenterX = PB_MeasurementPB.Width/2;
             int CenterY = PB_MeasurementPB.Height / 2;
             if(UseImage) if (CurrentStereoImage != null) myBuffer.Graphics.DrawImage(CurrentStereoImage.BasicImage, PB_MeasurementPB.DisplayRectangle);
-            myBuffer.Graphics.DrawLine(PencilForDraw2, CenterX, 0, CenterX, PB_MeasurementPB.Height);
+            myBuffer.Graphics.DrawLine(PencilForDraw_green_1px, CenterX, 0, CenterX, PB_MeasurementPB.Height);
             for (int i = 0; i < CenterY; i += 20)
             {
-                myBuffer.Graphics.DrawLine(PencilForDraw2, CenterX - 5, CenterY - i, CenterX + 5, CenterY - i);
-                myBuffer.Graphics.DrawLine(PencilForDraw2, CenterX - 5, CenterY + i, CenterX + 5, CenterY + i);
+                myBuffer.Graphics.DrawLine(PencilForDraw_green_1px, CenterX - 5, CenterY - i, CenterX + 5, CenterY - i);
+                myBuffer.Graphics.DrawLine(PencilForDraw_green_1px, CenterX - 5, CenterY + i, CenterX + 5, CenterY + i);
             }
-            myBuffer.Graphics.DrawRectangle(PencilForDraw2, new Rectangle(GRPX, GRPX,
+            myBuffer.Graphics.DrawRectangle(PencilForDraw_green_1px, new Rectangle(GRPX, GRPX,
                                         CenterX - 2 * GRPX, PB_MeasurementPB.Height - 2 * GRPX));
-            myBuffer.Graphics.DrawRectangle(PencilForDraw2, new Rectangle(CenterX + GRPX, GRPX,
+            myBuffer.Graphics.DrawRectangle(PencilForDraw_green_1px, new Rectangle(CenterX + GRPX, GRPX,
                                         CenterX - 2 * GRPX, PB_MeasurementPB.Height - 2 * GRPX)); 
         }
         public void Draw_closed_Measurements()
@@ -125,7 +130,7 @@ namespace Stereo_Vision
             var pts_3d = CurrentStereoImage.Get_Pts_info_inCurMes();
             foreach (Special_3D_pt pt3d in pts_3d)
             {
-                Draw_point_stereo(pt3d);
+                Draw_point_stereo(pt3d,PencilForDraw_yellow_1px);
             }
         }
         private double PerfectRounding(double val, int CharN)
@@ -233,16 +238,18 @@ namespace Stereo_Vision
                     }
             }
         }
-        private void Draw_point(float tX,float tY)
+        private void Draw_point(float tX, float tY) => Draw_point(tX, tY, PencilForDraw_green_1px);
+        private void Draw_point(float tX, float tY, Pen pPen)
         {
-            myBuffer.Graphics.DrawEllipse(PencilForDraw2, tX - (ediamd2), tY - (ediamd2), ediam, ediam);
-            myBuffer.Graphics.DrawLine(PencilForDraw2, tX - ediam, tY, tX + ediam, tY);
-            myBuffer.Graphics.DrawLine(PencilForDraw2, tX, tY - ediam, tX, tY + ediam);
+            myBuffer.Graphics.DrawEllipse(pPen, tX - (ediamd2), tY - (ediamd2), ediam, ediam);
+            myBuffer.Graphics.DrawLine(pPen, tX - ediam, tY, tX + ediam, tY);
+            myBuffer.Graphics.DrawLine(pPen, tX, tY - ediam, tX, tY + ediam);
         }
-        private void Draw_point_stereo(Special_3D_pt pt)
+        private void Draw_point_stereo(Special_3D_pt pt) => Draw_point_stereo(pt, PencilForDraw_green_1px);
+        private void Draw_point_stereo(Special_3D_pt pt, Pen pPen)
         {
-            Draw_point((float)pt.P_left_OnCtrl.X, (float)pt.P_left_OnCtrl.Y);
-            Draw_point((float)pt.P_right_OnCtrl.X, (float)pt.P_right_OnCtrl.Y);
+            Draw_point((float)pt.P_left_OnCtrl.X, (float)pt.P_left_OnCtrl.Y, pPen);
+            Draw_point((float)pt.P_right_OnCtrl.X, (float)pt.P_right_OnCtrl.Y, pPen);
         }
         private void Draw_Line(float Start_X,float Start_Y, float Finish_X,float Finish_Y)
         {
@@ -294,7 +301,7 @@ namespace Stereo_Vision
                 if ((Finish_Y - Start_Y) > 0) popry = ediamd2;
                 else popry = -ediamd2;
             }
-            myBuffer.Graphics.DrawLine(PencilForDraw, new PointF(Start_X + poprx,
+            myBuffer.Graphics.DrawLine(PencilForDraw_green_2px, new PointF(Start_X + poprx,
                 Start_Y + popry),
                 new PointF(Finish_X - poprx, Finish_Y - popry));
         }

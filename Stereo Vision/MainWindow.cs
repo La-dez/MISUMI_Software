@@ -27,7 +27,17 @@ namespace Stereo_Vision
         bool isArduino_closed = true;
         int ticks = 0;
         string User_Name = "MPEI";
-        
+
+        //TODO: убрать следующие переменные отсюда
+        int NumOfImages_WB = 2;
+        int CurNumOfImages_forWB = 2;
+
+        bool Camulating_isActive = false;
+        bool DigitalWB_Active = false;
+        double[,,] CMatrix;
+        int Width_Current = 1280;
+        int Height_Current = 720;
+
 
         int Saving_ShowLabel_time = 3;
 
@@ -71,18 +81,19 @@ namespace Stereo_Vision
                 OpenMainPanel();
                 HideSomeThings();
                 Read_and_Load_Settings();
-                Restore_CaptureDirectory();
                 System.Threading.Thread.CurrentThread.Priority = System.Threading.ThreadPriority.Highest;
                 BGWR_ChargeLev.WorkerSupportsCancellation = true;
                 BGWR_ChargeLev.RunWorkerAsync();
                 Set_ChargeBMP(BMP2set_chargelev);
-                Set_ChargeTEXT(Text2set);                
+                Set_ChargeTEXT(Text2set);
+                WhiteBalance.InitializeMatrix(1, ref CMatrix, Width_Current, Height_Current, 3);
                 StartCapture();
 
 
                 this.DoubleBuffered = true;
                 CurrentFrame = new Mat();
                 CurrentFrame2 = new Mat();
+                CurrentFrame_wb = new Mat();
                 resizedim = new Mat();
                 if(FullScrin) Size_for_Resizing = new Size(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height - 185);
                 else Size_for_Resizing = new Size(this.Width, this.Height - 185);
@@ -93,7 +104,8 @@ namespace Stereo_Vision
                 myBuffer.Render();
                 myBuffer.Dispose();
 
-                MyInit();
+                Models_view_init();
+                Restore_CaptureDirectory();
                 // Width_for_Resizing = CV_ImBox_Capture.Width;
                 //  Height_for_Resizing = CV_ImBox_Capture.Height;
                 // Size_for_Resizing = new Size(Width_for_Resizing, Height_for_Resizing);
@@ -138,6 +150,7 @@ namespace Stereo_Vision
             CV_ImBox_Capture.Dock = DockStyle.Fill;
             PB_MeasurementPB.Dock = DockStyle.Fill;
             OTK_3D_Control.Dock = DockStyle.Fill;
+            L_SnapShotSaved.BringToFront();
         }
         private void MainWindow_KeyDown(object sender, KeyEventArgs e)
         {
@@ -717,14 +730,15 @@ namespace Stereo_Vision
         {
             //CurrentStereoImage = new StereoImage()
             ActivatePreviousMode = (Action)OpenPlayPanel;
-            Init_all_for_Measurements(FilesToView[CurrentIndex]);
+            Init_Stereoimage(FilesToView[CurrentIndex]);
             OpenMeasurementsPanel();
             DB_Invalidate();
         }
 
         private void B_MeasureMode_Click(object sender, EventArgs e)
         {
-            Init_all_for_Measurements(Photo_name_lastcaptured_fullpath);
+            isSnapShot_needed = true;
+            Init_Stereoimage(null);
             ActivatePreviousMode = new Action(()=> 
             {   OpenMainPanel();
                 if(!isInTranslation) StartCapture();
@@ -833,7 +847,8 @@ namespace Stereo_Vision
 
         private void OTK_3D_Control_MouseDown(object sender, MouseEventArgs e)
         {
-            int ObjectN = FindAnObject(e.X, e.Y);
+            int ObjectN = -1;
+            //FindAnObject(e.X, e.Y);
             if(ObjectN==-1)
             {
                 RV_Start = new Point(e.X, OTK_3D_Control.Height - e.Y);
@@ -932,6 +947,47 @@ namespace Stereo_Vision
             // Start the time-consuming operation.
             Bitmap dataBMP = CurrentStereoImage.BasicImage as Bitmap;
             BuildModel3D(bw, dataBMP, true);
+        }
+
+        private void TrB_WB_CorPower_Scroll(object sender, EventArgs e)
+        {
+            double realval = (float)TrB_WB_CorPower.Value / 100.0;
+            L_WB_CorPower.Text = realval.ToString();
+        }
+
+        private void B_WB_LowerFrames_Click(object sender, EventArgs e)
+        {
+            if (NumOfImages_WB > 2) NumOfImages_WB--;
+            L_WB_NumOfImages.Text = NumOfImages_WB.ToString();
+            try { NumOfImages_WB = Convert.ToInt16(L_WB_NumOfImages.Text); }
+            catch { L_WB_NumOfImages.Text="2" ; NumOfImages_WB = 2; }
+        }
+
+        private void B_WB_HigherFrames_Click(object sender, EventArgs e)
+        {
+            if (NumOfImages_WB < 10) NumOfImages_WB++;
+            L_WB_NumOfImages.Text = NumOfImages_WB.ToString();
+            try { NumOfImages_WB = Convert.ToInt16(L_WB_NumOfImages.Text); }
+            catch { L_WB_NumOfImages.Text = "2"; NumOfImages_WB = 2; }
+        }
+
+        private void B_WB_Calculate_Click(object sender, EventArgs e)
+        {
+            if (!DigitalWB_Active)
+            {
+                WhiteBalance.InitializeMatrix(1, ref CMatrix, 3, Height_Current, Width_Current);//CMatrix
+                CurNumOfImages_forWB = 1; Camulating_isActive = true;
+            }
+            else
+            {
+                if (CurNumOfImages_forWB != NumOfImages_WB) WhiteBalance.InitializeMatrix(1, ref CMatrix, 3, Height_Current, Width_Current);
+                CurNumOfImages_forWB = NumOfImages_WB; Camulating_isActive = false;
+            }
+        }
+
+        private void tableLayoutPanel1_Paint_1(object sender, PaintEventArgs e)
+        {
+
         }
     }
 }

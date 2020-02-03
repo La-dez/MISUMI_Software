@@ -150,6 +150,7 @@ namespace Stereo_Vision
             }
             else
             {
+                
                 Control.Text = Text;
                 this.Refresh();
             }
@@ -172,6 +173,7 @@ namespace Stereo_Vision
             else
             {
                 Ctrl.Visible = IsVisible;
+                LogMessage("Состояние видимости TB = " + Ctrl.Visible.ToString());
             }
         }
         private void OpenSettings()
@@ -245,15 +247,16 @@ namespace Stereo_Vision
             if (!isAdmin)
             {
                 adminPages = new TabPage[] { /*TABC_Settings.TabPages[2], */TABC_Settings.TabPages[3], TABC_Settings.TabPages[4] };
+                TABC_Settings.TabPages[5].Parent = null;
                 TABC_Settings.TabPages[4].Parent = null;
                 TABC_Settings.TabPages[3].Parent = null;
-               // TABC_Settings.TabPages[2].Parent = null;
+                // TABC_Settings.TabPages[2].Parent = null;
             }
             else
             {
                TABC_Settings.TabPages.Add(adminPages[0]);
                 TABC_Settings.TabPages.Add(adminPages[1]);
-                /*TABC_Settings.TabPages.Add(adminPages[2]);*/
+                TABC_Settings.TabPages.Add(adminPages[2]);
             }
 
             LogMessage("AdminMode = " + isAdmin.ToString());

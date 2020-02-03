@@ -121,7 +121,8 @@ namespace Stereo_Vision
             Point2d result = new Point2d(0, 0);
             try
             {
-                pointFinder.Find((Bitmap)BasicImage, PT_left, ref result, true);
+                 pointFinder.Find((Bitmap)BasicImage, PT_left, ref result, true);
+               // throw new Exception();
             }
             catch
             {

@@ -18,6 +18,7 @@ namespace Stereo_Vision
         bool lastFrame_processed = true;
         private Mat CurrentFrame;
         private Mat CurrentFrame2;
+        dynamic CurrentFrame_wb;
         private Mat resizedim;
         int Width_for_Resizing = 1280;
         int Height_for_Resizing = 720;
@@ -193,6 +194,49 @@ namespace Stereo_Vision
                   {
 
                     _capture.Retrieve(CurrentFrame, 0); //Получение кадра. Переодический промер FPS
+
+                    //wb
+                 /*   using (CurrentFrame_wb = CurrentFrame.Clone())
+                    {
+                        if (Camulating_isActive)
+                        {
+                            if (CurNumOfImages_forWB < NumOfImages_WB)
+                            {
+                                WhiteBalance.CorrectionMatrix_AddImage(ref CMatrix, ref CurrentFrame_wb);
+                                CurNumOfImages_forWB++;
+                            }
+                            else
+                            {
+                                Camulating_isActive = false; DigitalWB_Active = true;
+
+                                System.Diagnostics.Stopwatch lfa = new System.Diagnostics.Stopwatch();
+                                System.Diagnostics.Stopwatch lfa2 = new System.Diagnostics.Stopwatch();
+                                lfa.Start();
+                                try
+                                {
+                                    //  Bitmap NewCalibrationBMP = _Capture.RetrieveBgrFrame().Bitmap;
+
+                                    lfa2.Reset(); lfa2.Start();
+                                    double CorrectionPower = Convert.ToDouble(L_WB_CorPower.Text);
+                                    WhiteBalance.CorrectionMatrix_Normalize(ref CMatrix, NumOfImages_WB, Height_Current, Width_Current);
+                                    WhiteBalance.CorrectionMatrix_FromNormilizedMatrix_Fastest(ref CMatrix, CorrectionPower, Width_Current, Height_Current);
+                                    // CMatrix = WhiteBalance.CorrectionMatrix_FromWhiteImage_Fastest(NewCalibrationBMP, CorrectionPower);
+                                    lfa2.Stop();
+                                    LogMessage("Вычисление коррекционной матрицы Методом Указателей завершено. Прошло времени: " + (lfa2.ElapsedMilliseconds / 1000.0).ToString());
+                                }
+                                catch (Exception exc) { LogError(exc.Message); }
+                                lfa.Stop();
+                                LogMessage("Файлы обработаны. Прошло времени: " + (lfa.ElapsedMilliseconds / 1000.0).ToString());
+                            }
+                        }
+                        else
+                        {
+                            WhiteBalance.CorrectImage_viaCorrectionMatrix_Color(CMatrix, ref CurrentFrame_wb);
+                            CurrentFrame = CurrentFrame_wb.Clone();
+                        }
+                    }*/
+
+
                     FramesGotten++;
                     if ((STW.Elapsed.Seconds > 5) && (STW.Elapsed.Seconds % 10 == 0))
                     {
@@ -320,6 +364,7 @@ namespace Stereo_Vision
         }
         private void Restore_CaptureDirectory()
         {
+            //сделано через invoke, так как иначе не открывалось окно на весь экран
             try
             {
                 if (!String.IsNullOrEmpty(Rec_Models_path))
@@ -330,12 +375,17 @@ namespace Stereo_Vision
             }
             catch
             {
-                System.Windows.Forms.MessageBox.Show("Путь "+ Rec_Models_path+ " не может быть создан! Сохранение моделей будет производиться в "+ Rec_Models_path_def, "Предупреждение", 
+                string data_last_Rec_Models_path = Rec_Models_path;
+                this.BeginInvoke(new Action(() =>
+                {
+                    System.Threading.Thread.Sleep(1000);
+                    System.Windows.Forms.MessageBox.Show("Путь " + data_last_Rec_Models_path + " не может быть создан! Сохранение моделей будет производиться в " + Rec_Models_path_def, "Предупреждение",
                     System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Exclamation);
+                }));
                 Rec_Models_path = Rec_Models_path_def;
                 Directory.CreateDirectory(Rec_Models_path_def);
             }
-
+            //сделано через invoke, так как иначе не открывалось окно на весь экран
             try
             {
                 if (!String.IsNullOrEmpty(Rec_Photos_path))
@@ -346,12 +396,17 @@ namespace Stereo_Vision
             }
             catch
             {
-                System.Windows.Forms.MessageBox.Show("Путь " + Rec_Photos_path + " не может быть создан! Сохранение моделей будет производиться в "+ Rec_Photos_path_def, "Предупреждение",
+                string data_last_Rec_Photos_path = Rec_Photos_path;
+                this.BeginInvoke(new Action(() =>
+                {
+                    System.Threading.Thread.Sleep(1000);
+                    System.Windows.Forms.MessageBox.Show("Путь " + data_last_Rec_Photos_path + " не может быть создан! Сохранение моделей будет производиться в " + Rec_Photos_path_def, "Предупреждение",
                     System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Exclamation);
+                }));
                 Rec_Photos_path = Rec_Photos_path_def;
                 Directory.CreateDirectory(Rec_Photos_path_def);
             }
-
+            //сделано через invoke, так как иначе не открывалось окно на весь экран
             try
             {
                 if (!String.IsNullOrEmpty(Rec_Videos_path))
@@ -362,8 +417,13 @@ namespace Stereo_Vision
             }
             catch
             {
-                System.Windows.Forms.MessageBox.Show("Путь " + Rec_Videos_path + " не может быть создан! Сохранение моделей будет производиться в "+ Rec_Videos_path_def, "Предупреждение",
+                string data_last_Rec_Videos_path = Rec_Videos_path;
+                this.BeginInvoke(new Action(() =>
+                {
+                    System.Threading.Thread.Sleep(1000);
+                    System.Windows.Forms.MessageBox.Show("Путь " + data_last_Rec_Videos_path + " не может быть создан! Сохранение моделей будет производиться в " + Rec_Videos_path_def, "Предупреждение",
                     System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Exclamation);
+                }));
                 Rec_Videos_path = Rec_Videos_path_def;
                 Directory.CreateDirectory(Rec_Videos_path_def);
             }
@@ -497,6 +557,9 @@ namespace Stereo_Vision
         {
             _capture.SetCaptureProperty(CapProp.FrameWidth, w);
             _capture.SetCaptureProperty(CapProp.FrameHeight, h);
+
+            Width_Current = (int)_capture.GetCaptureProperty(CapProp.FrameWidth);
+            Height_Current = (int)_capture.GetCaptureProperty(CapProp.FrameHeight);
         }
         private void Adjust_Brightness()
         {

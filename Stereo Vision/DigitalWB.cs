@@ -9,7 +9,7 @@ using Emgu.CV.Structure;
 using Emgu.Util;
 
 
-namespace CameraCapture
+namespace Stereo_Vision
 {
     public class WhiteBalance
     {
@@ -19,152 +19,18 @@ namespace CameraCapture
         [DllImport("Multiply_BMP_DLL.dll")]
         public static extern System.Text.StringBuilder EI_GetName();
 
-        /*    public WhiteBalance()
+        public static void InitializeMatrix(dynamic value, ref double[,,] M, int iM, int jM, int kM)
+        {
+            M = new double[iM, jM, kM];
+            try
             {
-                GdalConfiguration.ConfigureGdal();
+                for (int i = 0; i < iM; i++)
+                    for (int j = 0; j < jM; j++)
+                        for (int k = 0; k < kM; k++)
+                            M[i, j, k] = (double)value;
             }
-
-            public WhiteBalance(double percentForBalance)
-            {
-                this.percentForBalance = percentForBalance;
-                GdalConfiguration.ConfigureGdal();
-            }*/
-
-        /*     public void ApplyWhiteBalance(string imagePath, string outImagePath)
-             {
-
-                 using (Dataset image = Gdal.Open(imagePath, Access.GA_ReadOnly))
-                 {
-
-                     Band redBand = GetBand(image, ColorInterp.GCI_RedBand);
-                     Band greenBand = GetBand(image, ColorInterp.GCI_GreenBand);
-                     Band blueBand = GetBand(image, ColorInterp.GCI_BlueBand);
-
-                     if (redBand == null || greenBand == null || blueBand == null)
-                     {
-                         throw new NullReferenceException("One or more bands are not available.");
-                     }
-
-                     int width = redBand.XSize;
-                     int height = redBand.YSize;
-
-                     using (Dataset outImage = Gdal.GetDriverByName("GTiff").Create(outImagePath, width, height, 3, DataType.GDT_Byte, null))
-                     {
-
-                         double[] geoTransformerData = new double[6];
-                         image.GetGeoTransform(geoTransformerData);
-                         outImage.SetGeoTransform(geoTransformerData);
-                         outImage.SetProjection(image.GetProjection());
-
-                         Band outRedBand = outImage.GetRasterBand(1);
-                         Band outGreenBand = outImage.GetRasterBand(2);
-                         Band outBlueBand = outImage.GetRasterBand(3);
-
-                         int[] red = new int[width * height];
-                         int[] green = new int[width * height];
-                         int[] blue = new int[width * height];
-                         redBand.ReadRaster(0, 0, width, height, red, width, height, 0, 0);
-                         greenBand.ReadRaster(0, 0, width, height, green, width, height, 0, 0);
-                         blueBand.ReadRaster(0, 0, width, height, blue, width, height, 0, 0);
-
-                         int[] outRed = new int[width * height];
-                         int[] outGreen = new int[width * height];
-                         int[] outBlue = new int[width * height];
-                         if (percentForBalance != 0)
-                         {
-                             outRed = WhiteBalanceBand(red);
-                             outGreen = WhiteBalanceBand(green);
-                             outBlue = WhiteBalanceBand(blue);
-                         }
-                         else
-                         {
-                             outRed = red;
-                             outGreen = green;
-                             outBlue = blue;
-                         }
-                         outRedBand.WriteRaster(0, 0, width, height, outRed, width, height, 0, 0);
-                         outGreenBand.WriteRaster(0, 0, width, height, outGreen, width, height, 0, 0);
-                         outBlueBand.WriteRaster(0, 0, width, height, outBlue, width, height, 0, 0);
-
-                         outImage.FlushCache();
-                     }
-                 }
-             }*/
-
-        /* public void ApplyWhiteBalance(ref Bitmap pBMP)
-         {
-             Bitmap bmp = pBMP;
-             byte[] imageBuffer;
-
-             using (System.IO.MemoryStream stream = new System.IO.MemoryStream())
-             {
-                 bmp.Save(stream, ImageFormat.Tiff);
-                 imageBuffer = stream.ToArray();
-             }
-
-             Gdal.FileFromMemBuffer("/vsimem/tiffinmem", imageBuffer);
-
-             using (Dataset image = Gdal.Open("/vsimem/tiffinmem", Access.GA_ReadOnly))
-             { 
-                 Band redBand = GetBand(image, ColorInterp.GCI_RedBand);//считка в redband
-                 Band greenBand = GetBand(image, ColorInterp.GCI_GreenBand);
-                 Band blueBand = GetBand(image, ColorInterp.GCI_BlueBand);
-
-                 if (redBand == null || greenBand == null || blueBand == null)
-                 {
-                     throw new NullReferenceException("One or more bands are not available.");
-                 }
-
-                 int width = redBand.XSize;
-                 int height = redBand.YSize;
-
-                 using (Dataset outImage = Gdal.GetDriverByName("GTiff").Create("/vsimem/tiffinmem2", width, height, 3, DataType.GDT_Byte, null))
-                 {
-
-                     double[] geoTransformerData = new double[6];
-                     image.GetGeoTransform(geoTransformerData);
-                     outImage.SetGeoTransform(geoTransformerData);
-                     outImage.SetProjection(image.GetProjection());
-
-                     Band outRedBand = outImage.GetRasterBand(1);
-                     Band outGreenBand = outImage.GetRasterBand(2);
-                     Band outBlueBand = outImage.GetRasterBand(3);
-
-                     int[] red = new int[width * height];
-                     int[] green = new int[width * height];
-                     int[] blue = new int[width * height];
-                     redBand.ReadRaster(0, 0, width, height, red, width, height, 0, 0);//считка из redband в red
-                     greenBand.ReadRaster(0, 0, width, height, green, width, height, 0, 0);
-                     blueBand.ReadRaster(0, 0, width, height, blue, width, height, 0, 0);
-
-                     int[] outRed = WhiteBalanceBand(red);//передача red на WB и считка в Outred
-                     int[] outGreen = WhiteBalanceBand(green);
-                     int[] outBlue = WhiteBalanceBand(blue);
-
-
-                     outRedBand.WriteRaster(0, 0, width, height, outRed, width, height, 0, 0); //запись из outred в outredband, который
-                     outGreenBand.WriteRaster(0, 0, width, height, outGreen, width, height, 0, 0);//априори принадлежен outimage
-                     outBlueBand.WriteRaster(0, 0, width, height, outBlue, width, height, 0, 0);
-
-                     //попытка 1, проверим завтра
-
-                     //BitmapData bitmapData = pBMP.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadWrite, PixelFormat.Format32bppRgb);
-                     //int stride = bitmapData.Stride;
-                     //IntPtr buf = bitmapData.Scan0;  
-                     //redBand.WriteRaster(0, 0, width, height, outRed, width, height, 0, 0); //запись из outred в redband, который
-                     //greenBand.WriteRaster(0, 0, width, height, outGreen, width, height, 0, 0);//априори принадлежен image
-                     //blueBand.WriteRaster(0, 0, width, height, outBlue, width, height, 0, 0);
-
-                     //blueBand.ReadRaster(0, 0, width, height, buf, width, height, DataType.GDT_Byte, 4, stride);
-                     //greenBand.ReadRaster(0, 0, width, height, new IntPtr(buf.ToInt32() + 1), width, height, DataType.GDT_Byte, 4, stride);
-                     //redBand.ReadRaster(0, 0, width, height, new IntPtr(buf.ToInt32() + 2), width, height, DataType.GDT_Byte, 4, stride);
-
-                     //pBMP.UnlockBits(bitmapData);
-                     //outImage.FlushCache();
-                 }
-             }
-             Gdal.Unlink("/vsimem/tiffinmem");
-         }*/
+            catch { throw new Exception("Ошибка инициализации матрицы значением " + value.ToString()); }
+        }
 
         public int[] WhiteBalanceBand(int[] band)
         {

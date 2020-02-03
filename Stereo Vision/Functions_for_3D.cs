@@ -50,7 +50,7 @@ namespace Stereo_Vision
 
         bool MeshesFixedByEachOther = false;
 
-        private void MyInit()
+        private void Models_view_init()
         {
             LoadShaders();
             LoadFigures();
