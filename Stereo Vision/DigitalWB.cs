@@ -330,11 +330,12 @@ namespace Stereo_Vision
  //           double[] b32 = new double[3]; b32[0] = res[0, 0, 0]; b32[1] = res[1, 0, 0]; b32[2] = res[2, 0,0];
             return res;
         }
-        public static unsafe void CorrectImage_viaCorrectionMatrix_Color(double[,,] res, ref Image<Bgr, byte> pframe)
+        public static unsafe void CorrectImage_viaCorrectionMatrix_Color(double[,,] res, ref Mat pframe)
         {
             byte* curpos;
             int IMISS = 0;
-            byte[,,] data = pframe.Data;
+
+            byte[,,] data = pframe.ToImage<Bgr, Byte>().Data;
             int height = pframe.Height;
             int width =/* pframe.MIplImage.widthStep;*/ pframe.Width;
             int WH = width * height;
@@ -354,6 +355,8 @@ namespace Stereo_Vision
                         }                       
                     }
                 }
+                var a = new Image<Bgr, Byte>(data);
+                pframe = a.Mat;
             }
             catch
             {
@@ -457,6 +460,66 @@ namespace Stereo_Vision
 
             }
         }
+        public static unsafe void CorrectionMatrix_AddImage(ref double[,,] res, ref Mat pframe)
+        {
+            byte* curpos;
+            byte[,,] data = pframe.ToImage<Bgr, Byte>().Data;
+            int height = pframe.Height;
+            int width =/* pframe.MIplImage.widthStep;*/ pframe.Width;
+            int WH = width * height;
+            try
+            {
+                fixed (double* _res = res)
+                {
+                    fixed (byte* pData = data)
+                    {
+                        curpos = pData;
+                        double* _r = _res, _g = _res + WH, _b = _res + 2 * WH;
+                        for (int i = 0; i < WH; i++)
+                        {
+                            *_b += *(curpos++); _b++;
+                            *_g += *(curpos++); _g++;
+                            *_r += *(curpos++); _r++;
+                        }
+                    }
+                }
+            }
+            catch
+            {
+
+            }
+        }
+        /*public static unsafe void CorrectionMatrix_AddImage(ref Mat result, Mat pframe)
+        {
+            result = result + pframe;
+            byte* curpos;
+            byte[,,] data = pframe.Data;
+            int height = pframe.Height;
+            int width = pframe.Width;
+            int WH = width * height;
+            try
+            {
+                fixed (double* _res = res)
+                {
+                    fixed (byte* pData = data)
+                    {
+                        curpos = pData;
+                        double* _r = _res, _g = _res + WH, _b = _res + 2 * WH;
+                        for (int i = 0; i < WH; i++)
+                        {
+                            *_b += *(curpos++); _b++;
+                            *_g += *(curpos++); _g++;
+                            *_r += *(curpos++); _r++;
+                        }
+                    }
+                }
+            }
+            catch
+            {
+
+            }
+        }*/
+
         public static unsafe void CorrectionMatrix_Normalize(ref double[,,] res, int NumOfIMG, int height, int width)
         {
             int WH = width * height;

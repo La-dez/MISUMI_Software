@@ -18,7 +18,7 @@ namespace Stereo_Vision
         bool lastFrame_processed = true;
         private Mat CurrentFrame;
         private Mat CurrentFrame2;
-        dynamic CurrentFrame_wb;
+        public Mat CurrentFrame_wb;
         private Mat resizedim;
         int Width_for_Resizing = 1280;
         int Height_for_Resizing = 720;
@@ -196,7 +196,7 @@ namespace Stereo_Vision
                     _capture.Retrieve(CurrentFrame, 0); //Получение кадра. Переодический промер FPS
 
                     //wb
-                 /*   using (CurrentFrame_wb = CurrentFrame.Clone())
+                    using (CurrentFrame_wb = CurrentFrame.Clone())
                     {
                         if (Camulating_isActive)
                         {
@@ -234,7 +234,7 @@ namespace Stereo_Vision
                             WhiteBalance.CorrectImage_viaCorrectionMatrix_Color(CMatrix, ref CurrentFrame_wb);
                             CurrentFrame = CurrentFrame_wb.Clone();
                         }
-                    }*/
+                    }
 
 
                     FramesGotten++;
@@ -560,6 +560,8 @@ namespace Stereo_Vision
 
             Width_Current = (int)_capture.GetCaptureProperty(CapProp.FrameWidth);
             Height_Current = (int)_capture.GetCaptureProperty(CapProp.FrameHeight);
+
+            WhiteBalance.InitializeMatrix(1, ref CMatrix, Width_Current, Height_Current, 3);
         }
         private void Adjust_Brightness()
         {

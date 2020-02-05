@@ -34,7 +34,7 @@ namespace Stereo_Vision
 
         bool Camulating_isActive = false;
         bool DigitalWB_Active = false;
-        double[,,] CMatrix;
+        double[,,] CMatrix = null;
         int Width_Current = 1280;
         int Height_Current = 720;
 
@@ -86,7 +86,6 @@ namespace Stereo_Vision
                 BGWR_ChargeLev.RunWorkerAsync();
                 Set_ChargeBMP(BMP2set_chargelev);
                 Set_ChargeTEXT(Text2set);
-                WhiteBalance.InitializeMatrix(1, ref CMatrix, Width_Current, Height_Current, 3);
                 StartCapture();
 
 
@@ -982,16 +981,16 @@ namespace Stereo_Vision
 
         private void B_WB_Calculate_Click(object sender, EventArgs e)
         {
-          /*  if (!DigitalWB_Active)
+            if (!DigitalWB_Active)
             {
                 WhiteBalance.InitializeMatrix(1, ref CMatrix, 3, Height_Current, Width_Current);//CMatrix
-                CurNumOfImages_forWB = 1; Camulating_isActive = true;
+                CurNumOfImages_forWB = 2; Camulating_isActive = true;
             }
             else
             {
                 if (CurNumOfImages_forWB != NumOfImages_WB) WhiteBalance.InitializeMatrix(1, ref CMatrix, 3, Height_Current, Width_Current);
-                CurNumOfImages_forWB = NumOfImages_WB; Camulating_isActive = false;
-            }*/
+                CurNumOfImages_forWB = NumOfImages_WB; Camulating_isActive = true;
+            }
         }
 
         private void tableLayoutPanel1_Paint_1(object sender, PaintEventArgs e)
