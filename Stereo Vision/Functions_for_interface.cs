@@ -456,6 +456,18 @@ namespace Stereo_Vision
                                 Export_Models_to = toObject;
                                 break;
                             }
+                        case "XMLCalib_path":
+                            {
+                                string toObject = CutFromEdges(AllLines[i]);
+                                XMLCalib_path = toObject;
+                                break;
+                            }
+                        case "RGBCalib_path":
+                            {
+                                string toObject = CutFromEdges(AllLines[i]);
+                                RGBCalib_path = toObject;
+                                break;
+                            }
                     }
 
                 }
@@ -527,8 +539,10 @@ namespace Stereo_Vision
                 try
                 {
 
-                    _capture.SetCaptureProperty(CapProp.FrameWidth, 640);
-                    _capture.SetCaptureProperty(CapProp.FrameHeight, 480);
+                    /*_capture.SetCaptureProperty(CapProp.FrameWidth, 640);
+                    _capture.SetCaptureProperty(CapProp.FrameHeight, 480);*/
+                    _capture.SetCaptureProperty(CapProp.FrameWidth, 1280);
+                    _capture.SetCaptureProperty(CapProp.FrameHeight, 720);
                 }
                 catch
                 {
@@ -623,6 +637,10 @@ namespace Stereo_Vision
                 sw.WriteLine("<Last_export_path_Video_to>" + Export_Vid_to + "</Last_export_path_Photo>");
                 sw.WriteLine("<Last_export_path_Photo_to>" + Export_Photos_to + "</Last_export_path_Photo_to>");
                 sw.WriteLine("<Last_export_path_Models_to>" + Export_Models_to + "</Last_export_path_Photo_to>");
+
+                sw.WriteLine("<XMLCalib_path>" + XMLCalib_path + "</XMLCalib_path>");
+                sw.WriteLine("<RGBCalib_path>" + RGBCalib_path + "</RGBCalib_path>");
+                
             }
         }
 

@@ -41,15 +41,16 @@ namespace Stereo_Vision
 
 
         //all the math
-        ICameraPair stereoPair = XMLLoader.ReadCameraPair("M5_chess.xml");
+        ICameraPair stereoPair/* = XMLLoader.ReadCameraPair("M5_chess.xml")*/;
         ISimpleCorrPointFinder pointFinder;
 
-        public StereoImage(System.Drawing.Bitmap BMP, Size pSizeOfCtrl)
+        public StereoImage(System.Drawing.Bitmap BMP, Size pSizeOfCtrl, string XMLCalib_path)
         {
             BasicImage = BMP;
             Ctrl_Height = pSizeOfCtrl.Height;
             Ctrl_Width = pSizeOfCtrl.Width;
             CenterOfImg = new Point(pSizeOfCtrl.Width / 2, pSizeOfCtrl.Height / 2);
+            stereoPair = XMLLoader.ReadCameraPair(XMLCalib_path);
             X_ration = (float)Ctrl_Width / ((float)BasicImage.Width);
             Y_ration = (float)Ctrl_Height / ((float)BasicImage.Height);
             _Measuremets = new List<Measurement>();

@@ -31,7 +31,21 @@ namespace Stereo_Vision
             }
             catch { throw new Exception("Ошибка инициализации матрицы значением " + value.ToString()); }
         }
-
+        public static double FindMax(double[,,] M, int iM, int jM, int kM)
+        {
+            double result = M[0, 0, 0];
+            try
+            {
+                for (int i = 0; i < iM; i++)
+                    for (int j = 0; j < jM; j++)
+                        for (int k = 0; k < kM; k++)
+                        {
+                            result = result < M[i, j, k] ? M[i, j, k] : result;
+                        }
+                return result;
+            }
+            catch { return 1; }
+        }
         public int[] WhiteBalanceBand(int[] band)
         {
             int[] sortedBand = new int[band.Length];
@@ -76,8 +90,10 @@ namespace Stereo_Vision
 
         private static byte LimitToByte(double value)
         {
-            if (value < 0)  return 0; 
-            else return ((value > 255) ? (byte)255 : (byte)value);
+            if (value < 0) return 0;
+            else if (value > 255)
+                return (byte)255;
+            else return (byte)value;
         }
 
         /**
@@ -196,6 +212,27 @@ namespace Stereo_Vision
             double[] b34 = new double[3]; b34[0] = bmp.GetPixel(1919,1079).R; b34[0]= bmp.GetPixel(1919, 1079).G; b34[2] = bmp.GetPixel(1919, 1079).B;
             double[] b33 = new double[3]; b33[0] = res[1919, 1078, 0]; b33[1] = res[1919, 1078, 1]; b33[2] = res[1919, 1078, 2];*/
             return res;
+        }
+        public static void Convert_CorM2BMP(double[,,] CM, ref Bitmap pBMP)
+        {
+            int W = pBMP.Width, H = pBMP.Height;
+            for (int i = 0; i < W; i++)
+            {
+                for (int j = 0; j < H; j++)
+                {
+                    try
+                    {
+                        pBMP.SetPixel(i, j, Color.FromArgb(LimitToByte(255 * CM[i, j, 0]),
+                                                           LimitToByte(255 * CM[i, j, 1]),
+                                                            LimitToByte(255 * CM[i, j, 2])));
+
+                    }
+                    catch (Exception e)
+                    {
+                        pBMP.SetPixel(i, j, Color.FromArgb(0, 0, 0));
+                    }
+                }
+            }
         }
         public static string CompareMassives(Bitmap bmp, double[,,] m1, double[,,] m2)
         {
@@ -334,10 +371,10 @@ namespace Stereo_Vision
         {
             byte* curpos;
             int IMISS = 0;
-
+          
             byte[,,] data = pframe.ToImage<Bgr, Byte>().Data;
             int height = pframe.Height;
-            int width =/* pframe.MIplImage.widthStep;*/ pframe.Width;
+            int width = pframe.Width;
             int WH = width * height;
             try
             {
@@ -355,6 +392,41 @@ namespace Stereo_Vision
                         }                       
                     }
                 }
+                var a = new Image<Bgr, Byte>(data);
+                pframe = a.Mat;
+            }
+            catch
+            {
+                fixed (byte* pData = data)
+                {
+                    for (int i = 0; i < 255 * width; i += 4)
+                        *(pData + i) = (byte)(i % width);
+                }
+            }
+        }
+        public static unsafe void CorrectImage_InitByValue(ref Mat pframe,byte value = 255)
+        {
+            byte* curpos;
+            int IMISS = 0;
+
+            byte[,,] data = pframe.ToImage<Bgr, Byte>().Data;
+            int height = pframe.Height;
+            int width = pframe.Width;
+            int WH = width * height;
+            try
+            {
+
+                    fixed (byte* pData = data)
+                    {
+                        curpos = pData;
+                        for (int i = 0; i < WH; i++)
+                        {
+                            *(curpos) = value; curpos++; IMISS++;
+                            *(curpos) = value; curpos++; IMISS++;
+                            *(curpos) = value; curpos++; IMISS++;
+                        }
+                    }
+                
                 var a = new Image<Bgr, Byte>(data);
                 pframe = a.Mat;
             }
@@ -519,7 +591,15 @@ namespace Stereo_Vision
 
             }
         }*/
-
+        public static unsafe double[,,] CorrectionMatrix_fromFile(string Path)
+        {
+            double[,,] result = new double[3, 720, 1280];
+            Mat data = new Emgu.CV.Image<Bgr,Byte>(Path).Mat;
+            InitializeMatrix(0,ref result, data.NumberOfChannels, data.Height, data.Width);
+            WhiteBalance.CorrectionMatrix_AddImage(ref result, ref data);
+            WhiteBalance.CorrectionMatrix_NormalizeByValue(ref result, data.Width, data.Height,255);
+            return result;
+        }
         public static unsafe void CorrectionMatrix_Normalize(ref double[,,] res, int NumOfIMG, int height, int width)
         {
             int WH = width * height;
@@ -587,18 +667,47 @@ namespace Stereo_Vision
             }
             //           double[] b32 = new double[3]; b32[0] = res[0, 0, 0]; b32[1] = res[1, 0, 0]; b32[2] = res[2, 0,0];
         }
-       /* public static unsafe void ImageEdit_Mono(ref Image<Gray, byte> pframe)
+        public static unsafe void CorrectionMatrix_NormalizeByValue(ref double[,,] res, int width, int height,double val)
         {
-            var data = pframe.Data;
-           // pframe.SetRandUniform(new MCvScalar(), new MCvScalar(255));
-             int stride = pframe.MIplImage.widthStep;
-            int H = pframe.Height;
-             fixed (byte* pData = data)
-             {
-                 for (int i = 0; i < H * stride; i+=2) 
-                     *(pData + i) = (byte)(i % stride);
-             }
-        }*/
+            int WH = width * height;
+            double sred = 0.0;
+            double Maximum = 0, CurMax = 0;
+            try
+            {
+                double* curpos;
+                fixed (double* _res = res)
+                {
+                    double* _r = _res, _g = _res + WH, _b = _res + 2 * WH;
+                    for (int h = 0; h < height; h++)
+                    {
+                        curpos = /*startpix + h * bd.Stride*/_res;
+                        for (int w = 0; w < width; w++)
+                        {
+                            *_b = (*_b)/ (double)val; 
+                            *_g = (*_g) / (double)val; 
+                            *_r = (*_r) / (double)val;
+
+                            ++_b; ++_g; ++_r;
+                        }
+                    }
+                }
+            }
+            finally
+            {
+            }          
+        }
+        /* public static unsafe void ImageEdit_Mono(ref Image<Gray, byte> pframe)
+         {
+             var data = pframe.Data;
+            // pframe.SetRandUniform(new MCvScalar(), new MCvScalar(255));
+              int stride = pframe.MIplImage.widthStep;
+             int H = pframe.Height;
+              fixed (byte* pData = data)
+              {
+                  for (int i = 0; i < H * stride; i+=2) 
+                      *(pData + i) = (byte)(i % stride);
+              }
+         }*/
         public static unsafe void CorrectImage_viaCorrectionMatrix(double[,,] res, ref dynamic pframe)
         {
             int width = pframe.Width, height = pframe.Height, WH = width * height;
@@ -626,26 +735,6 @@ namespace Stereo_Vision
             }
             //  double[] b32 = new double[3]; b32[0] = res[0, 1000, 1]; b32[1] = res[1, 1000, 1]; b32[2] = res[2, 1000, 1];
         }
-        public static void Convert_CorM2BMP(double [,,] CM,ref Bitmap pBMP)
-        {
-            int W = pBMP.Width, H = pBMP.Height;
-            for (int i = 0; i < W; i++)
-            {
-                for (int j = 0; j < H; j++)
-                {
-                    try
-                    {
-                        pBMP.SetPixel(i, j, Color.FromArgb(LimitToByte(255*CM[i, j, 0]),
-                                                           LimitToByte(255*CM[i, j, 1]),
-                                                            LimitToByte(255*CM[i, j, 2])));
 
-                    }
-                    catch (Exception e)
-                    {
-                        pBMP.SetPixel(i, j, Color.FromArgb(0, 0, 0));
-                    }
-                }
-            }            
-        }
     }
 }

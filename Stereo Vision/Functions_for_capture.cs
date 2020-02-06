@@ -60,6 +60,9 @@ namespace Stereo_Vision
         string Photo_name_lastcaptured = "Snapshot_000.jpeg";
         string Model_name_lastcaptured = "Model_000.ply";
 
+        string XMLCalib_path = "M5_chess.xml"; //string cfgFilePath = IsPrism ? "M5_chess.xml" : "M1_chess.xml"
+        string RGBCalib_path = "RGB_calib_matrix.bmp";
+
         string Photo_name_lastcaptured_fullpath = null;
         string Model_name_lastbuild_fullpath = null;
         int Brightness_Value = 0;
@@ -200,10 +203,10 @@ namespace Stereo_Vision
                     {
                         if (Camulating_isActive)
                         {
-                            if (CurNumOfImages_forWB < NumOfImages_WB)
+                            if (NumOfImages_WB_current < NumOfImages_WB_needed)
                             {
                                 WhiteBalance.CorrectionMatrix_AddImage(ref CMatrix, ref CurrentFrame_wb);
-                                CurNumOfImages_forWB++;
+                                NumOfImages_WB_current++;
                             }
                             else
                             {
@@ -218,8 +221,18 @@ namespace Stereo_Vision
 
                                     lfa2.Reset(); lfa2.Start();
                                     double CorrectionPower = Convert.ToDouble(L_WB_CorPower.Text);
-                                    WhiteBalance.CorrectionMatrix_Normalize(ref CMatrix, NumOfImages_WB, Height_Current, Width_Current);
+                                    WhiteBalance.CorrectionMatrix_Normalize(ref CMatrix, NumOfImages_WB_needed, Height_Current, Width_Current);
                                     WhiteBalance.CorrectionMatrix_FromNormilizedMatrix_Fastest(ref CMatrix, CorrectionPower, Width_Current, Height_Current);
+
+                                    Mat datamat = new Mat(new System.Drawing.Size(Width_Current, Height_Current), DepthType.Cv8U, 3);
+                                    WhiteBalance.CorrectImage_InitByValue(ref datamat);
+                                    double max = WhiteBalance.FindMax(CMatrix, 3, Height_Current, Width_Current);
+                                   /* WhiteBalance.CorrectionMatrix_NormalizeByValue(ref CMatrix, Width_Current, Height_Current, max);
+                                    max = WhiteBalance.FindMax(CMatrix, 3, Height_Current, Width_Current);*/
+                                    WhiteBalance.CorrectImage_viaCorrectionMatrix_Color(CMatrix, ref datamat);
+                                    datamat.Save(RGBCalib_path);
+                                   // Mat data = new Mat(,)
+                               
                                     // CMatrix = WhiteBalance.CorrectionMatrix_FromWhiteImage_Fastest(NewCalibrationBMP, CorrectionPower);
                                     lfa2.Stop();
                                     LogMessage("Вычисление коррекционной матрицы Методом Указателей завершено. Прошло времени: " + (lfa2.ElapsedMilliseconds / 1000.0).ToString());

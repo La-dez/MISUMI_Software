@@ -509,7 +509,7 @@ namespace Stereo_Vision
             IndexTriplet[] TriangleModelMass;
             RGBPointOwnType[] RGBPointsMass;
             //string cfgFilePath = IsPrism ? "M5_chess_shiftM11.xml": "M1_chess.xml";
-            string cfgFilePath = IsPrism ? "M5_chess.xml" : "M1_chess.xml";
+            //string cfgFilePath = IsPrism ? "M5_chess.xml" : "M1_chess.xml";
             MyMesh result = null;
 
             if (!bw.CancellationPending)
@@ -528,7 +528,7 @@ namespace Stereo_Vision
                 // Read camera pair parameters from XML file
 
                 try
-                { stereoPair = XMLLoader.ReadCameraPair(cfgFilePath); }
+                { stereoPair = XMLLoader.ReadCameraPair(XMLCalib_path); }
                 catch
                 {
                    throw new Exception("Ошибка на этапе чтения калибровочного файла.\nПостроение 3D модели завершено с ошибкой.");

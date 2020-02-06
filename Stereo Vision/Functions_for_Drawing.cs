@@ -37,14 +37,14 @@ namespace Stereo_Vision
             try
             {
                 if (String.IsNullOrEmpty(PathToImg)) throw new Exception();
-                CurrentStereoImage = new StereoImage(new Bitmap(PathToImg), PB_MeasurementPB.Size);
+                CurrentStereoImage = new StereoImage(new Bitmap(PathToImg), PB_MeasurementPB.Size,XMLCalib_path);
             }
             catch (Exception exc)
             {
                 LogError(exc.Message);
                 try
                 {
-                    CurrentStereoImage = new StereoImage(CurrentFrame.Bitmap, PB_MeasurementPB.Size);
+                    CurrentStereoImage = new StereoImage(CurrentFrame.Bitmap, PB_MeasurementPB.Size, XMLCalib_path);
                 }
                 catch { }
             }

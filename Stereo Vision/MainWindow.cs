@@ -29,8 +29,10 @@ namespace Stereo_Vision
         string User_Name = "MPEI";
 
         //TODO: убрать следующие переменные отсюда
-        int NumOfImages_WB = 2;
-        int CurNumOfImages_forWB = 2;
+        int NumOfImages_WB_needed = 2;
+        int NumOfImages_WB_current = 0;
+        int NumOfImages_WB_max= 10;
+        int NumOfImages_WB_min = 0;
 
         bool Camulating_isActive = false;
         bool DigitalWB_Active = false;
@@ -86,6 +88,7 @@ namespace Stereo_Vision
                 BGWR_ChargeLev.RunWorkerAsync();
                 Set_ChargeBMP(BMP2set_chargelev);
                 Set_ChargeTEXT(Text2set);
+                Load_Correction_Matrix(ref CMatrix); 
                 StartCapture();
 
 
@@ -111,6 +114,15 @@ namespace Stereo_Vision
             }
             catch(Exception exc) { LogError(exc.Message); }
             finally { this.Visible = true; }
+        }
+        private void Load_Correction_Matrix(ref double[,,] pMat)
+        {
+            try
+            {
+                pMat = WhiteBalance.CorrectionMatrix_fromFile(RGBCalib_path);
+                DigitalWB_Active = true;
+            }
+            catch { DigitalWB_Active = false; }
         }
         private void Build_Interface()
         {
@@ -160,8 +172,9 @@ namespace Stereo_Vision
                 BGWR_ChargeLev.CancelAsync();
                 SaveSettings();
                 StopCapture();
-                while ((!isArduino_closed)&&(!lastFrame_processed))
+                while (/*(!isArduino_closed)&&*/(!lastFrame_processed))
                 {
+                    //int a = 0;
                     //we will wait for closing
                 }
                 Application.Exit();
@@ -965,18 +978,18 @@ namespace Stereo_Vision
 
         private void B_WB_LowerFrames_Click(object sender, EventArgs e)
         {
-            if (NumOfImages_WB > 2) NumOfImages_WB--;
-            L_WB_NumOfImages.Text = NumOfImages_WB.ToString();
-            try { NumOfImages_WB = Convert.ToInt16(L_WB_NumOfImages.Text); }
-            catch { L_WB_NumOfImages.Text="2" ; NumOfImages_WB = 2; }
+            if (NumOfImages_WB_needed > NumOfImages_WB_min) NumOfImages_WB_needed--;
+            L_WB_NumOfImages.Text = NumOfImages_WB_needed.ToString();
+            try { NumOfImages_WB_needed = Convert.ToInt16(L_WB_NumOfImages.Text); }
+            catch { L_WB_NumOfImages.Text= NumOfImages_WB_min.ToString(); NumOfImages_WB_needed = NumOfImages_WB_min; }
         }
 
         private void B_WB_HigherFrames_Click(object sender, EventArgs e)
         {
-            if (NumOfImages_WB < 10) NumOfImages_WB++;
-            L_WB_NumOfImages.Text = NumOfImages_WB.ToString();
-            try { NumOfImages_WB = Convert.ToInt16(L_WB_NumOfImages.Text); }
-            catch { L_WB_NumOfImages.Text = "2"; NumOfImages_WB = 2; }
+            if (NumOfImages_WB_needed < NumOfImages_WB_max) NumOfImages_WB_needed++;
+            L_WB_NumOfImages.Text = NumOfImages_WB_needed.ToString();
+            try { NumOfImages_WB_needed = Convert.ToInt16(L_WB_NumOfImages.Text); }
+            catch { L_WB_NumOfImages.Text = NumOfImages_WB_min.ToString(); NumOfImages_WB_needed = NumOfImages_WB_min; }
         }
 
         private void B_WB_Calculate_Click(object sender, EventArgs e)
@@ -984,16 +997,27 @@ namespace Stereo_Vision
             if (!DigitalWB_Active)
             {
                 WhiteBalance.InitializeMatrix(1, ref CMatrix, 3, Height_Current, Width_Current);//CMatrix
-                CurNumOfImages_forWB = 2; Camulating_isActive = true;
+                NumOfImages_WB_current = 0; Camulating_isActive = (NumOfImages_WB_needed == 0) ? false:true;
             }
             else
             {
-                if (CurNumOfImages_forWB != NumOfImages_WB) WhiteBalance.InitializeMatrix(1, ref CMatrix, 3, Height_Current, Width_Current);
-                CurNumOfImages_forWB = NumOfImages_WB; Camulating_isActive = true;
+                WhiteBalance.InitializeMatrix(1, ref CMatrix, 3, Height_Current, Width_Current);
+                NumOfImages_WB_current = 0;
+                Camulating_isActive = (NumOfImages_WB_needed == 0) ? false : true;
             }
         }
 
         private void tableLayoutPanel1_Paint_1(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void B_Set_FindStereoCalibFile_Click(object sender, EventArgs e)
+        {
+            //XMLCalib_path;
+        }
+
+        private void B_Set_FindWBCalibFile_Click(object sender, EventArgs e)
         {
 
         }
