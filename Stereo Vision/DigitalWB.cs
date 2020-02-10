@@ -404,6 +404,82 @@ namespace Stereo_Vision
                 }
             }
         }
+
+        public static unsafe void Convert_DoubleMass2Mat(double[,,] source,ref Mat result_frame)
+        {
+           
+
+            double[,,] result = result_frame.ToImage<Bgr, Double>().Data;
+            int height = result_frame.Height;
+            int width = result_frame.Width;
+            int WH = width * height;
+
+            double* curpos;
+            try
+            {
+                fixed (double* _source = source)
+                {
+                    fixed (double* _result = result)
+                    {
+                        curpos = _result;
+                        double* _r = _source, _g = _source + WH, _b = _source + 2 * WH;
+                        for (int i = 0; i < WH; i++)
+                        {
+                            *(curpos) = (*_b); curpos++; _b++;
+                            *(curpos) = (*_g); curpos++; _g++;
+                            *(curpos) = (*_r); curpos++; _r++;
+                        }
+                    }
+                }
+                var a = new Image<Bgr, Double>(result);
+                result_frame = a.Mat;
+            }
+            catch
+            {
+                fixed (double* pData = result)
+                {
+                    for (int i = 0; i < 255 * width; i += 4)
+                        *(pData + i) = (double)(i % width);
+                }
+            }
+        }
+
+        public static unsafe void Convert_Mat2DoubleMass(out double[,,] res, Mat pframe)
+        {
+            double* curpos; //счетчик для data, чтобы удобнее было
+          //  int IMISS = 0;
+            int height = pframe.Height;
+            int width = pframe.Width;
+            int WH = width * height;
+
+            double[,,] data = pframe.ToImage<Bgr, Double>().Data;
+            res = new double[3, height, width];
+            try
+            {
+                fixed (double* _res = res)
+                {
+                    fixed (double* _Data = data)
+                    {
+                        curpos = _Data;
+                        double* _r = _res, _g = _res + WH, _b = _res + 2 * WH;
+                        for (int i = 0; i < WH; i++)
+                        {
+                            *(_b) = *(curpos); curpos++; _b++;
+                            *(_g) = *(curpos); curpos++; _g++;
+                            *(_r) = *(curpos); curpos++; _r++;
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                fixed (double* _res = res)
+                {
+                    for (int i = 0; i < 255 * width; i += 4)
+                        *(_res + i) = (double)(i % width);
+                }
+            }
+        }
         public static unsafe void CorrectImage_InitByValue(ref Mat pframe,byte value = 255)
         {
             byte* curpos;
@@ -593,8 +669,9 @@ namespace Stereo_Vision
         }*/
         public static unsafe double[,,] CorrectionMatrix_fromFile(string Path)
         {
-            double[,,] result = new double[3, 720, 1280];
+
             Mat data = new Emgu.CV.Image<Bgr,Byte>(Path).Mat;
+            double[,,] result = new double[3, data.Height, data.Width];
             InitializeMatrix(0,ref result, data.NumberOfChannels, data.Height, data.Width);
             WhiteBalance.CorrectionMatrix_AddImage(ref result, ref data);
             WhiteBalance.CorrectionMatrix_NormalizeByValue(ref result, data.Width, data.Height,255);

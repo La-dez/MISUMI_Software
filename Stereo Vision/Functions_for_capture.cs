@@ -224,7 +224,15 @@ namespace Stereo_Vision
                                     WhiteBalance.CorrectionMatrix_Normalize(ref CMatrix, NumOfImages_WB_needed, Height_Current, Width_Current);
                                     WhiteBalance.CorrectionMatrix_FromNormilizedMatrix_Fastest(ref CMatrix, CorrectionPower, Width_Current, Height_Current);
 
+                                    //new
+                                    Mat datamat2 = new Mat(new System.Drawing.Size(Width_Current, Height_Current), DepthType.Cv64F, 3);
+                                    WhiteBalance.Convert_DoubleMass2Mat(CMatrix, ref datamat2);
+                                    double[,,] test_mass = null;
+                                    WhiteBalance.Convert_Mat2DoubleMass(out test_mass, datamat2);
+
+                                    //new
                                     Mat datamat = new Mat(new System.Drawing.Size(Width_Current, Height_Current), DepthType.Cv8U, 3);
+                                     
                                     WhiteBalance.CorrectImage_InitByValue(ref datamat);
                                     double max = WhiteBalance.FindMax(CMatrix, 3, Height_Current, Width_Current);
                                    /* WhiteBalance.CorrectionMatrix_NormalizeByValue(ref CMatrix, Width_Current, Height_Current, max);
