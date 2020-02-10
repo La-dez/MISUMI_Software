@@ -497,6 +497,8 @@ namespace Stereo_Vision
             if (bw == null)
             {
                 bw = new System.ComponentModel.BackgroundWorker();
+                bw.WorkerReportsProgress = true;
+                bw.WorkerSupportsCancellation = true;
                 bw.RunWorkerAsync();
             }
             LogMessage("Начало построения 3D...");      
@@ -520,6 +522,7 @@ namespace Stereo_Vision
                     img = (Bitmap)image;
                     if (img.PixelFormat != System.Drawing.Imaging.PixelFormat.Format24bppRgb)
                     { img = img.Clone(new Rectangle(0, 0, img.Width, img.Height), PxForm); }
+                    try { bw.ReportProgress(5); } catch { }
                 }
                 catch
                 {
@@ -534,7 +537,8 @@ namespace Stereo_Vision
                    throw new Exception("Ошибка на этапе чтения калибровочного файла.\nПостроение 3D модели завершено с ошибкой.");
                 }
                 LogMessage("Загрузка изображения и калибровки успешна!");
-               // SetProgress(10);
+                try { bw.ReportProgress(10); } catch { }          
+                // SetProgress(10);
             }
 
             if (stereoPair == null)
@@ -574,6 +578,7 @@ namespace Stereo_Vision
                     stereoEstimator.SetZDiap(10.0, 70.00);//17+-
                     System.Threading.Thread.Sleep(200);//little fix
                                                        //  SetProgress(15);
+                    try { bw.ReportProgress(15); } catch { }
                 }
                 else return null;
 
@@ -586,6 +591,7 @@ namespace Stereo_Vision
                     {
                         bDenseStereoCorrTestPassed = bDenseStereoCorrTestPassed && stereoEstimator.Find(img, ref trPtArray);
                         LogMessage("Модель построена!");
+                        try { bw.ReportProgress(30); } catch { }
                         //SetProgress(30);
                     }//
                     catch (Exception exc)
@@ -599,6 +605,7 @@ namespace Stereo_Vision
                     LogMessage("Применение фильтров...");
                     MeshUtils.FilterLongEdge(ref trPtArray, 0.2);
                     LogMessage("Фильтры применены!");
+                    try { bw.ReportProgress(40); } catch { }
                     // SetProgress(40);
                 }
                 else return null;
@@ -625,8 +632,8 @@ namespace Stereo_Vision
                     if (!bw.CancellationPending)
                     {
                         LogMessage("Вычисление цветовых и пространственных координат...");
-                        MyMesh data;
-                        MyMesh.CreateCilindricMesh(out data, 1.5f, 360.0f, 1.0f, 0.1f, Color.FromArgb(0, 255, 0));
+                     /*   MyMesh data;
+                        MyMesh.CreateCilindricMesh(out data, 1.5f, 360.0f, 1.0f, 0.1f, Color.FromArgb(0, 255, 0));*/
 
                         for (uint i = 0; i < Num_of_Pts; i++)
                         {
@@ -637,6 +644,7 @@ namespace Stereo_Vision
                             sred100X += RGBPointsMass[i].X;
                             sred100Y += RGBPointsMass[i].Y;
                             sred100Z += RGBPointsMass[i].Z;
+                            try { bw.ReportProgress(40 + ((int)(((double)i / (double)Num_of_Pts) * 20))); } catch { }
                         }
                         //вычисляем....
                         sred100X = sred100X / Num_of_Pts;
@@ -648,8 +656,9 @@ namespace Stereo_Vision
                             RGBPointsMass[i].X -= sred100X;
                             RGBPointsMass[i].Y -= sred100Y;
                             RGBPointsMass[i].Z -= sred100Z;
+                            try { bw.ReportProgress(60 + ((int)(((double)i / (double)Num_of_Pts) * 20))); } catch { }
                         }
-                        LogMessage("Вычисление цветовых и пространственных координат...");
+                        LogMessage("Вычисление завершено.");
                     }
 
                     if (!bw.CancellationPending)
@@ -657,6 +666,7 @@ namespace Stereo_Vision
                         LogMessage("Создание модели для отрисовки...");
                         // SetProgress(95);                      
                         result = new MyMesh(RGBPointsMass, TriangleModelMass);
+                        bw.ReportProgress(90);
                         LogMessage("Запись файла модели(PLY)");
 
                         string datename = GetTimeString();
@@ -664,10 +674,12 @@ namespace Stereo_Vision
                         string FileName = CalculatenName_forNewModel();
                         string FullPath = System.IO.Path.Combine(Rec_Models_path, FileName);
                         PLYWriter.SaveBinary(FullPath, trPtArray);
+                        LastNumber_Model++;
                         Model_name_lastbuild_fullpath = FullPath;
                         //bDenseStereoCorrTestPassed = bDenseStereoCorrTestPassed; //&&
 
                         //SetProgress(100);
+                        try { bw.ReportProgress(100); } catch { }
                     }
                     else return null;
                 }

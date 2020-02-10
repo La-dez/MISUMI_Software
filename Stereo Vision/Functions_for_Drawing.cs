@@ -44,7 +44,10 @@ namespace Stereo_Vision
                 LogError(exc.Message);
                 try
                 {
-                    CurrentStereoImage = new StereoImage(CurrentFrame.Bitmap, PB_MeasurementPB.Size, XMLCalib_path);
+                    /* Bitmap Current = CurrentFrame.Bitmap.Clone(new Rectangle(0, 0, CurrentFrame.Width, CurrentFrame.Height),
+                         System.Drawing.Imaging.PixelFormat.Format24bppRgb);*/
+                    //CurrentStereoImage = new StereoImage(CurrentFrame.Bitmap, PB_MeasurementPB.Size, XMLCalib_path);
+                    CurrentStereoImage = new StereoImage(new Bitmap(CurrentFrame.Bitmap), PB_MeasurementPB.Size, XMLCalib_path);
                 }
                 catch { }
             }

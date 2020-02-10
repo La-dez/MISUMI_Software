@@ -55,9 +55,12 @@ namespace Stereo_Vision
                 InitialFilePath = FilesToView[CurrentIndex];
                 Init_Scroll_Slider(pPlayMode_2set);
 
-                if (pPlayMode_2set==Modes.Video) View_Video_byIndex(0);
-                else if(pPlayMode_2set == Modes.Photo) View_Image_byIndex(0);
-                else View_Model_byIndex(0);
+                if (pPlayMode_2set == Modes.Video) View_Video_byIndex(0);
+                else if (pPlayMode_2set == Modes.Photo) View_Image_byIndex(0);
+                else
+                {
+                    View_Model_byIndex(0);
+                }
             }
         }
         private Bitmap Create_ImageOfEmptyness()

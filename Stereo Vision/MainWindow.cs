@@ -119,10 +119,14 @@ namespace Stereo_Vision
         {
             try
             {
-                pMat = WhiteBalance.CorrectionMatrix_fromFile(RGBCalib_path);
+                pMat = WhiteBalance.CorrectionMatrix_fromImage(RGBCalib_visual_path);
+               // pMat = WhiteBalance.CorrectionMatrix_fromMatFile(RGBCalib_path);
                 DigitalWB_Active = true;
             }
-            catch { DigitalWB_Active = false; }
+            catch
+            {
+                DigitalWB_Active = false;
+            }
         }
         private void Build_Interface()
         {
@@ -169,10 +173,14 @@ namespace Stereo_Vision
             {
                 // Thread_for_Refreshing_of_ChargeLev.Abort();
                 //Thread_for_Refreshing_of_ChargeLev.Join();              
-                BGWR_ChargeLev.CancelAsync();
-                SaveSettings();
+                try { BGWR_ChargeLev.CancelAsync(); } catch { }
+                try
+                { SaveSettings(); }
+                catch { }
                 StopCapture();
-                while (/*(!isArduino_closed)&&*/(!lastFrame_processed))
+                System.Diagnostics.Stopwatch stw_closing = new System.Diagnostics.Stopwatch();
+                stw_closing.Start();
+                while (/*(!isArduino_closed)&&*/(!lastFrame_processed)&&(stw_closing.Elapsed.TotalMilliseconds<3000))
                 {
                     //int a = 0;
                     //we will wait for closing
@@ -966,7 +974,7 @@ namespace Stereo_Vision
         {
             BackgroundWorker bw = sender as BackgroundWorker;
             // Start the time-consuming operation.
-            Bitmap dataBMP = CurrentStereoImage.BasicImage as Bitmap;
+            Bitmap dataBMP = new Bitmap(CurrentStereoImage.BasicImage);
             BuildModel3D(bw, dataBMP, true);
         }
 
@@ -1018,6 +1026,21 @@ namespace Stereo_Vision
         }
 
         private void B_Set_FindWBCalibFile_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void BWorkerForLoad3D_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            PrB_3D_Building.Value = e.ProgressPercentage;
+        }
+
+        private void BWorkerForLoad3D_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            Pan_3D_Building.Hide();
+        }
+
+        private void B_3D_CancelBuilding_Click(object sender, EventArgs e)
         {
 
         }

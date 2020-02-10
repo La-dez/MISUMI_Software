@@ -61,7 +61,9 @@ namespace Stereo_Vision
         string Model_name_lastcaptured = "Model_000.ply";
 
         string XMLCalib_path = "M5_chess.xml"; //string cfgFilePath = IsPrism ? "M5_chess.xml" : "M1_chess.xml"
-        string RGBCalib_path = "RGB_calib_matrix.bmp";
+        const string RGBCalib_visual_path = "RGB_calib_matrix.bmp";
+        const string RGBCalib_math_path = "RGB_calib_matrix.bmp";
+        string RGBCalib_path = RGBCalib_visual_path;
 
         string Photo_name_lastcaptured_fullpath = null;
         string Model_name_lastbuild_fullpath = null;
@@ -84,6 +86,7 @@ namespace Stereo_Vision
         int Count_of_Digits_vid = 2;
         int Count_of_Digits_snap = 3;
         int Count_of_Digits_mod = 3;
+
         int LastNumber_Vid = 4;
         int LastNumber_Photo = 0;
         int LastNumber_Model = 0;
@@ -217,30 +220,46 @@ namespace Stereo_Vision
                                 lfa.Start();
                                 try
                                 {
-                                    //  Bitmap NewCalibrationBMP = _Capture.RetrieveBgrFrame().Bitmap;
-
                                     lfa2.Reset(); lfa2.Start();
                                     double CorrectionPower = Convert.ToDouble(L_WB_CorPower.Text);
                                     WhiteBalance.CorrectionMatrix_Normalize(ref CMatrix, NumOfImages_WB_needed, Height_Current, Width_Current);
                                     WhiteBalance.CorrectionMatrix_FromNormilizedMatrix_Fastest(ref CMatrix, CorrectionPower, Width_Current, Height_Current);
-
-                                    //new
-                                    Mat datamat2 = new Mat(new System.Drawing.Size(Width_Current, Height_Current), DepthType.Cv64F, 3);
-                                    WhiteBalance.Convert_DoubleMass2Mat(CMatrix, ref datamat2);
-                                    double[,,] test_mass = null;
-                                    WhiteBalance.Convert_Mat2DoubleMass(out test_mass, datamat2);
-
-                                    //new
                                     Mat datamat = new Mat(new System.Drawing.Size(Width_Current, Height_Current), DepthType.Cv8U, 3);
-                                     
-                                    WhiteBalance.CorrectImage_InitByValue(ref datamat);
-                                    double max = WhiteBalance.FindMax(CMatrix, 3, Height_Current, Width_Current);
-                                   /* WhiteBalance.CorrectionMatrix_NormalizeByValue(ref CMatrix, Width_Current, Height_Current, max);
-                                    max = WhiteBalance.FindMax(CMatrix, 3, Height_Current, Width_Current);*/
+                                    WhiteBalance.Image_InitByValue(ref datamat);
                                     WhiteBalance.CorrectImage_viaCorrectionMatrix_Color(CMatrix, ref datamat);
-                                    datamat.Save(RGBCalib_path);
-                                   // Mat data = new Mat(,)
-                               
+                                    datamat.Save(RGBCalib_visual_path);
+
+                                    //new
+                                    /*     WhiteBalance.Save_double_mass_2xml(CMatrix, "shit.xml");
+                                         Mat datamat2 = new Mat(new System.Drawing.Size(Width_Current, Height_Current), DepthType.Cv64F, 3);
+                                         WhiteBalance.Convert_DoubleMass2Mat(CMatrix, ref datamat2);
+                                         double[,,] test_mass = null;
+                                        // WhiteBalance.Convert_Mat2DoubleMass(out test_mass, datamat2);                            
+
+
+
+                                         //datamat2 saving
+                                         Matrix<Double> datamat3 = new Matrix<Double>(Width_Current, Height_Current, 3);
+                                         datamat2.CopyTo(datamat3);
+
+                                         System.Xml.Linq.XDocument alpha = Emgu.Util.Toolbox.XmlSerialize<Matrix<Double>>(datamat3);
+                                         alpha.Save("shit.xml");                               
+
+                                         System.Xml.XmlDocument xDoc_rd = new System.Xml.XmlDocument();
+                                         FileStream fs = new FileStream("shit.xml", FileMode.Open, FileAccess.Read);
+                                         xDoc_rd.Load(fs);
+
+                                         Matrix<Double> matrix = (Matrix<Double>)
+                                             (new System.Xml.Serialization.XmlSerializer(typeof(Matrix<Double>))).Deserialize(new System.Xml.XmlNodeReader(xDoc_rd));
+                                         matrix.Mat.CopyTo(datamat2);
+                                         WhiteBalance.Convert_Mat2DoubleMass(out test_mass, datamat2);*/
+
+
+
+                                    //  Emgu.CV.FileStorage
+                                    //datamat
+                                    // Mat data = new Mat(,)
+
                                     // CMatrix = WhiteBalance.CorrectionMatrix_FromWhiteImage_Fastest(NewCalibrationBMP, CorrectionPower);
                                     lfa2.Stop();
                                     LogMessage("Вычисление коррекционной матрицы Методом Указателей завершено. Прошло времени: " + (lfa2.ElapsedMilliseconds / 1000.0).ToString());
@@ -252,6 +271,7 @@ namespace Stereo_Vision
                         }
                         else
                         {
+
                             WhiteBalance.CorrectImage_viaCorrectionMatrix_Color(CMatrix, ref CurrentFrame_wb);
                             CurrentFrame = CurrentFrame_wb.Clone();
                         }
@@ -370,8 +390,10 @@ namespace Stereo_Vision
               }
               catch
               {
-                  //Попробуем в следующий раз
-              }
+                lastFrame_processed = true;
+                return;
+                //Попробуем в следующий раз
+            }
             lastFrame_processed = true;
         }
         
@@ -475,6 +497,7 @@ namespace Stereo_Vision
                                
                 _capture.Stop();
                 isInTranslation = !isInTranslation;
+                
             }
         }
         private bool StartRecording()

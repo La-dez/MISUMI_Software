@@ -404,7 +404,32 @@ namespace Stereo_Vision
                 }
             }
         }
+        public static  void Save_double_mass_2xml(double[,,] source, string pPath)
+        {
+            int Width_Current = source.GetLength(2);
+            int Height_Current = source.GetLength(1);
+            Mat datamat2 = new Mat(new System.Drawing.Size(Width_Current, Height_Current), Emgu.CV.CvEnum.DepthType.Cv64F, 3);
+            WhiteBalance.Convert_DoubleMass2Mat(source, ref datamat2);
+            Matrix<Double> datamat3 = new Matrix<Double>(Width_Current, Height_Current, 3);
+            datamat2.CopyTo(datamat3);
+            System.Xml.Linq.XDocument alpha = Emgu.Util.Toolbox.XmlSerialize<Matrix<Double>>(datamat3);
+            alpha.Save(pPath);
 
+        }
+    /*    public static void Read_double_mass_from_xml(out double[,,] source, string pPath)
+        {
+            System.Xml.XmlDocument xDoc_rd = new System.Xml.XmlDocument();
+            using (System.IO.FileStream fs = new System.IO.FileStream("shit.xml", System.IO.FileMode.Open, System.IO.FileAccess.Read))
+            {
+                xDoc_rd.Load(fs);
+            }
+
+            Matrix<Double> matrix = (Matrix<Double>)
+                (new System.Xml.Serialization.XmlSerializer(typeof(Matrix<Double>))).Deserialize(new System.Xml.XmlNodeReader(xDoc_rd));
+
+            datamat3.Mat.CopyTo(datamat2);
+            WhiteBalance.Convert_Mat2DoubleMass(out test_mass, datamat2);
+        }*/
         public static unsafe void Convert_DoubleMass2Mat(double[,,] source,ref Mat result_frame)
         {
            
@@ -444,23 +469,23 @@ namespace Stereo_Vision
             }
         }
 
-        public static unsafe void Convert_Mat2DoubleMass(out double[,,] res, Mat pframe)
+        public static unsafe void Convert_Mat2DoubleMass(out double[,,] res, Mat source_frame)
         {
             double* curpos; //счетчик для data, чтобы удобнее было
           //  int IMISS = 0;
-            int height = pframe.Height;
-            int width = pframe.Width;
+            int height = source_frame.Height;
+            int width = source_frame.Width;
             int WH = width * height;
 
-            double[,,] data = pframe.ToImage<Bgr, Double>().Data;
+            double[,,] source = source_frame.ToImage<Bgr, Double>().Data;
             res = new double[3, height, width];
             try
             {
                 fixed (double* _res = res)
                 {
-                    fixed (double* _Data = data)
+                    fixed (double* _source = source)
                     {
-                        curpos = _Data;
+                        curpos = _source;
                         double* _r = _res, _g = _res + WH, _b = _res + 2 * WH;
                         for (int i = 0; i < WH; i++)
                         {
@@ -480,7 +505,7 @@ namespace Stereo_Vision
                 }
             }
         }
-        public static unsafe void CorrectImage_InitByValue(ref Mat pframe,byte value = 255)
+        public static unsafe void Image_InitByValue(ref Mat pframe,byte value = 255)
         {
             byte* curpos;
             int IMISS = 0;
@@ -667,7 +692,7 @@ namespace Stereo_Vision
 
             }
         }*/
-        public static unsafe double[,,] CorrectionMatrix_fromFile(string Path)
+        public static unsafe double[,,] CorrectionMatrix_fromImage(string Path)
         {
 
             Mat data = new Emgu.CV.Image<Bgr,Byte>(Path).Mat;
@@ -675,6 +700,13 @@ namespace Stereo_Vision
             InitializeMatrix(0,ref result, data.NumberOfChannels, data.Height, data.Width);
             WhiteBalance.CorrectionMatrix_AddImage(ref result, ref data);
             WhiteBalance.CorrectionMatrix_NormalizeByValue(ref result, data.Width, data.Height,255);
+            return result;
+        }
+        public static unsafe double[,,] CorrectionMatrix_fromMatFile(string Path)
+        {
+            Mat source = new Mat(Path, Emgu.CV.CvEnum.ImreadModes.AnyColor);
+            double[,,] result = new double[3, source.Height, source.Width];
+            WhiteBalance.Convert_Mat2DoubleMass(out result, source);
             return result;
         }
         public static unsafe void CorrectionMatrix_Normalize(ref double[,,] res, int NumOfIMG, int height, int width)

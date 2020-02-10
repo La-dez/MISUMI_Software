@@ -202,20 +202,25 @@ namespace Stereo_Vision
             Initialize_Player_Controls(Playing_mode);
             
         }
-        private void OpenPlayPanel(bool Build3D)
+        private void OpenPlayPanel(bool Build3D_fromstereo)
         {
             TogglePanelsVisability(false, false, false, true);
-            bool AsyncBuilding = false;
+            bool AsyncBuilding = true;
             StopCapture();
-            if (Build3D)
+            Bitmap data = new Bitmap(CurrentStereoImage.BasicImage);
+            Initialize_Player_Controls(Playing_mode);
+
+            if (Build3D_fromstereo)
             {
+                Pan_3D_Building.Show();
                 if (AsyncBuilding)
                     BWorkerForLoad3D.RunWorkerAsync();//BuildModel3D();
                 else
-                    BuildModel3D(null, CurrentStereoImage.BasicImage, true);
-            }
-            Initialize_Player_Controls(Playing_mode);
+                {
 
+                    BuildModel3D(null, data , true);
+                }
+            }
         }
         private void OpenMeasurementsPanel()
         {
@@ -330,6 +335,12 @@ namespace Stereo_Vision
                                 LastNumber_Photo = Convert.ToInt16(toObject);
                                 break;
                             }
+                        case "LastNumber_Model":
+                            {
+                                string toObject = CutFromEdges(AllLines[i]);
+                                LastNumber_Model = Convert.ToInt16(toObject);
+                                break;
+                            }
                         case "Count_of_files_Vid":
                             {
                                 string toObject = CutFromEdges(AllLines[i]);
@@ -342,6 +353,12 @@ namespace Stereo_Vision
                                 Count_of_Digits_snap = Convert.ToInt16(toObject);
                                 break;
                             }
+                        case "Count_of_Digits_mod":
+                            {
+                                string toObject = CutFromEdges(AllLines[i]);
+                                Count_of_Digits_mod = Convert.ToInt16(toObject);
+                                break;
+                            }                           
                         case "Export_style":
                             {
                                 string toObject = CutFromEdges(AllLines[i]);
@@ -492,6 +509,7 @@ namespace Stereo_Vision
             LastNumber_Photo = 0;
             Count_of_Digits_vid = 2;
             Count_of_Digits_snap = 3;
+            Count_of_Digits_mod = 3;
             Export_style = 3;
             Number_of_FilesorHours = 1;
             Brightness_Value = 0;
@@ -610,8 +628,12 @@ namespace Stereo_Vision
 
                 sw.WriteLine("<LastFileDigit_vid>" + LastNumber_Vid+"</LastFileDigit_vid>");
                 sw.WriteLine("<LastFileDigit_Photo>" + LastNumber_Photo + "</LastFileDigit_Photo>");
-                sw.WriteLine("<Count_of_files_Vid>" + Count_of_Digits_vid + "</Count_of_files_Vid>");
+                sw.WriteLine("<LastNumber_Model>" + LastNumber_Model + "</LastNumber_Model>");
+
+                sw.WriteLine("<Count_of_files_Vid>" + Count_of_Digits_vid + "</Count_of_files_Vid>");                
                 sw.WriteLine("<Count_of_files_Photo>" + Count_of_Digits_snap + "</Count_of_files_Photo>");
+                sw.WriteLine("<Count_of_Digits_mod>" + Count_of_Digits_mod + "</Count_of_Digits_mod>");
+                
                 sw.WriteLine("<Export_style>" + Export_style + "</Export_style>");
                 sw.WriteLine("<Number_of_FilesorHours>" + Number_of_FilesorHours + "</Number_of_FilesorHours>");
                 sw.WriteLine("<LastChargeLevel>" + LastChargeLevel + "</LastChargeLevel>");

@@ -182,6 +182,10 @@ namespace Stereo_Vision
             this.Timer_3DRenderer = new System.Windows.Forms.Timer(this.components);
             this.BGW_3DRotator = new System.ComponentModel.BackgroundWorker();
             this.BWorkerForLoad3D = new System.ComponentModel.BackgroundWorker();
+            this.Pan_3D_Building = new System.Windows.Forms.Panel();
+            this.TLP_3D_Building = new System.Windows.Forms.TableLayoutPanel();
+            this.PrB_3D_Building = new System.Windows.Forms.ProgressBar();
+            this.B_3D_CancelBuilding = new System.Windows.Forms.Button();
             this.TLP_BASE.SuspendLayout();
             this.Pan_ViewRegion.SuspendLayout();
             this.Pan_Pl_3D.SuspendLayout();
@@ -227,6 +231,8 @@ namespace Stereo_Vision
             this.tableLayoutPanel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.CV_ImBox_VidPhoto_Player)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.PB_MeasurementPB)).BeginInit();
+            this.Pan_3D_Building.SuspendLayout();
+            this.TLP_3D_Building.SuspendLayout();
             this.SuspendLayout();
             // 
             // TLP_BASE
@@ -306,7 +312,8 @@ namespace Stereo_Vision
             this.TLP_Pl_3D.Controls.Add(this.TRB_Pl_ModelsLister, 1, 1);
             this.TLP_Pl_3D.Controls.Add(this.label16, 2, 0);
             this.TLP_Pl_3D.Controls.Add(this.B_Pl_ModelPrevious, 0, 2);
-            this.TLP_Pl_3D.Controls.Add(this.B_Pl_ModelNext, 4, 2);
+            this.TLP_Pl_3D.Controls.Add(this.B_Pl_ModelNext, 6, 2);
+            this.TLP_Pl_3D.Controls.Add(this.Pan_3D_Building, 2, 2);
             this.TLP_Pl_3D.Dock = System.Windows.Forms.DockStyle.Fill;
             this.TLP_Pl_3D.Location = new System.Drawing.Point(0, 0);
             this.TLP_Pl_3D.Margin = new System.Windows.Forms.Padding(0);
@@ -383,14 +390,14 @@ namespace Stereo_Vision
             this.B_Pl_ModelPrevious.BackColor = System.Drawing.Color.Black;
             this.B_Pl_ModelPrevious.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("B_Pl_ModelPrevious.BackgroundImage")));
             this.B_Pl_ModelPrevious.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.TLP_Pl_3D.SetColumnSpan(this.B_Pl_ModelPrevious, 4);
+            this.TLP_Pl_3D.SetColumnSpan(this.B_Pl_ModelPrevious, 2);
             this.B_Pl_ModelPrevious.Dock = System.Windows.Forms.DockStyle.Fill;
             this.B_Pl_ModelPrevious.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.B_Pl_ModelPrevious.Location = new System.Drawing.Point(0, 30);
             this.B_Pl_ModelPrevious.Margin = new System.Windows.Forms.Padding(0);
             this.B_Pl_ModelPrevious.Name = "B_Pl_ModelPrevious";
             this.TLP_Pl_3D.SetRowSpan(this.B_Pl_ModelPrevious, 2);
-            this.B_Pl_ModelPrevious.Size = new System.Drawing.Size(216, 33);
+            this.B_Pl_ModelPrevious.Size = new System.Drawing.Size(108, 33);
             this.B_Pl_ModelPrevious.TabIndex = 10;
             this.B_Pl_ModelPrevious.UseVisualStyleBackColor = false;
             this.B_Pl_ModelPrevious.Click += new System.EventHandler(this.B_Pl_ModelPrevious_Click);
@@ -400,14 +407,14 @@ namespace Stereo_Vision
             this.B_Pl_ModelNext.BackColor = System.Drawing.Color.Black;
             this.B_Pl_ModelNext.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("B_Pl_ModelNext.BackgroundImage")));
             this.B_Pl_ModelNext.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.TLP_Pl_3D.SetColumnSpan(this.B_Pl_ModelNext, 4);
+            this.TLP_Pl_3D.SetColumnSpan(this.B_Pl_ModelNext, 2);
             this.B_Pl_ModelNext.Dock = System.Windows.Forms.DockStyle.Fill;
             this.B_Pl_ModelNext.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.B_Pl_ModelNext.Location = new System.Drawing.Point(216, 30);
+            this.B_Pl_ModelNext.Location = new System.Drawing.Point(324, 30);
             this.B_Pl_ModelNext.Margin = new System.Windows.Forms.Padding(0);
             this.B_Pl_ModelNext.Name = "B_Pl_ModelNext";
             this.TLP_Pl_3D.SetRowSpan(this.B_Pl_ModelNext, 2);
-            this.B_Pl_ModelNext.Size = new System.Drawing.Size(219, 33);
+            this.B_Pl_ModelNext.Size = new System.Drawing.Size(111, 33);
             this.B_Pl_ModelNext.TabIndex = 11;
             this.B_Pl_ModelNext.UseVisualStyleBackColor = false;
             this.B_Pl_ModelNext.Click += new System.EventHandler(this.B_Pl_ModelNext_Click);
@@ -994,7 +1001,7 @@ namespace Stereo_Vision
             this.TLP_ExportTable.Controls.Add(this.B_Ex_3DMode, 2, 0);
             this.TLP_ExportTable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.TLP_ExportTable.Location = new System.Drawing.Point(0, 0);
-            this.TLP_ExportTable.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.TLP_ExportTable.Margin = new System.Windows.Forms.Padding(2);
             this.TLP_ExportTable.Name = "TLP_ExportTable";
             this.TLP_ExportTable.RowCount = 8;
             this.TLP_ExportTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 12.5F));
@@ -1417,7 +1424,7 @@ namespace Stereo_Vision
             this.TPAGE_PhotoSettings.Location = new System.Drawing.Point(4, 25);
             this.TPAGE_PhotoSettings.Margin = new System.Windows.Forms.Padding(0);
             this.TPAGE_PhotoSettings.Name = "TPAGE_PhotoSettings";
-            this.TPAGE_PhotoSettings.Size = new System.Drawing.Size(493, 48);
+            this.TPAGE_PhotoSettings.Size = new System.Drawing.Size(492, 48);
             this.TPAGE_PhotoSettings.TabIndex = 1;
             this.TPAGE_PhotoSettings.Text = "Запись фото";
             // 
@@ -1437,7 +1444,7 @@ namespace Stereo_Vision
             this.TLP_Settings_Photo.RowCount = 2;
             this.TLP_Settings_Photo.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 70F));
             this.TLP_Settings_Photo.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 30F));
-            this.TLP_Settings_Photo.Size = new System.Drawing.Size(493, 48);
+            this.TLP_Settings_Photo.Size = new System.Drawing.Size(492, 48);
             this.TLP_Settings_Photo.TabIndex = 6;
             this.TLP_Settings_Photo.Paint += new System.Windows.Forms.PaintEventHandler(this.tableLayoutPanel1_Paint);
             // 
@@ -1481,7 +1488,7 @@ namespace Stereo_Vision
             this.B_Settings_FindPhotoPath.Location = new System.Drawing.Point(326, 1);
             this.B_Settings_FindPhotoPath.Margin = new System.Windows.Forms.Padding(0, 1, 1, 1);
             this.B_Settings_FindPhotoPath.Name = "B_Settings_FindPhotoPath";
-            this.B_Settings_FindPhotoPath.Size = new System.Drawing.Size(166, 31);
+            this.B_Settings_FindPhotoPath.Size = new System.Drawing.Size(165, 31);
             this.B_Settings_FindPhotoPath.TabIndex = 8;
             this.B_Settings_FindPhotoPath.Text = "Обзор...";
             this.B_Settings_FindPhotoPath.UseVisualStyleBackColor = false;
@@ -1493,7 +1500,7 @@ namespace Stereo_Vision
             this.TPAGE_CameraSettings.Controls.Add(this.TLP_Settings_Camera);
             this.TPAGE_CameraSettings.Location = new System.Drawing.Point(4, 25);
             this.TPAGE_CameraSettings.Name = "TPAGE_CameraSettings";
-            this.TPAGE_CameraSettings.Size = new System.Drawing.Size(493, 48);
+            this.TPAGE_CameraSettings.Size = new System.Drawing.Size(492, 48);
             this.TPAGE_CameraSettings.TabIndex = 3;
             this.TPAGE_CameraSettings.Text = "Настройки камеры";
             // 
@@ -1530,7 +1537,7 @@ namespace Stereo_Vision
             this.TLP_Settings_Camera.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
             this.TLP_Settings_Camera.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
             this.TLP_Settings_Camera.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-            this.TLP_Settings_Camera.Size = new System.Drawing.Size(493, 48);
+            this.TLP_Settings_Camera.Size = new System.Drawing.Size(492, 48);
             this.TLP_Settings_Camera.TabIndex = 16;
             this.TLP_Settings_Camera.Paint += new System.Windows.Forms.PaintEventHandler(this.tableLayoutPanel4_Paint);
             // 
@@ -1543,7 +1550,7 @@ namespace Stereo_Vision
             this.TrBContrast.Location = new System.Drawing.Point(158, 19);
             this.TrBContrast.Maximum = 100;
             this.TrBContrast.Name = "TrBContrast";
-            this.TrBContrast.Size = new System.Drawing.Size(31, 10);
+            this.TrBContrast.Size = new System.Drawing.Size(30, 10);
             this.TrBContrast.TabIndex = 29;
             this.TrBContrast.TickFrequency = 5;
             this.TrBContrast.TickStyle = System.Windows.Forms.TickStyle.None;
@@ -1570,7 +1577,7 @@ namespace Stereo_Vision
             this.TrBBrightness.Maximum = 50;
             this.TrBBrightness.Minimum = -50;
             this.TrBBrightness.Name = "TrBBrightness";
-            this.TrBBrightness.Size = new System.Drawing.Size(31, 10);
+            this.TrBBrightness.Size = new System.Drawing.Size(30, 10);
             this.TrBBrightness.TabIndex = 26;
             this.TrBBrightness.TickFrequency = 5;
             this.TrBBrightness.TickStyle = System.Windows.Forms.TickStyle.None;
@@ -1582,7 +1589,7 @@ namespace Stereo_Vision
             this.LBrigthnessValue.AutoSize = true;
             this.LBrigthnessValue.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.LBrigthnessValue.ForeColor = System.Drawing.Color.White;
-            this.LBrigthnessValue.Location = new System.Drawing.Point(209, 0);
+            this.LBrigthnessValue.Location = new System.Drawing.Point(208, 0);
             this.LBrigthnessValue.Name = "LBrigthnessValue";
             this.LBrigthnessValue.Size = new System.Drawing.Size(16, 16);
             this.LBrigthnessValue.TabIndex = 27;
@@ -1594,7 +1601,7 @@ namespace Stereo_Vision
             this.LContrastValue.AutoSize = true;
             this.LContrastValue.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.LContrastValue.ForeColor = System.Drawing.Color.White;
-            this.LContrastValue.Location = new System.Drawing.Point(209, 16);
+            this.LContrastValue.Location = new System.Drawing.Point(208, 16);
             this.LContrastValue.Name = "LContrastValue";
             this.LContrastValue.Size = new System.Drawing.Size(16, 16);
             this.LContrastValue.TabIndex = 30;
@@ -1618,7 +1625,7 @@ namespace Stereo_Vision
             this.LSaturationValue.AutoSize = true;
             this.LSaturationValue.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.LSaturationValue.ForeColor = System.Drawing.Color.White;
-            this.LSaturationValue.Location = new System.Drawing.Point(209, 32);
+            this.LSaturationValue.Location = new System.Drawing.Point(208, 32);
             this.LSaturationValue.Name = "LSaturationValue";
             this.LSaturationValue.Size = new System.Drawing.Size(16, 16);
             this.LSaturationValue.TabIndex = 45;
@@ -1631,7 +1638,7 @@ namespace Stereo_Vision
             this.TrBSaturation.Location = new System.Drawing.Point(158, 35);
             this.TrBSaturation.Maximum = 130;
             this.TrBSaturation.Name = "TrBSaturation";
-            this.TrBSaturation.Size = new System.Drawing.Size(31, 10);
+            this.TrBSaturation.Size = new System.Drawing.Size(30, 10);
             this.TrBSaturation.TabIndex = 50;
             this.TrBSaturation.TickFrequency = 5;
             this.TrBSaturation.TickStyle = System.Windows.Forms.TickStyle.None;
@@ -1655,7 +1662,7 @@ namespace Stereo_Vision
             this.L_Settings_l4.AutoSize = true;
             this.L_Settings_l4.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.L_Settings_l4.ForeColor = System.Drawing.Color.White;
-            this.L_Settings_l4.Location = new System.Drawing.Point(248, 0);
+            this.L_Settings_l4.Location = new System.Drawing.Point(247, 0);
             this.L_Settings_l4.Name = "L_Settings_l4";
             this.L_Settings_l4.Size = new System.Drawing.Size(146, 16);
             this.L_Settings_l4.TabIndex = 42;
@@ -1667,7 +1674,7 @@ namespace Stereo_Vision
             this.L_Settings_l5.AutoSize = true;
             this.L_Settings_l5.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.L_Settings_l5.ForeColor = System.Drawing.Color.White;
-            this.L_Settings_l5.Location = new System.Drawing.Point(299, 16);
+            this.L_Settings_l5.Location = new System.Drawing.Point(298, 16);
             this.L_Settings_l5.Name = "L_Settings_l5";
             this.L_Settings_l5.Size = new System.Drawing.Size(95, 16);
             this.L_Settings_l5.TabIndex = 43;
@@ -1677,10 +1684,10 @@ namespace Stereo_Vision
             // 
             this.TrBGamma.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.TrBGamma.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.TrBGamma.Location = new System.Drawing.Point(400, 3);
+            this.TrBGamma.Location = new System.Drawing.Point(399, 3);
             this.TrBGamma.Maximum = 500;
             this.TrBGamma.Name = "TrBGamma";
-            this.TrBGamma.Size = new System.Drawing.Size(31, 10);
+            this.TrBGamma.Size = new System.Drawing.Size(30, 10);
             this.TrBGamma.TabIndex = 51;
             this.TrBGamma.TickFrequency = 5;
             this.TrBGamma.TickStyle = System.Windows.Forms.TickStyle.None;
@@ -1690,10 +1697,10 @@ namespace Stereo_Vision
             // 
             this.TrBGain.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.TrBGain.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.TrBGain.Location = new System.Drawing.Point(400, 19);
+            this.TrBGain.Location = new System.Drawing.Point(399, 19);
             this.TrBGain.Maximum = 100;
             this.TrBGain.Name = "TrBGain";
-            this.TrBGain.Size = new System.Drawing.Size(31, 10);
+            this.TrBGain.Size = new System.Drawing.Size(30, 10);
             this.TrBGain.TabIndex = 53;
             this.TrBGain.TickFrequency = 5;
             this.TrBGain.TickStyle = System.Windows.Forms.TickStyle.None;
@@ -1705,7 +1712,7 @@ namespace Stereo_Vision
             this.LGammaValue.AutoSize = true;
             this.LGammaValue.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.LGammaValue.ForeColor = System.Drawing.Color.White;
-            this.LGammaValue.Location = new System.Drawing.Point(455, 0);
+            this.LGammaValue.Location = new System.Drawing.Point(454, 0);
             this.LGammaValue.Name = "LGammaValue";
             this.LGammaValue.Size = new System.Drawing.Size(16, 16);
             this.LGammaValue.TabIndex = 48;
@@ -1717,7 +1724,7 @@ namespace Stereo_Vision
             this.LGainValue.AutoSize = true;
             this.LGainValue.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.LGainValue.ForeColor = System.Drawing.Color.White;
-            this.LGainValue.Location = new System.Drawing.Point(455, 16);
+            this.LGainValue.Location = new System.Drawing.Point(454, 16);
             this.LGainValue.Name = "LGainValue";
             this.LGainValue.Size = new System.Drawing.Size(16, 16);
             this.LGainValue.TabIndex = 49;
@@ -1728,9 +1735,9 @@ namespace Stereo_Vision
             this.TPAGE_WB.BackColor = System.Drawing.Color.Black;
             this.TPAGE_WB.Controls.Add(this.tableLayoutPanel1);
             this.TPAGE_WB.Location = new System.Drawing.Point(4, 25);
-            this.TPAGE_WB.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.TPAGE_WB.Margin = new System.Windows.Forms.Padding(2);
             this.TPAGE_WB.Name = "TPAGE_WB";
-            this.TPAGE_WB.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.TPAGE_WB.Padding = new System.Windows.Forms.Padding(2);
             this.TPAGE_WB.Size = new System.Drawing.Size(492, 48);
             this.TPAGE_WB.TabIndex = 5;
             this.TPAGE_WB.Text = "Баланс Белого";
@@ -1786,7 +1793,7 @@ namespace Stereo_Vision
             this.B_WB_LowerFrames.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.B_WB_LowerFrames.ForeColor = System.Drawing.Color.White;
             this.B_WB_LowerFrames.Location = new System.Drawing.Point(119, 2);
-            this.B_WB_LowerFrames.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.B_WB_LowerFrames.Margin = new System.Windows.Forms.Padding(2);
             this.B_WB_LowerFrames.Name = "B_WB_LowerFrames";
             this.B_WB_LowerFrames.Size = new System.Drawing.Size(43, 40);
             this.B_WB_LowerFrames.TabIndex = 1;
@@ -1802,7 +1809,7 @@ namespace Stereo_Vision
             this.B_WB_HigherFrames.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.B_WB_HigherFrames.ForeColor = System.Drawing.Color.White;
             this.B_WB_HigherFrames.Location = new System.Drawing.Point(213, 2);
-            this.B_WB_HigherFrames.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.B_WB_HigherFrames.Margin = new System.Windows.Forms.Padding(2);
             this.B_WB_HigherFrames.Name = "B_WB_HigherFrames";
             this.B_WB_HigherFrames.Size = new System.Drawing.Size(43, 40);
             this.B_WB_HigherFrames.TabIndex = 2;
@@ -1853,7 +1860,7 @@ namespace Stereo_Vision
             this.TrB_WB_CorPower.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.TrB_WB_CorPower.AutoSize = false;
             this.TrB_WB_CorPower.Location = new System.Drawing.Point(353, 10);
-            this.TrB_WB_CorPower.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.TrB_WB_CorPower.Margin = new System.Windows.Forms.Padding(2);
             this.TrB_WB_CorPower.Maximum = 100;
             this.TrB_WB_CorPower.Name = "TrB_WB_CorPower";
             this.TrB_WB_CorPower.Size = new System.Drawing.Size(1, 23);
@@ -1882,7 +1889,7 @@ namespace Stereo_Vision
             this.tabPage3.Controls.Add(this.TB_Set_CalibStereoFilePath);
             this.tabPage3.Location = new System.Drawing.Point(4, 25);
             this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Size = new System.Drawing.Size(493, 48);
+            this.tabPage3.Size = new System.Drawing.Size(492, 48);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "Настройки приложения";
             // 
@@ -1900,12 +1907,12 @@ namespace Stereo_Vision
             this.TB_Set_CalibStereoFilePath.Controls.Add(this.B_Set_FindStereoCalibFile, 2, 0);
             this.TB_Set_CalibStereoFilePath.Dock = System.Windows.Forms.DockStyle.Fill;
             this.TB_Set_CalibStereoFilePath.Location = new System.Drawing.Point(0, 0);
-            this.TB_Set_CalibStereoFilePath.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.TB_Set_CalibStereoFilePath.Margin = new System.Windows.Forms.Padding(2);
             this.TB_Set_CalibStereoFilePath.Name = "TB_Set_CalibStereoFilePath";
             this.TB_Set_CalibStereoFilePath.RowCount = 2;
             this.TB_Set_CalibStereoFilePath.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.TB_Set_CalibStereoFilePath.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.TB_Set_CalibStereoFilePath.Size = new System.Drawing.Size(493, 48);
+            this.TB_Set_CalibStereoFilePath.Size = new System.Drawing.Size(492, 48);
             this.TB_Set_CalibStereoFilePath.TabIndex = 16;
             // 
             // label18
@@ -1945,7 +1952,7 @@ namespace Stereo_Vision
             this.textBox1.Location = new System.Drawing.Point(293, 0);
             this.textBox1.Margin = new System.Windows.Forms.Padding(0);
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(100, 35);
+            this.textBox1.Size = new System.Drawing.Size(99, 35);
             this.textBox1.TabIndex = 13;
             // 
             // TB_Set_CalibWBFilePath
@@ -1957,7 +1964,7 @@ namespace Stereo_Vision
             this.TB_Set_CalibWBFilePath.Location = new System.Drawing.Point(293, 24);
             this.TB_Set_CalibWBFilePath.Margin = new System.Windows.Forms.Padding(0);
             this.TB_Set_CalibWBFilePath.Name = "TB_Set_CalibWBFilePath";
-            this.TB_Set_CalibWBFilePath.Size = new System.Drawing.Size(100, 35);
+            this.TB_Set_CalibWBFilePath.Size = new System.Drawing.Size(99, 35);
             this.TB_Set_CalibWBFilePath.TabIndex = 17;
             // 
             // B_Set_FindWBCalibFile
@@ -1970,7 +1977,7 @@ namespace Stereo_Vision
             this.B_Set_FindWBCalibFile.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.B_Set_FindWBCalibFile.ForeColor = System.Drawing.Color.White;
             this.B_Set_FindWBCalibFile.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.B_Set_FindWBCalibFile.Location = new System.Drawing.Point(393, 25);
+            this.B_Set_FindWBCalibFile.Location = new System.Drawing.Point(392, 25);
             this.B_Set_FindWBCalibFile.Margin = new System.Windows.Forms.Padding(0, 1, 1, 1);
             this.B_Set_FindWBCalibFile.Name = "B_Set_FindWBCalibFile";
             this.B_Set_FindWBCalibFile.Size = new System.Drawing.Size(99, 22);
@@ -1989,7 +1996,7 @@ namespace Stereo_Vision
             this.B_Set_FindStereoCalibFile.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.B_Set_FindStereoCalibFile.ForeColor = System.Drawing.Color.White;
             this.B_Set_FindStereoCalibFile.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.B_Set_FindStereoCalibFile.Location = new System.Drawing.Point(393, 1);
+            this.B_Set_FindStereoCalibFile.Location = new System.Drawing.Point(392, 1);
             this.B_Set_FindStereoCalibFile.Margin = new System.Windows.Forms.Padding(0, 1, 1, 1);
             this.B_Set_FindStereoCalibFile.Name = "B_Set_FindStereoCalibFile";
             this.B_Set_FindStereoCalibFile.Size = new System.Drawing.Size(99, 22);
@@ -2002,7 +2009,7 @@ namespace Stereo_Vision
             // 
             this.tabPage5.Location = new System.Drawing.Point(4, 25);
             this.tabPage5.Name = "tabPage5";
-            this.tabPage5.Size = new System.Drawing.Size(493, 48);
+            this.tabPage5.Size = new System.Drawing.Size(492, 48);
             this.tabPage5.TabIndex = 4;
             this.tabPage5.Text = "Прочие";
             this.tabPage5.UseVisualStyleBackColor = true;
@@ -2268,7 +2275,7 @@ namespace Stereo_Vision
             this.B_MeasureMode.Dock = System.Windows.Forms.DockStyle.Fill;
             this.B_MeasureMode.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.B_MeasureMode.Location = new System.Drawing.Point(269, 2);
-            this.B_MeasureMode.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.B_MeasureMode.Margin = new System.Windows.Forms.Padding(2);
             this.B_MeasureMode.Name = "B_MeasureMode";
             this.B_MeasureMode.Size = new System.Drawing.Size(85, 52);
             this.B_MeasureMode.TabIndex = 13;
@@ -2280,7 +2287,7 @@ namespace Stereo_Vision
             this.Pan_Measurements.BackColor = System.Drawing.Color.Black;
             this.Pan_Measurements.Controls.Add(this.tableLayoutPanel2);
             this.Pan_Measurements.Location = new System.Drawing.Point(619, 246);
-            this.Pan_Measurements.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Pan_Measurements.Margin = new System.Windows.Forms.Padding(2);
             this.Pan_Measurements.Name = "Pan_Measurements";
             this.Pan_Measurements.Size = new System.Drawing.Size(626, 77);
             this.Pan_Measurements.TabIndex = 9;
@@ -2308,7 +2315,7 @@ namespace Stereo_Vision
             this.tableLayoutPanel2.Controls.Add(this.B_Mes_Back, 8, 0);
             this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel2.Location = new System.Drawing.Point(0, 0);
-            this.tableLayoutPanel2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.tableLayoutPanel2.Margin = new System.Windows.Forms.Padding(2);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
             this.tableLayoutPanel2.RowCount = 2;
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
@@ -2532,7 +2539,7 @@ namespace Stereo_Vision
             this.PB_MeasurementPB.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.PB_MeasurementPB.InitialImage = null;
             this.PB_MeasurementPB.Location = new System.Drawing.Point(0, 0);
-            this.PB_MeasurementPB.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.PB_MeasurementPB.Margin = new System.Windows.Forms.Padding(2);
             this.PB_MeasurementPB.Name = "PB_MeasurementPB";
             this.PB_MeasurementPB.Size = new System.Drawing.Size(494, 290);
             this.PB_MeasurementPB.TabIndex = 10;
@@ -2583,7 +2590,62 @@ namespace Stereo_Vision
             // 
             // BWorkerForLoad3D
             // 
+            this.BWorkerForLoad3D.WorkerReportsProgress = true;
+            this.BWorkerForLoad3D.WorkerSupportsCancellation = true;
             this.BWorkerForLoad3D.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BWorkerForLoad3D_DoWork);
+            this.BWorkerForLoad3D.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.BWorkerForLoad3D_ProgressChanged);
+            this.BWorkerForLoad3D.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.BWorkerForLoad3D_RunWorkerCompleted);
+            // 
+            // Pan_3D_Building
+            // 
+            this.TLP_Pl_3D.SetColumnSpan(this.Pan_3D_Building, 4);
+            this.Pan_3D_Building.Controls.Add(this.TLP_3D_Building);
+            this.Pan_3D_Building.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.Pan_3D_Building.Location = new System.Drawing.Point(108, 30);
+            this.Pan_3D_Building.Margin = new System.Windows.Forms.Padding(0);
+            this.Pan_3D_Building.Name = "Pan_3D_Building";
+            this.TLP_Pl_3D.SetRowSpan(this.Pan_3D_Building, 2);
+            this.Pan_3D_Building.Size = new System.Drawing.Size(216, 33);
+            this.Pan_3D_Building.TabIndex = 0;
+            // 
+            // TLP_3D_Building
+            // 
+            this.TLP_3D_Building.ColumnCount = 1;
+            this.TLP_3D_Building.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.TLP_3D_Building.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.TLP_3D_Building.Controls.Add(this.PrB_3D_Building, 0, 0);
+            this.TLP_3D_Building.Controls.Add(this.B_3D_CancelBuilding, 0, 1);
+            this.TLP_3D_Building.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.TLP_3D_Building.Location = new System.Drawing.Point(0, 0);
+            this.TLP_3D_Building.Name = "TLP_3D_Building";
+            this.TLP_3D_Building.RowCount = 2;
+            this.TLP_3D_Building.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.TLP_3D_Building.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.TLP_3D_Building.Size = new System.Drawing.Size(216, 33);
+            this.TLP_3D_Building.TabIndex = 0;
+            // 
+            // PrB_3D_Building
+            // 
+            this.PrB_3D_Building.BackColor = System.Drawing.Color.Red;
+            this.PrB_3D_Building.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.PrB_3D_Building.ForeColor = System.Drawing.SystemColors.Desktop;
+            this.PrB_3D_Building.Location = new System.Drawing.Point(3, 3);
+            this.PrB_3D_Building.Name = "PrB_3D_Building";
+            this.PrB_3D_Building.Size = new System.Drawing.Size(210, 10);
+            this.PrB_3D_Building.TabIndex = 0;
+            // 
+            // B_3D_CancelBuilding
+            // 
+            this.B_3D_CancelBuilding.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.B_3D_CancelBuilding.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.B_3D_CancelBuilding.ForeColor = System.Drawing.Color.White;
+            this.B_3D_CancelBuilding.Location = new System.Drawing.Point(3, 19);
+            this.B_3D_CancelBuilding.Name = "B_3D_CancelBuilding";
+            this.B_3D_CancelBuilding.Size = new System.Drawing.Size(210, 11);
+            this.B_3D_CancelBuilding.TabIndex = 1;
+            this.B_3D_CancelBuilding.Text = "Прервать построение";
+            this.B_3D_CancelBuilding.UseVisualStyleBackColor = true;
+            this.B_3D_CancelBuilding.Click += new System.EventHandler(this.B_3D_CancelBuilding_Click);
             // 
             // MainWindow
             // 
@@ -2657,6 +2719,8 @@ namespace Stereo_Vision
             this.tableLayoutPanel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.CV_ImBox_VidPhoto_Player)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.PB_MeasurementPB)).EndInit();
+            this.Pan_3D_Building.ResumeLayout(false);
+            this.TLP_3D_Building.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -2813,6 +2877,10 @@ namespace Stereo_Vision
         private System.Windows.Forms.Label label18;
         private System.Windows.Forms.TextBox TB_Set_CalibWBFilePath;
         private System.Windows.Forms.Button B_Set_FindWBCalibFile;
+        private System.Windows.Forms.Panel Pan_3D_Building;
+        private System.Windows.Forms.TableLayoutPanel TLP_3D_Building;
+        private System.Windows.Forms.ProgressBar PrB_3D_Building;
+        private System.Windows.Forms.Button B_3D_CancelBuilding;
     }
 }
 
