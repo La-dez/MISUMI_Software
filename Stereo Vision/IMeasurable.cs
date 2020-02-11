@@ -11,6 +11,7 @@ namespace Stereo_Vision
     public class StereoImage
     {
         public Image BasicImage;
+        public Image ResizedImage;
         public List<Measurement> Measuremets { get { return _Measuremets; } }
         private List<Measurement> _Measuremets { get; set; }
         private Measurement LastMeasurement;
@@ -39,15 +40,21 @@ namespace Stereo_Vision
         protected int Point_UnderCursor_PointNumber { set; get; }
         protected bool Point_UnderCursor_isLeft { set; get; }
 
-
+        public Rectangle ROI_ctrl_left { get; private set; }
+        public Rectangle ROI_ctrl_right { get; private set; }
+        public int GRPX { get; private set; }
         //all the math
         ICameraPair stereoPair/* = XMLLoader.ReadCameraPair("M5_chess.xml")*/;
         ISimpleCorrPointFinder pointFinder;
+        //Graphics
+        static SolidBrush Highlighter = new SolidBrush(Color.FromArgb(100, 50, 255, 50));
 
-        public StereoImage(System.Drawing.Bitmap BMP, Size pSizeOfCtrl, string XMLCalib_path)
+        public StereoImage(System.Drawing.Bitmap BMP, Size pSizeOfCtrl, string XMLCalib_path,int pGRPX)
         {
             BasicImage = new Bitmap(BMP);
             BasicImage = ((Bitmap)BasicImage).Clone(new Rectangle(0, 0, BasicImage.Width, BasicImage.Height), System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+            ResizedImage = ResizeBitmap(BasicImage, pSizeOfCtrl.Width, pSizeOfCtrl.Height, System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic);
+
             Ctrl_Height = pSizeOfCtrl.Height;
             Ctrl_Width = pSizeOfCtrl.Width;
             CenterOfImg = new Point(pSizeOfCtrl.Width / 2, pSizeOfCtrl.Height / 2);
@@ -69,6 +76,12 @@ namespace Stereo_Vision
             Point_UnderCursor_MeasureNumber = -1;
             Point_UnderCursor_PointNumber = -1;
             Point_UnderCursor_isLeft = false;
+
+            GRPX = pGRPX;
+            ROI_ctrl_left = new Rectangle(GRPX, GRPX,
+                                        pSizeOfCtrl.Width / 2 - 2 * GRPX, Ctrl_Height - 2 * GRPX);
+            ROI_ctrl_right = new Rectangle(GRPX + pSizeOfCtrl.Width / 2, GRPX,
+                               pSizeOfCtrl.Width / 2 - 2 * GRPX, Ctrl_Height - 2 * GRPX);
         }
         public Point2d Transform_Ctrl2Img(float X_ctrl,float Y_ctrl)
         {
@@ -124,7 +137,7 @@ namespace Stereo_Vision
             try
             {
                  pointFinder.Find((Bitmap)BasicImage, PT_left, ref result, true);
-               // throw new Exception();
+              //  throw new Exception();
             }
             catch
             {
@@ -241,7 +254,10 @@ namespace Stereo_Vision
             Special_3D_pt NewPoint = new Special_3D_pt(Pt_onCtrl_left, Pt_onCtrl_right, Pt_onIm_left, Pt_onIm_right, Data3D);
             Measuremets[Mes_index].Edit_Point_byIndex(Pt_index, NewPoint);
         }
-
+        public Special_3D_pt Get_Point_inMeasurement_byIndex(int Mes_index, uint Pt_index)
+        {
+            return Measuremets[Mes_index].Get_Point_byIndex(Pt_index);
+        }
 
         public void Edit_Grabbed_Point(Point NewPosition_ctrl)
         {
@@ -253,10 +269,21 @@ namespace Stereo_Vision
 
                 if (OnLeftPart)
                 {
+                    var bkppt = Get_Point_inMeasurement_byIndex(Point_UnderCursor_MeasureNumber, (uint)Point_UnderCursor_PointNumber);
+
                     var Pt_left_onCtrl = new Point2d(NewPosition_ctrl.X, NewPosition_ctrl.Y);
                     var Pt_left_onImg = Pt_on_img;
                     var Pt_right_onImg = FindCorPoint_onImg(Pt_left_onImg);
                     var Pt_right_onCtrl = Transform_Img2Ctrl(Pt_right_onImg.X, Pt_right_onImg.Y);
+                    
+                    if((Pt_right_onCtrl.X<ROI_ctrl_right.X)|| //if pt out of rectangle
+                        (Pt_right_onCtrl.Y < ROI_ctrl_right.Y) ||
+                        (Pt_right_onCtrl.X > ROI_ctrl_right.X + ROI_ctrl_right.Width) ||
+                        (Pt_right_onCtrl.Y > ROI_ctrl_right.Y + ROI_ctrl_right.Height))
+                    {
+                        Pt_right_onImg = new Point2d(Pt_left_onImg.X + Im_Width / 2, Pt_left_onImg.Y);
+                        Pt_right_onCtrl = Transform_Img2Ctrl(Pt_right_onImg.X, Pt_right_onImg.Y);
+                    }
                     Edit_Point_inMeasurement_byIndex(Point_UnderCursor_MeasureNumber, (uint)Point_UnderCursor_PointNumber,
                         Pt_left_onCtrl, Pt_right_onCtrl, Pt_left_onImg, Pt_right_onImg);
                 }
@@ -295,7 +322,42 @@ namespace Stereo_Vision
         {
             Measuremets.Clear();
         }
-        
+        public static Bitmap ResizeBitmap(Image source, int FinalW, int FinalH, System.Drawing.Drawing2D.InterpolationMode quality)
+        {
+            if (source == null)
+                throw new ArgumentNullException("source");
+
+            // Figure out the new size.
+            var width = FinalW;
+            var height = FinalH;
+
+            // Create the new bitmap.
+            // Note that Bitmap has a resize constructor, but you can't control the quality.
+            var bmp = new Bitmap(width, height);
+
+            using (var g = Graphics.FromImage(bmp))
+            {
+                g.InterpolationMode = quality;
+                g.DrawImage(source, new Rectangle(0, 0, width, height));
+                g.Save();
+            }
+
+            return bmp;
+        }
+        public void HighLight_Grabbed_Pt(Graphics g)
+        {
+            if(Point_UnderCursor_grabbed)
+            {
+                var a = Get_Point_inMeasurement_byIndex(Point_UnderCursor_MeasureNumber, (uint)Point_UnderCursor_PointNumber);
+                g.FillEllipse(Highlighter,
+                    (int)(a.P_left_OnCtrl.X- DetectionRadius_onCtrl/2), (int)(a.P_left_OnCtrl.Y- DetectionRadius_onCtrl/2), (int)DetectionRadius_onCtrl, (int)DetectionRadius_onCtrl);
+                g.FillEllipse(Highlighter,
+                    (int)(a.P_right_OnCtrl.X - DetectionRadius_onCtrl / 2), (int)(a.P_right_OnCtrl.Y - DetectionRadius_onCtrl / 2), (int)DetectionRadius_onCtrl, (int)DetectionRadius_onCtrl);
+                /*g.DrawEllipse(Highlighter,
+                    a.P_left_OnCtrl.X, a.P_left_OnCtrl.Y, DetectionRadius_onCtrl, DetectionRadius_onCtrl);*/
+            }
+           // 
+        }
     }
     public class Special_3D_pt
     {
@@ -355,6 +417,10 @@ namespace Stereo_Vision
             return Ready;
         }
         public abstract void Edit_Point_byIndex(uint index, Special_3D_pt newValue);
+        public virtual Special_3D_pt Get_Point_byIndex(uint index)
+        {
+            return _Points[(int)index];
+        }
         public virtual int Find_Pt_inRadiusOfPt(Point2d pt, double Radius,ref bool isLeft) //-1   - no pts found, else - index
         {
             double dist_2_left = -1;

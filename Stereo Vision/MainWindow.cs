@@ -851,13 +851,20 @@ namespace Stereo_Vision
             {
                 CurrentStereoImage.AddPoint_2NewMeasurement(e.X, e.Y);
             }
+            Cursor.Clip = new Rectangle();
             DB_Invalidate();
         }
         private void PB_MeasurementPB_MouseMove(object sender, MouseEventArgs e)
         {
             try
             {
+                
                 CurrentStereoImage.Edit_Grabbed_Point(e.Location);
+                if(CurrentStereoImage.Point_UnderCursor_grabbed)
+                {
+                    if (e.Location.X < PB_MeasurementPB.Width / 2) Cursor.Clip = PB_MeasurementPB.RectangleToScreen(CurrentStereoImage.ROI_ctrl_left);
+                    else Cursor.Clip = PB_MeasurementPB.RectangleToScreen(CurrentStereoImage.ROI_ctrl_right);
+                }
             }
             catch { }
             DB_Invalidate();

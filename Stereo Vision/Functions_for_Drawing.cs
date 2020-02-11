@@ -16,7 +16,6 @@ namespace Stereo_Vision
         static Pen PencilForDraw_yellow_1px = new Pen(Color.FromArgb(255, 255, 255, 0));
         static Pen PencilForDraw_green_1px = new Pen(Color.FromArgb(255, 50, 255, 50));
         static Pen PencilForDraw_green_2px = new Pen(Color.FromArgb(255, 50, 255, 50), 2);
-        static SolidBrush PencilPodsv = new SolidBrush(Color.FromArgb(100, 50, 255, 50));
 
         static Brush brush_text = new SolidBrush(Color.FromArgb(50, 255, 50));
         System.Drawing.Font drawFont = new System.Drawing.Font("Arial", 18);
@@ -37,7 +36,7 @@ namespace Stereo_Vision
             try
             {
                 if (String.IsNullOrEmpty(PathToImg)) throw new Exception();
-                CurrentStereoImage = new StereoImage(new Bitmap(PathToImg), PB_MeasurementPB.Size,XMLCalib_path);
+                CurrentStereoImage = new StereoImage(new Bitmap(PathToImg), PB_MeasurementPB.Size,XMLCalib_path,GRPX);
             }
             catch (Exception exc)
             {
@@ -47,7 +46,9 @@ namespace Stereo_Vision
                     /* Bitmap Current = CurrentFrame.Bitmap.Clone(new Rectangle(0, 0, CurrentFrame.Width, CurrentFrame.Height),
                          System.Drawing.Imaging.PixelFormat.Format24bppRgb);*/
                     //CurrentStereoImage = new StereoImage(CurrentFrame.Bitmap, PB_MeasurementPB.Size, XMLCalib_path);
-                    CurrentStereoImage = new StereoImage(new Bitmap(CurrentFrame.Bitmap), PB_MeasurementPB.Size, XMLCalib_path);
+                    WhiteBalance.CorrectImage_viaCorrectionMatrix_Color(CMatrix, ref CurrentFrame);
+                    CurrentStereoImage = new StereoImage(new Bitmap(CurrentFrame.Bitmap), PB_MeasurementPB.Size, XMLCalib_path,GRPX);
+                    
                 }
                 catch { }
             }
@@ -96,6 +97,7 @@ namespace Stereo_Vision
                 Draw_Base(true);
                 Draw_closed_Measurements();
                 Draw_opened_Measurement();
+                Draw_Highlight_for_GrabbedPoint(myBuffer.Graphics);
                 //if()
                 myBuffer.Render();
                 myBuffer.Dispose();
@@ -112,18 +114,18 @@ namespace Stereo_Vision
         {
             int CenterX = PB_MeasurementPB.Width/2;
             int CenterY = PB_MeasurementPB.Height / 2;
-            if(UseImage) if (CurrentStereoImage != null) myBuffer.Graphics.DrawImage(CurrentStereoImage.BasicImage, PB_MeasurementPB.DisplayRectangle);
+            if(UseImage) if (CurrentStereoImage != null)
+                    myBuffer.Graphics.DrawImage(CurrentStereoImage.ResizedImage, PB_MeasurementPB.DisplayRectangle);
             myBuffer.Graphics.DrawLine(PencilForDraw_green_1px, CenterX, 0, CenterX, PB_MeasurementPB.Height);
             for (int i = 0; i < CenterY; i += 20)
             {
                 myBuffer.Graphics.DrawLine(PencilForDraw_green_1px, CenterX - 5, CenterY - i, CenterX + 5, CenterY - i);
                 myBuffer.Graphics.DrawLine(PencilForDraw_green_1px, CenterX - 5, CenterY + i, CenterX + 5, CenterY + i);
             }
-            myBuffer.Graphics.DrawRectangle(PencilForDraw_green_1px, new Rectangle(GRPX, GRPX,
-                                        CenterX - 2 * GRPX, PB_MeasurementPB.Height - 2 * GRPX));
-            myBuffer.Graphics.DrawRectangle(PencilForDraw_green_1px, new Rectangle(CenterX + GRPX, GRPX,
-                                        CenterX - 2 * GRPX, PB_MeasurementPB.Height - 2 * GRPX)); 
+            myBuffer.Graphics.DrawRectangle(PencilForDraw_green_1px, CurrentStereoImage.ROI_ctrl_left);
+            myBuffer.Graphics.DrawRectangle(PencilForDraw_green_1px, CurrentStereoImage.ROI_ctrl_right); 
         }
+     
         public void Draw_closed_Measurements()
         {
             foreach (Measurement m in CurrentStereoImage.Measuremets) Draw_Measurement(m);
@@ -136,6 +138,10 @@ namespace Stereo_Vision
             {
                 Draw_point_stereo(pt3d,PencilForDraw_yellow_1px);
             }
+        }
+        private void Draw_Highlight_for_GrabbedPoint(Graphics gr)
+        {
+            CurrentStereoImage.HighLight_Grabbed_Pt(gr);
         }
         private double PerfectRounding(double val, int CharN)
         {
