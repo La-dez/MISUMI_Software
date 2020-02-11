@@ -867,7 +867,9 @@ namespace Stereo_Vision
             }
             else
             {
-                CurrentStereoImage.AddPoint_2NewMeasurement(e.X, e.Y);
+                if ((e.Location.X < CurrentStereoImage.ROI_ctrl_left.Right) && (e.Location.X > CurrentStereoImage.ROI_ctrl_left.Left)&&
+                    (e.Location.Y< CurrentStereoImage.ROI_ctrl_left.Bottom) &&(e.Location.Y > CurrentStereoImage.ROI_ctrl_left.Top))
+                    CurrentStereoImage.AddPoint_2NewMeasurement(e.X, e.Y);
             }
             Cursor.Clip = new Rectangle();
             DB_Invalidate();
@@ -880,8 +882,8 @@ namespace Stereo_Vision
                 CurrentStereoImage.Edit_Grabbed_Point(e.Location);
                 if(CurrentStereoImage.Point_UnderCursor_grabbed)
                 {
-                    if (e.Location.X < PB_MeasurementPB.Width / 2) Cursor.Clip = PB_MeasurementPB.RectangleToScreen(CurrentStereoImage.ROI_ctrl_left);
-                    else Cursor.Clip = PB_MeasurementPB.RectangleToScreen(CurrentStereoImage.ROI_ctrl_right);
+                    if ((e.Location.X < CurrentStereoImage.ROI_ctrl_left.Right) &&(e.Location.X > CurrentStereoImage.ROI_ctrl_left.Left)) Cursor.Clip = PB_MeasurementPB.RectangleToScreen(CurrentStereoImage.ROI_ctrl_left);
+                    else if((e.Location.X < CurrentStereoImage.ROI_ctrl_right.Right) && (e.Location.X > CurrentStereoImage.ROI_ctrl_right.Left)) Cursor.Clip = PB_MeasurementPB.RectangleToScreen(CurrentStereoImage.ROI_ctrl_right);
                 }
             }
             catch { }
