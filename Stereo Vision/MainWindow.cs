@@ -330,7 +330,13 @@ namespace Stereo_Vision
 
         private void B_Pl_GoToMain_Click(object sender, EventArgs e)
         {
-         //   ActivatePreviousMode();
+            //   ActivatePreviousMode();
+            if (BWorkerForLoad3D.IsBusy)
+            {
+                is3DBuilding_cancelled = true;
+                BWorkerForLoad3D.CancelAsync();
+                T_3DCancellingChecker.Start();
+            }
             OpenMainPanel();
             if (isPlayingVideoNow) View_Video_Stop();
             StartCapture();
@@ -608,6 +614,7 @@ namespace Stereo_Vision
 
         private void TRB_Pl_PhotoLister_Scroll(object sender, EventArgs e)
         {
+            CurrentIndex = TRB_Pl_PhotoLister.Value;
             View_Image_byIndex(TRB_Pl_PhotoLister.Value);
             L_Pl_Photo_Cur.Text = (TRB_Pl_PhotoLister.Value + 1).ToString();
             L_Pl_Photo_All.Text = FilesToView.Count.ToString();
@@ -635,7 +642,8 @@ namespace Stereo_Vision
 
         private void TRB_Pl_ModelsLister_Scroll(object sender, EventArgs e)
         {
-
+            CurrentIndex = TRB_Pl_PhotoLister.Value;
+            View_Model_byIndex(CurrentIndex);
         }
 
 
@@ -763,9 +771,10 @@ namespace Stereo_Vision
 
             }
         }
-
+        int index_of_photo_for_3dbuild = 0;
         private void B_Mes_Reconstruct3D_Click(object sender, EventArgs e)
         {
+            index_of_photo_for_3dbuild = CurrentIndex;
             Allow3DInvalidate = false;
             Playing_mode = Modes.Models3D;
             Open_3DViewPanel(true);
@@ -785,6 +794,7 @@ namespace Stereo_Vision
 
         private void B_Mes_Back_Click(object sender, EventArgs e)
         {
+            Playing_mode = Modes.Photo;
             if (ActivatePreviousMode != null) ActivatePreviousMode();
         }
 
@@ -1076,18 +1086,22 @@ namespace Stereo_Vision
 
         private void BWorkerForLoad3D_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            is3DBuilding_cancelled = false;
             if (e.Cancelled == true)
             {
                 LogMessage("Отменено пользователем!");
 
-                B_Pl_GoToMain_Click(null, null);
+                Pan_3D_Building.Hide();
+
+              //  B_Pl_GoToMain_Click(null, null);
             }
             else if (e.Error != null)
             {
 
                 LogMessage("Ошибка: " + e.Error.Message);
 
-                B_Pl_GoToMain_Click(null, null);
+                Pan_3D_Building.Hide();
+              //  B_Pl_GoToMain_Click(null, null);
             }
             else
             {
@@ -1104,16 +1118,56 @@ namespace Stereo_Vision
                 Load_File_onControls(Modes.Models3D); //
             }
 
-            is3DBuilding_cancelled = false;
-
+            if (BWG_restart)
+            {
+                BWG_restart = false; BWorkerForLoad3D.RunWorkerAsync();
+            }
+            else
+            {
+                B_Pl_ModelNext.BackgroundImage = BMP_PlNext_on;
+                B_Pl_ModelPrevious.BackgroundImage = BMP_PlBack_on;
+                B_Pl_ModelNext.Enabled = true;
+                B_Pl_ModelPrevious.Enabled = true;
+            }
          /*   var localmodel = Read3DModel(Model_name_lastbuild_fullpath);
             Load3DModel(localmodel);*/
         }
 
         private void B_3D_CancelBuilding_Click(object sender, EventArgs e)
         {
+
             BWorkerForLoad3D.CancelAsync();
             is3DBuilding_cancelled = true;
+            if (!string.IsNullOrWhiteSpace(Rec_Photos_path))
+            {
+                Find_and_Resort_Files(Modes.Photo, Rec_Photos_path); //пересортировка по дате
+            }
+            else { }
+            CurrentIndex = index_of_photo_for_3dbuild;
+            Init_Stereoimage(FilesToView[CurrentIndex]);
+            OpenMeasurementsPanel();
+            DB_Invalidate();
+            T_3DCancellingChecker.Start();
+            /*OpenMainPanel();
+            if (isPlayingVideoNow) View_Video_Stop();
+            StartCapture();*/
+        }
+
+        private void T_3DCancellingChecker_Tick(object sender, EventArgs e)
+        {
+            if(BWorkerForLoad3D.IsBusy) //еще занят, держим кнопку 3D некликабельной
+            {
+                B_Mes_Reconstruct3D.BackgroundImage = BMP_Build3D_off;
+                B_Mes_Reconstruct3D.Enabled = false;
+
+            } 
+            else
+            {
+                B_Mes_Reconstruct3D.BackgroundImage = BMP_Build3D_on;
+                B_Mes_Reconstruct3D.Enabled = true;
+                T_3DCancellingChecker.Stop();
+
+            }
         }
     }
 }

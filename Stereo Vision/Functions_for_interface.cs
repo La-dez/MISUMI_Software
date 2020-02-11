@@ -35,6 +35,14 @@ namespace Stereo_Vision
         static Bitmap BMP_PlMode_3D_off = new Bitmap("Resources\\3D_off.png");
         static Bitmap BMP_Playing_Play = new Bitmap("Resources\\play_play.png");
         static Bitmap BMP_Playing_Pause = new Bitmap("Resources\\play_pause.png");
+        static Bitmap BMP_PlNext_off = new Bitmap("Resources\\play_next_dis.png");
+        static Bitmap BMP_PlNext_on = new Bitmap("Resources\\play_next.png");
+        static Bitmap BMP_PlBack_off = new Bitmap("Resources\\play_back_dis.png");
+        static Bitmap BMP_PlBack_on = new Bitmap("Resources\\play_back.png");
+        static Bitmap BMP_Build3D_off = new Bitmap("Resources\\3D_mes_v1_off.png");
+        static Bitmap BMP_Build3D_on = new Bitmap("Resources\\3D_mes_v1.png");
+        // 3D_mes_v1.png
+
         string Text2set = "?%";
 
         delegate void DelegateForMessages(string text);
@@ -202,6 +210,7 @@ namespace Stereo_Vision
             Initialize_Player_Controls(Playing_mode);
             
         }
+        bool BWG_restart = false;
         private void Open_3DViewPanel(bool Build3D_fromstereo)
         {
             TogglePanelsVisability(false, false, false, true);
@@ -213,12 +222,27 @@ namespace Stereo_Vision
             if (Build3D_fromstereo)
             {
                 Pan_3D_Building.Show();
+                B_Pl_ModelNext.BackgroundImage = BMP_PlNext_off;
+                B_Pl_ModelPrevious.BackgroundImage = BMP_PlBack_off;
+                B_Pl_ModelNext.Enabled = false;
+                B_Pl_ModelPrevious.Enabled = false;
                 if (AsyncBuilding)
-                    BWorkerForLoad3D.RunWorkerAsync();//BuildModel3D();
+                {
+                    if (!BWorkerForLoad3D.IsBusy)
+                    {
+                        is3DBuilding_cancelled = false;
+                        BWorkerForLoad3D.RunWorkerAsync();//BuildModel3D();
+                    }
+                    else
+                    {
+                        BWorkerForLoad3D.CancelAsync();
+                        BWG_restart = true;
+                    }
+                }
                 else
                 {
 
-                    BuildModel3D(null, data , true);
+                    BuildModel3D(null, data, true);
                 }
             }
         }
@@ -251,17 +275,17 @@ namespace Stereo_Vision
             else LBConsole.SendToBack();
             if (!isAdmin)
             {
-                adminPages = new TabPage[] { /*TABC_Settings.TabPages[2], */TABC_Settings.TabPages[4], TABC_Settings.TabPages[5] };
+                adminPages = new TabPage[] { TABC_Settings.TabPages[3], TABC_Settings.TabPages[4], TABC_Settings.TabPages[5] };
                 TABC_Settings.TabPages[5].Parent = null;
                 TABC_Settings.TabPages[4].Parent = null;
-               // TABC_Settings.TabPages[3].Parent = null;
+                TABC_Settings.TabPages[3].Parent = null;
                 // TABC_Settings.TabPages[2].Parent = null;
             }
             else
             {
                TABC_Settings.TabPages.Add(adminPages[0]);
                 TABC_Settings.TabPages.Add(adminPages[1]);
-               // TABC_Settings.TabPages.Add(adminPages[2]);
+                TABC_Settings.TabPages.Add(adminPages[2]);
             }
 
             LogMessage("AdminMode = " + isAdmin.ToString());

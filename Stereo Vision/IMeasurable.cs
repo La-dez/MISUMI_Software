@@ -466,8 +466,11 @@ namespace Stereo_Vision
         {
             if (Ready)
             {
-                _Measurement_CurrentValue = GeomUtils.Distance(Points[0].P3D_implementation, Points[1].P3D_implementation);
-                return Measurement_CurrentValue;
+                try
+                {
+                    _Measurement_CurrentValue = GeomUtils.Distance(Points[0].P3D_implementation, Points[1].P3D_implementation);
+                    return Measurement_CurrentValue;
+                } catch { return - 1; }
             }
             else
                 return -1;
@@ -505,8 +508,11 @@ namespace Stereo_Vision
         {
             if (Ready)
             {
-                _Measurement_CurrentValue = GeomUtils.Distance(Points[0].P3D_implementation, ThisLine);
-                return Measurement_CurrentValue;
+                try
+                {
+                    _Measurement_CurrentValue = GeomUtils.Distance(Points[0].P3D_implementation, ThisLine);
+                    return Measurement_CurrentValue;
+                } catch { return -1; }
             }
             else
                 return -1;
@@ -545,8 +551,11 @@ namespace Stereo_Vision
         {
             if (Ready)
             {
-                _Measurement_CurrentValue = GeomUtils.Distance(Points[0].P3D_implementation, ThisPlane);
-                return Measurement_CurrentValue;
+                try
+                {
+                    _Measurement_CurrentValue = GeomUtils.Distance(Points[0].P3D_implementation, ThisPlane);
+                    return Measurement_CurrentValue;
+                } catch { return -1; }
             }
             else
                 return -1;
@@ -583,16 +592,22 @@ namespace Stereo_Vision
         {
             if (Ready)
             {
-                _Measurement_CurrentValue = ThisLine.GetLength();
-                return Measurement_CurrentValue;
+                try
+                {
+                    _Measurement_CurrentValue = ThisLine.GetLength();
+                    return Measurement_CurrentValue;
+                } catch { return -1; }
             }
             else
                 return -1;
         }
         public void CloseMeasurement()
         {
-            _Ready = true;
-            Measure();
+            if (_Points.Count > 1)
+            {
+                _Ready = true;
+                Measure();
+            }
         }
     }
 
@@ -627,16 +642,22 @@ namespace Stereo_Vision
             if (Ready)
             {
                 ThisLine.IsClosed = true;
-                _Measurement_CurrentValue = ThisLine.GetLength();
-                return Measurement_CurrentValue;
+                try
+                {
+                    _Measurement_CurrentValue = ThisLine.GetLength();
+                    return Measurement_CurrentValue;
+                } catch { return -1; }
             }
             else
                 return -1;
         }
         public void CloseMeasurement()
         {
-            _Ready = true;
-            Measure();
+            if (_Points.Count > 2)
+            {
+                _Ready = true;
+                Measure();
+            }
         }
     }
 
@@ -670,17 +691,24 @@ namespace Stereo_Vision
         {
             if (Ready)
             {
-                _Measurement_CurrentValue = ThisLine.GetSquare();
-                return Measurement_CurrentValue;
+                try
+                {
+                    _Measurement_CurrentValue = ThisLine.GetSquare();
+                    return Measurement_CurrentValue;
+                }
+                catch { return -1; }
             }
             else
                 return -1;
         }
         public void CloseMeasurement()
         {
-            _Ready = true;
-            ThisLine.IsClosed = true;
-            Measure();
+            if (_Points.Count > 2)
+            {
+                _Ready = true;
+                ThisLine.IsClosed = true;
+                Measure();
+            }
         }
     }
 }

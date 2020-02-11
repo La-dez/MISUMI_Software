@@ -45,8 +45,6 @@ E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x6
 E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\obj\x64\Release\HDVision.pdb
 E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\obj\x64\Release\Stereo Vision.csprojAssemblyReference.cache
 D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Stereo Vision\bin\x64\Release\HDVision.exe.config
-D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Stereo Vision\obj\x64\Release\HDVision.exe
-D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Stereo Vision\obj\x64\Release\HDVision.pdb
 D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Stereo Vision\bin\x64\Release\concrt140.dll
 D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Stereo Vision\bin\x64\Release\msvcp140.dll
 D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Stereo Vision\bin\x64\Release\vcruntime140.dll
@@ -83,11 +81,6 @@ D:\Работа\Программы (мои разработки)\Техниче�
 D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Stereo Vision\bin\x64\Release\tr\ZedGraph.resources.dll
 D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Stereo Vision\bin\x64\Release\zh-cn\ZedGraph.resources.dll
 D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Stereo Vision\bin\x64\Release\zh-tw\ZedGraph.resources.dll
-D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Stereo Vision\obj\x64\Release\Stereo Vision.csprojResolveAssemblyReference.cache
-D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Stereo Vision\obj\x64\Release\Stereo_Vision.Export_files_form.resources
-D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Stereo Vision\obj\x64\Release\Stereo_Vision.MainWindow.resources
-D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Stereo Vision\obj\x64\Release\Stereo_Vision.Properties.Resources.resources
-D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Stereo Vision\obj\x64\Release\Stereo Vision.csproj.GenerateResource.Cache
 E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\bin\x64\Release\CameraMathDLLWrapper.pdb
 E:\Работа Саша\Эндоскопы\MISUMI_Software\Release\concrt140.dll
 E:\Работа Саша\Эндоскопы\MISUMI_Software\Release\msvcp140.dll
@@ -120,7 +113,6 @@ D:\Работа\Разработки\Технические эндоскопы\M
 D:\Работа\Разработки\Технические эндоскопы\MISUMI_Software\Stereo Vision\obj\x64\Release\Stereo_Vision.MainWindow.resources
 D:\Работа\Разработки\Технические эндоскопы\MISUMI_Software\Stereo Vision\obj\x64\Release\Stereo_Vision.Properties.Resources.resources
 D:\Работа\Разработки\Технические эндоскопы\MISUMI_Software\Stereo Vision\obj\x64\Release\Stereo Vision.csproj.GenerateResource.Cache
-D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Release\HDVision.exe.config
 D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Release\concrt140.dll
 D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Release\msvcp140.dll
 D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Release\opencv_ffmpeg341_64.dll
@@ -130,5 +122,13 @@ D:\Работа\Программы (мои разработки)\Техниче�
 D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Release\x64\msvcp140.dll
 D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Release\x64\opencv_ffmpeg341_64.dll
 D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Release\x64\vcruntime140.dll
+D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Release\HDVision.exe.config
 D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Release\HDVision.exe
 D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Release\HDVision.pdb
+D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Stereo Vision\obj\x64\Release\Stereo_Vision.Export_files_form.resources
+D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Stereo Vision\obj\x64\Release\Stereo_Vision.MainWindow.resources
+D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Stereo Vision\obj\x64\Release\Stereo_Vision.Properties.Resources.resources
+D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Stereo Vision\obj\x64\Release\Stereo Vision.csproj.GenerateResource.Cache
+D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Stereo Vision\obj\x64\Release\HDVision.exe
+D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Stereo Vision\obj\x64\Release\HDVision.pdb
+D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Stereo Vision\obj\x64\Release\Stereo Vision.csprojResolveAssemblyReference.cache

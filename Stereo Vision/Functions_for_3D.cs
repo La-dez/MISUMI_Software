@@ -514,7 +514,7 @@ namespace Stereo_Vision
             //string cfgFilePath = IsPrism ? "M5_chess.xml" : "M1_chess.xml";
             MyMesh result = null;
 
-            if (!bw.CancellationPending)
+            if (!bw.CancellationPending || !is3DBuilding_cancelled)
             {
                 // Load image
                 try
@@ -550,7 +550,7 @@ namespace Stereo_Vision
             }
             else
             {
-                if (!bw.CancellationPending)
+                if (!bw.CancellationPending || !is3DBuilding_cancelled)
                 {
                     LogMessage("Загрузка файла stereo_params_new.xml");
                     // Set ROI (region of interest)
@@ -563,6 +563,10 @@ namespace Stereo_Vision
                     var rectROI2 = new Rect2d(GRPX, image.Width / 2 + GRPX, ROI_w, ROI_h);*/
                     var rectROI1 = new Rect2d(40.0, 40.0, 560.0, 640.0);
                     var rectROI2 = new Rect2d(40.0, 680.0, 550.0, 640.0);
+
+
+                    if (bw.CancellationPending || is3DBuilding_cancelled)
+                    { if (e != null) e.Cancel = true; MyMesh res; MyMesh.CreateNullMesh(out res); return res; }
 
                     // Initialize stereo correspondence finder
                     if (IsPrism)
@@ -585,7 +589,7 @@ namespace Stereo_Vision
                 }
                 else { if (e != null) e.Cancel = true; MyMesh res; MyMesh.CreateNullMesh(out res); return res; }
 
-                if (!bw.CancellationPending)
+                if (!bw.CancellationPending || !is3DBuilding_cancelled)
                 {
                     // Find triangle mesh
                     LogMessage("Построение триангуляционной модели....");
@@ -603,7 +607,8 @@ namespace Stereo_Vision
                         throw exc;
                         //return false;
                     }
-                    if (bw.CancellationPending) { if (e != null) e.Cancel = true; MyMesh res; MyMesh.CreateNullMesh(out res); return res; }
+                    if (bw.CancellationPending || is3DBuilding_cancelled)
+                    { if (e != null) e.Cancel = true; MyMesh res; MyMesh.CreateNullMesh(out res); return res; }
                     // Filter
                     // Delete triangles with edges longer than 0.2
                     LogMessage("Применение фильтров...");
@@ -624,18 +629,28 @@ namespace Stereo_Vision
                     RGBPointsMass = new RGBPointOwnType[Num_of_Pts];
 
                     RGBPoint3f DataPoint = null;
-                    if (!bw.CancellationPending)
+                    int current_progress = 40;
+                    if (!bw.CancellationPending || !is3DBuilding_cancelled)
                     {
                         for (uint i = 0; i < Num_of_Triangles; i++)
                         {
                             TriangleModelMass[i] = trPtArray.GetTriangle(i);
-                            try { bw.ReportProgress(40 + ((int)(((double)i / (double)Num_of_Triangles) * 10))); } catch { }
-                            if (bw.CancellationPending) { if (e != null) e.Cancel = true; MyMesh res; MyMesh.CreateNullMesh(out res); return res; }
+                            try
+                            {
+                                if (current_progress != 40 + (int)i * 10 / (int)Num_of_Pts)
+                                {
+                                    current_progress = 40 + (int)i * 10 / (int)Num_of_Pts;
+                                    bw.ReportProgress(current_progress);
+                                }
+                            }
+                            catch { }
+                            if (bw.CancellationPending|| is3DBuilding_cancelled)
+                            { if (e != null) e.Cancel = true; MyMesh res; MyMesh.CreateNullMesh(out res); return res; }
                         }
                     }
                     else return null;
 
-                    if (!bw.CancellationPending)
+                    if (!bw.CancellationPending || !is3DBuilding_cancelled)
                     {
                         LogMessage("Вычисление цветовых и пространственных координат...");
                      /*   MyMesh data;
@@ -650,8 +665,15 @@ namespace Stereo_Vision
                             sred100X += RGBPointsMass[i].X;
                             sred100Y += RGBPointsMass[i].Y;
                             sred100Z += RGBPointsMass[i].Z;
-                            try { bw.ReportProgress(50 + ((int)(((double)i / (double)Num_of_Pts) * 10))); } catch { }
-                            if (bw.CancellationPending) { if (e != null) e.Cancel = true; MyMesh res; MyMesh.CreateNullMesh(out res); return res; }
+                            try {
+                                if(current_progress!= 50 + (int)i * 10 / (int)Num_of_Pts)
+                                {
+                                    current_progress = 50 + (int)i * 10 / (int)Num_of_Pts;
+                                    bw.ReportProgress(current_progress);
+                                }
+                            } catch { }
+                            if (bw.CancellationPending ||  is3DBuilding_cancelled)
+                            { if (e != null) e.Cancel = true; MyMesh res; MyMesh.CreateNullMesh(out res); return res; }
                         }
                         //вычисляем....
                         sred100X = sred100X / Num_of_Pts;
@@ -663,14 +685,23 @@ namespace Stereo_Vision
                             RGBPointsMass[i].X -= sred100X;
                             RGBPointsMass[i].Y -= sred100Y;
                             RGBPointsMass[i].Z -= sred100Z;
-                            try { bw.ReportProgress(60 + ((int)(((double)i / (double)Num_of_Pts) * 20))); } catch { }
-                            if (bw.CancellationPending) { if (e != null) e.Cancel = true; MyMesh res; MyMesh.CreateNullMesh(out res); return res; }
+                            try
+                            {
+                                if (current_progress != 60 + (int)i * 20 / (int)Num_of_Pts)
+                                {
+                                    current_progress = 60 + (int)i * 20 / (int)Num_of_Pts;
+                                    bw.ReportProgress(current_progress);
+                                }
+                            }
+                            catch { }
+                            if (bw.CancellationPending || is3DBuilding_cancelled)
+                            { if (e != null) e.Cancel = true; MyMesh res; MyMesh.CreateNullMesh(out res); return res; }
                         }
                         LogMessage("Вычисление завершено.");
                     }
                     else { if (e != null) e.Cancel = true; MyMesh res; MyMesh.CreateNullMesh(out res); return res; }
 
-                    if (!bw.CancellationPending)
+                    if (!bw.CancellationPending || !is3DBuilding_cancelled)
                     {
                         LogMessage("Создание модели для отрисовки...");
                         // SetProgress(95);                      

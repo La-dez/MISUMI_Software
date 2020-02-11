@@ -128,6 +128,8 @@ namespace OpenTK_3DMesh
             rTopRadius = topRadius;
             ZoomFactor = 1.0f;
             TypeOfMesh = TypesOfMesh[3];
+            this.TranslationZ = 0; //Эти преобразования работают именно после бинда текстур. Почему - нет времени разбираться
+            this.SetZoomFactor(1);
         }
         public int GetNumberOfVertices() { return vertexCount; }
         public float GetTopRadius() { return topRadius; }

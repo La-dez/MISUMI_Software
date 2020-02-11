@@ -300,9 +300,9 @@ namespace Stereo_Vision
                         STW_Resizing.Reset();
                     }
 
-                    //   Refresh_image_Invoke(resizedim);
+                     //  Refresh_image_Invoke(resizedim);
                     CV_ImBox_Capture.Image = resizedim;
-                    //CV_ImBox_Capture.Image = CurrentFrame;
+                   // CV_ImBox_Capture.Image = CurrentFrame;
                     FramesDrawen++;
                     STW_Resizing.Stop();
                     FrameDrawen = true;
