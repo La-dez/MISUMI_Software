@@ -24,7 +24,7 @@ namespace Stereo_Vision
         int CurrentFrameNo_inCurVid=0;
         int FPS_toPlay;
 
-        private void Initialize_Player_Controls(Modes pPlayMode_2set)
+        private void Initialize_Player_Controls(Modes pPlayMode_2set, bool load_last_file = true)
         {
             CV_ImBox_Capture.Visible = false;
             PB_MeasurementPB.Visible = false;
@@ -38,10 +38,10 @@ namespace Stereo_Vision
                 OTK_3D_Control.Visible = false;
                 CV_ImBox_VidPhoto_Player.Visible = true;
             }
-            Toogle_Play_Mode(pPlayMode_2set);
+            Toogle_Play_Mode(pPlayMode_2set,load_last_file);
 
         }
-        private void Load_File_onControls(Modes pPlayMode_2set)
+        private void Load_File_onControls(Modes pPlayMode_2set, bool load_last_file = true)
         {
             string InitialFilePath = null;
             if (FilesToView.Count == 0)
@@ -54,12 +54,20 @@ namespace Stereo_Vision
                 CurrentIndex = 0;
                 InitialFilePath = FilesToView[CurrentIndex];
                 Init_Scroll_Slider(pPlayMode_2set);
-
-                if (pPlayMode_2set == Modes.Video) View_Video_byIndex(0);
-                else if (pPlayMode_2set == Modes.Photo) View_Image_byIndex(0);
+                if (load_last_file)
+                {
+                    if (pPlayMode_2set == Modes.Video) View_Video_byIndex(0);
+                    else if (pPlayMode_2set == Modes.Photo) View_Image_byIndex(0);
+                    else
+                    {
+                        View_Model_byIndex(0);
+                    }
+                }
                 else
                 {
-                    View_Model_byIndex(0);
+                    if (pPlayMode_2set == Modes.Video) View_Video_byIndex(0);
+                    else if (pPlayMode_2set == Modes.Photo) View_Image_byIndex(0);
+                    else View_Model_byIndex(-2);
                 }
             }
         }
@@ -113,7 +121,7 @@ namespace Stereo_Vision
 
         }
 
-        private void Toogle_Play_Mode(Modes ppPlayMode_2set)
+        private void Toogle_Play_Mode(Modes ppPlayMode_2set, bool load_last_file = true)
         {
             //bkp на случай, если переключиться не получится
             /*string L_Ex_mode_text_bkp = L_Ex_Mode.Text;
@@ -153,6 +161,7 @@ namespace Stereo_Vision
                             B_Pl_PhotoMode.BackgroundImage = BMP_ExMode_Photo_off;
                             B_Pl_VideoMode.BackgroundImage = BMP_ExMode_Video_off;
                             B_Pl_3DMode.BackgroundImage = BMP_PlMode_3D;
+                            Pan_3D_Building.Hide();
                             break;
                         }
                 }
@@ -168,7 +177,7 @@ namespace Stereo_Vision
                 if ((Playing_mode==Modes.Video) && isPlayingVideoNow) View_Video_Stop();
 
 
-                Load_File_onControls(ppPlayMode_2set); //
+                Load_File_onControls(ppPlayMode_2set, load_last_file); //
                 Playing_mode = ppPlayMode_2set;
                 Pan_Pl_Video.Visible = (ppPlayMode_2set == Modes.Video);
                 Pan_Pl_Photo.Visible = (ppPlayMode_2set == Modes.Photo);
@@ -226,46 +235,58 @@ namespace Stereo_Vision
         }
         private void View_Video_byIndex(int pIndex)
         {
-            string CurrentVideo_strway = FilesToView[CurrentIndex];
-            //Добавить загрузку времени в контролы
-            CurrentVideo = new VideoCapture(CurrentVideo_strway);
-            TotalFrames_inCurVid = Convert.ToInt32(CurrentVideo.GetCaptureProperty(CapProp.FrameCount));
-            FPS_toPlay = Convert.ToInt32(CurrentVideo.GetCaptureProperty(CapProp.Fps));
-            isPlayingVideoNow = false;
-            CurrentFrame = new Mat();
-            CurrentFrameNo_inCurVid = 0;
-            TRB_Pl_VideoTimer.Maximum = TotalFrames_inCurVid-1;
-            TRB_Pl_VideoTimer.Minimum = 0;
-            TRB_Pl_VideoTimer.Value = 0;
+            if (FilesToView.Count != 0)
+            {
+                string CurrentVideo_strway = FilesToView[pIndex];
+                //Добавить загрузку времени в контролы
+                CurrentVideo = new VideoCapture(CurrentVideo_strway);
+                TotalFrames_inCurVid = Convert.ToInt32(CurrentVideo.GetCaptureProperty(CapProp.FrameCount));
+                FPS_toPlay = Convert.ToInt32(CurrentVideo.GetCaptureProperty(CapProp.Fps));
+                isPlayingVideoNow = false;
+                CurrentFrame = new Mat();
+                CurrentFrameNo_inCurVid = 0;
+                TRB_Pl_VideoTimer.Maximum = TotalFrames_inCurVid - 1;
+                TRB_Pl_VideoTimer.Minimum = 0;
+                TRB_Pl_VideoTimer.Value = 0;
 
-            Get_and_Load_CurrentFrame(CurrentFrameNo_inCurVid);
-            CV_ImBox_VidPhoto_Player.Invalidate();
-            Refresh_Video_Labels();
+                Get_and_Load_CurrentFrame(CurrentFrameNo_inCurVid);
+                CV_ImBox_VidPhoto_Player.Invalidate();
+                Refresh_Video_Labels();
+            }
         }
         private void View_Model_byIndex(int pIndex)
         {
+            if(pIndex==-2) //load interface with empty model
+            {
+                M3D_Figure = new MyMesh();
+                M3D_BasicMesh = new MyMesh();
+                MyMesh.CreateNullMesh(out M3D_Figure);
+                Load3DModel(M3D_Figure);
+                Allow3DInvalidate = true;
+                Draw_3D_graphics();
+                Timer_3DRenderer.Start();
+            }
+            else if (FilesToView.Count != 0)
+            {
+                M3D_Figure = new MyMesh();
+                M3D_BasicMesh = new MyMesh();
 
-            M3D_Figure = new MyMesh();
-            M3D_BasicMesh = new MyMesh();
+                //Load3DModel(Model_name_lastbuild_fullpath);
+                //Read_and_Load_3DModel(FilesToView[pIndex]);
+                var a = Read3DModel(FilesToView[pIndex]);
+                Load3DModel(a);
+                //MyMesh.CreateCilindricMesh(out Figure, ConvertText(TBRadius.Text), 360.0f, 2.0f, 0.1f, Color.FromArgb(0, 255, 0));
+                //MyMesh.CreateCilindricMesh(out M3D_BasicMesh, 2, 360.0f, 2.0f, 0.1f, Color.FromArgb(0, 0, 0));
+                //MyMesh.CreatePlainMesh(out M3D_BasicMesh, 20.0f, 0.1f, Color.Black);
+                //MyMesh.CreateSphereMesh(out M3D_BasicMesh, 2, 0.1f, Color.FromArgb(0, 0, 0));
+                //MyMesh.CreateNullMesh(out M3D_Figure);
 
-            //Load3DModel(Model_name_lastbuild_fullpath);
-            Load3DModel(FilesToView[pIndex]);
-            //MyMesh.CreateCilindricMesh(out Figure, ConvertText(TBRadius.Text), 360.0f, 2.0f, 0.1f, Color.FromArgb(0, 255, 0));
-            //MyMesh.CreateCilindricMesh(out M3D_BasicMesh, 2, 360.0f, 2.0f, 0.1f, Color.FromArgb(0, 0, 0));
-            //MyMesh.CreatePlainMesh(out M3D_BasicMesh, 20.0f, 0.1f, Color.Black);
-            //MyMesh.CreateSphereMesh(out M3D_BasicMesh, 2, 0.1f, Color.FromArgb(0, 0, 0));
-
-            //MyMesh.CreateNullMesh(out M3D_Figure);
-
-            BindTextures();
-
-            M3D_Figure.TranslationZ = -10;
-            M3D_Figure.SetZoomFactor(0.5f);
-
-            Allow3DInvalidate = true;
-            Draw_3D_graphics();
-            Timer_3DRenderer.Start();
+                Allow3DInvalidate = true;
+                Draw_3D_graphics();
+                Timer_3DRenderer.Start();
+            }
         }
+
         private void View_Video_Prev()
         {
             if (isPlayingVideoNow) View_Video_Stop();

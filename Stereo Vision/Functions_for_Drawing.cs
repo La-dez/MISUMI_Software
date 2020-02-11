@@ -102,9 +102,10 @@ namespace Stereo_Vision
                 stw_dbi.Stop();
                 LogMessage("Время на отрисовку: " + stw_dbi.Elapsed.TotalMilliseconds.ToString());
             }
-            catch
+            catch(Exception e)
             {
-                LogMessage("Ошибка при отрисовке");
+                LogError("Ошибка при отрисовке");
+                LogError(e.Message);
             }
         }
         public void Draw_Base(bool UseImage)

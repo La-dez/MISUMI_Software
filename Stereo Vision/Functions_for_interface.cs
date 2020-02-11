@@ -202,13 +202,13 @@ namespace Stereo_Vision
             Initialize_Player_Controls(Playing_mode);
             
         }
-        private void OpenPlayPanel(bool Build3D_fromstereo)
+        private void Open_3DViewPanel(bool Build3D_fromstereo)
         {
             TogglePanelsVisability(false, false, false, true);
             bool AsyncBuilding = true;
             StopCapture();
             Bitmap data = new Bitmap(CurrentStereoImage.BasicImage);
-            Initialize_Player_Controls(Playing_mode);
+            Initialize_Player_Controls(Playing_mode, false);
 
             if (Build3D_fromstereo)
             {

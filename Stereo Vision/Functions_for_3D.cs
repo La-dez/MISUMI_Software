@@ -492,7 +492,7 @@ namespace Stereo_Vision
         double sred100X = 0;
         double sred100Y = 0;
         double sred100Z = 0;
-        private MyMesh BuildModel3D(System.ComponentModel.BackgroundWorker bw, Image image,bool IsPrism)
+        private MyMesh BuildModel3D(System.ComponentModel.BackgroundWorker bw, Image image,bool IsPrism, System.ComponentModel.DoWorkEventArgs e = null)
         {
             if (bw == null)
             {
@@ -526,7 +526,7 @@ namespace Stereo_Vision
                 }
                 catch
                 {
-                   throw new Exception("Ошибка на этапе загрузки изображения.\nПостроение 3D модели завершено с ошибкой.");
+                    throw new Exception("Ошибка на этапе загрузки изображения.\nПостроение 3D модели завершено с ошибкой.");
                 }
                 // Read camera pair parameters from XML file
 
@@ -534,12 +534,15 @@ namespace Stereo_Vision
                 { stereoPair = XMLLoader.ReadCameraPair(XMLCalib_path); }
                 catch
                 {
-                   throw new Exception("Ошибка на этапе чтения калибровочного файла.\nПостроение 3D модели завершено с ошибкой.");
+                    throw new Exception("Ошибка на этапе чтения калибровочного файла.\nПостроение 3D модели завершено с ошибкой.");
                 }
                 LogMessage("Загрузка изображения и калибровки успешна!");
-                try { bw.ReportProgress(10); } catch { }          
+                try { bw.ReportProgress(10); } catch { }
+
                 // SetProgress(10);
             }
+            else { if (e != null) e.Cancel = true; MyMesh res; MyMesh.CreateNullMesh(out res); return res; }
+            
 
             if (stereoPair == null)
             {
@@ -580,7 +583,7 @@ namespace Stereo_Vision
                                                        //  SetProgress(15);
                     try { bw.ReportProgress(15); } catch { }
                 }
-                else return null;
+                else { if (e != null) e.Cancel = true; MyMesh res; MyMesh.CreateNullMesh(out res); return res; }
 
                 if (!bw.CancellationPending)
                 {
@@ -600,6 +603,7 @@ namespace Stereo_Vision
                         throw exc;
                         //return false;
                     }
+                    if (bw.CancellationPending) { if (e != null) e.Cancel = true; MyMesh res; MyMesh.CreateNullMesh(out res); return res; }
                     // Filter
                     // Delete triangles with edges longer than 0.2
                     LogMessage("Применение фильтров...");
@@ -608,7 +612,7 @@ namespace Stereo_Vision
                     try { bw.ReportProgress(40); } catch { }
                     // SetProgress(40);
                 }
-                else return null;
+                else { if (e != null) e.Cancel = true; MyMesh res; MyMesh.CreateNullMesh(out res); return res; }
 
                 // Save to ply file
                 try
@@ -625,6 +629,8 @@ namespace Stereo_Vision
                         for (uint i = 0; i < Num_of_Triangles; i++)
                         {
                             TriangleModelMass[i] = trPtArray.GetTriangle(i);
+                            try { bw.ReportProgress(40 + ((int)(((double)i / (double)Num_of_Triangles) * 10))); } catch { }
+                            if (bw.CancellationPending) { if (e != null) e.Cancel = true; MyMesh res; MyMesh.CreateNullMesh(out res); return res; }
                         }
                     }
                     else return null;
@@ -644,7 +650,8 @@ namespace Stereo_Vision
                             sred100X += RGBPointsMass[i].X;
                             sred100Y += RGBPointsMass[i].Y;
                             sred100Z += RGBPointsMass[i].Z;
-                            try { bw.ReportProgress(40 + ((int)(((double)i / (double)Num_of_Pts) * 20))); } catch { }
+                            try { bw.ReportProgress(50 + ((int)(((double)i / (double)Num_of_Pts) * 10))); } catch { }
+                            if (bw.CancellationPending) { if (e != null) e.Cancel = true; MyMesh res; MyMesh.CreateNullMesh(out res); return res; }
                         }
                         //вычисляем....
                         sred100X = sred100X / Num_of_Pts;
@@ -657,9 +664,11 @@ namespace Stereo_Vision
                             RGBPointsMass[i].Y -= sred100Y;
                             RGBPointsMass[i].Z -= sred100Z;
                             try { bw.ReportProgress(60 + ((int)(((double)i / (double)Num_of_Pts) * 20))); } catch { }
+                            if (bw.CancellationPending) { if (e != null) e.Cancel = true; MyMesh res; MyMesh.CreateNullMesh(out res); return res; }
                         }
                         LogMessage("Вычисление завершено.");
                     }
+                    else { if (e != null) e.Cancel = true; MyMesh res; MyMesh.CreateNullMesh(out res); return res; }
 
                     if (!bw.CancellationPending)
                     {
@@ -681,11 +690,10 @@ namespace Stereo_Vision
                         //SetProgress(100);
                         try { bw.ReportProgress(100); } catch { }
                     }
-                    else return null;
+                    else { if (e != null) e.Cancel = true; MyMesh res; MyMesh.CreateNullMesh(out res); return res; }
                 }
                 catch (Exception exc)
                 { throw exc; }
-
                 if (bDenseStereoCorrTestPassed)
                 {
                     LogMessage("Готово");
@@ -697,7 +705,7 @@ namespace Stereo_Vision
             }
             return result;
         }
-        private void Load3DModel(string way)
+        private void Read_and_Load_3DModel(string way)
         {
             var trPtArrayRead = new TriangPointArray3f();
 
@@ -714,7 +722,7 @@ namespace Stereo_Vision
             }
 
            // BCalculateQD.Enabled = false;
-            MeshUtils.FilterLongEdge(ref trPtArrayRead, 0.2);
+            //MeshUtils.FilterLongEdge(ref trPtArrayRead, 0.2);
             IndexTriplet indexTr = null;
             uint localMAX1 = trPtArrayRead.GetNumberOfTriangles();
             uint localMAX2 = trPtArrayRead.GetNumberOfPoints();
@@ -752,8 +760,78 @@ namespace Stereo_Vision
                 RGBPointsMass[i].Z -= sred100Z;
             }
             M3D_Figure = new MyMesh(RGBPointsMass, TriangleModelMass);
+            M3D_Figure.TranslationZ = -10;
+            M3D_Figure.SetZoomFactor(0.5f);
+
             BindTextures();
            // NeedLoader = false; ChkBModel.Checked = true;
+        }
+        private MyMesh Read3DModel(string way)
+        {
+            var trPtArrayRead = new TriangPointArray3f();
+
+            System.Threading.Thread.Sleep(200);
+            bool result = true;
+            result = System.IO.File.Exists(way);
+            try
+            {
+                result = PLYReader.ReadBinary(way, ref trPtArrayRead);
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show(exc.Message);
+            }
+
+            // BCalculateQD.Enabled = false;
+            //MeshUtils.FilterLongEdge(ref trPtArrayRead, 0.2);
+            IndexTriplet indexTr = null;
+            uint localMAX1 = trPtArrayRead.GetNumberOfTriangles();
+            uint localMAX2 = trPtArrayRead.GetNumberOfPoints();
+            IndexTriplet[] TriangleModelMass = new IndexTriplet[localMAX1];
+            RGBPointOwnType[] RGBPointsMass = new RGBPointOwnType[localMAX2];
+            RGBPoint3f DataPoint = new RGBPoint3f();
+
+            for (uint i = 0; i < localMAX1; i++)
+            {
+                indexTr = trPtArrayRead.GetTriangle(i);
+                TriangleModelMass[i] = indexTr;
+            }
+
+            for (uint i = 0; i < localMAX2; i++)
+            {
+                RGBPointsMass[i] = new RGBPointOwnType();
+                DataPoint = trPtArrayRead.GetPoint(i);
+                RGBPointsMass[i].X = DataPoint.X;
+                RGBPointsMass[i].Y = DataPoint.Y;
+                RGBPointsMass[i].Z = -DataPoint.Z;
+                RGBPointsMass[i].R = ((double)DataPoint.R) / 255.0;
+                RGBPointsMass[i].G = ((double)DataPoint.G) / 255.0;
+                RGBPointsMass[i].B = ((double)DataPoint.B) / 255.0;
+                sred100X += RGBPointsMass[i].X;
+                sred100Y += RGBPointsMass[i].Y;
+                sred100Z += RGBPointsMass[i].Z;
+            }
+            sred100X = sred100X / localMAX2;
+            sred100Y = sred100Y / localMAX2;
+            sred100Z = sred100Z / localMAX2;
+            for (uint i = 0; i < localMAX2; i++)
+            {
+                RGBPointsMass[i].X -= sred100X;
+                RGBPointsMass[i].Y -= sred100Y;
+                RGBPointsMass[i].Z -= sred100Z;
+            }
+            return new MyMesh(RGBPointsMass, TriangleModelMass);
+            //BindTextures();
+            // NeedLoader = false; ChkBModel.Checked = true;
+        }
+        private void Load3DModel(MyMesh mesh)
+        {         
+            M3D_Figure = mesh;
+
+            BindTextures();
+            M3D_Figure.TranslationZ = -10; //Эти преобразования работают именно после бинда текстур. Почему - нет времени разбираться
+            M3D_Figure.SetZoomFactor(0.5f);
+            // NeedLoader = false; ChkBModel.Checked = true;
         }
         private int FindAnObject(float MouseX3D, int MouseY3D)
         {

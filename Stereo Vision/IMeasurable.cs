@@ -47,6 +47,7 @@ namespace Stereo_Vision
         public StereoImage(System.Drawing.Bitmap BMP, Size pSizeOfCtrl, string XMLCalib_path)
         {
             BasicImage = new Bitmap(BMP);
+            BasicImage = ((Bitmap)BasicImage).Clone(new Rectangle(0, 0, BasicImage.Width, BasicImage.Height), System.Drawing.Imaging.PixelFormat.Format24bppRgb);
             Ctrl_Height = pSizeOfCtrl.Height;
             Ctrl_Width = pSizeOfCtrl.Width;
             CenterOfImg = new Point(pSizeOfCtrl.Width / 2, pSizeOfCtrl.Height / 2);

@@ -25,6 +25,7 @@ namespace Stereo_Vision
         bool is3DViewing = false;
         bool throwed_to_hiber = false;
         bool isArduino_closed = true;
+        bool is3DBuilding_cancelled = false;
         int ticks = 0;
         string User_Name = "MPEI";
 
@@ -292,6 +293,12 @@ namespace Stereo_Vision
         private void B_ViewMode_Click(object sender, EventArgs e)
         {
             OpenPlayPanel();
+           /* ActivatePreviousMode = new Action(() =>
+                                    {
+                                        OpenMainPanel();
+                                        if (isPlayingVideoNow) View_Video_Stop();
+                                        if (!isInTranslation) StartCapture();
+                                    });*/
         }
         private void B_Ex_BackToMain_Click(object sender, EventArgs e)
         {
@@ -305,9 +312,11 @@ namespace Stereo_Vision
 
         private void B_Pl_GoToMain_Click(object sender, EventArgs e)
         {
+         //   ActivatePreviousMode();
             OpenMainPanel();
             if (isPlayingVideoNow) View_Video_Stop();
             StartCapture();
+
         }
         private void B_SwitchRec_Click(object sender, EventArgs e)
         {
@@ -741,8 +750,15 @@ namespace Stereo_Vision
         {
             Allow3DInvalidate = false;
             Playing_mode = Modes.Models3D;
-            OpenPlayPanel(true);
-            
+            Open_3DViewPanel(true);
+
+         /*   ActivatePreviousMode = new Action(() =>
+            {
+                Init_Stereoimage(FilesToView[CurrentIndex]);
+                OpenMeasurementsPanel();
+                DB_Invalidate();
+            });*/
+
         }
         private void B_Ex_3DMode_Click(object sender, EventArgs e)
         {
@@ -759,6 +775,7 @@ namespace Stereo_Vision
         {
             //CurrentStereoImage = new StereoImage()
             ActivatePreviousMode = (Action)OpenPlayPanel;
+           
             Init_Stereoimage(FilesToView[CurrentIndex]);
             OpenMeasurementsPanel();
             DB_Invalidate();
@@ -953,11 +970,6 @@ namespace Stereo_Vision
                 }
             }
         }
-
-        private void PB_MeasurementPB_Click_1(object sender, EventArgs e)
-        {
-
-        }
         double RotX = 0;
         double RotY = 0;
         private void BGW_3DRotator_DoWork(object sender, DoWorkEventArgs e)
@@ -975,7 +987,7 @@ namespace Stereo_Vision
             BackgroundWorker bw = sender as BackgroundWorker;
             // Start the time-consuming operation.
             Bitmap dataBMP = new Bitmap(CurrentStereoImage.BasicImage);
-            BuildModel3D(bw, dataBMP, true);
+            BuildModel3D(bw, dataBMP, true,e);
         }
 
         private void TrB_WB_CorPower_Scroll(object sender, EventArgs e)
@@ -1037,12 +1049,44 @@ namespace Stereo_Vision
 
         private void BWorkerForLoad3D_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            Pan_3D_Building.Hide();
+            if (e.Cancelled == true)
+            {
+                LogMessage("Отменено пользователем!");
+
+                B_Pl_GoToMain_Click(null, null);
+            }
+            else if (e.Error != null)
+            {
+
+                LogMessage("Ошибка: " + e.Error.Message);
+
+                B_Pl_GoToMain_Click(null, null);
+            }
+            else
+            {
+                LogMessage("Успешно!");
+
+                Pan_3D_Building.Hide();
+                if (!string.IsNullOrWhiteSpace(Rec_Models_path))
+                {
+                    Find_and_Resort_Files(Modes.Models3D, Rec_Models_path); //пересортировка по дате
+                }
+                else { }
+
+
+                Load_File_onControls(Modes.Models3D); //
+            }
+
+            is3DBuilding_cancelled = false;
+
+         /*   var localmodel = Read3DModel(Model_name_lastbuild_fullpath);
+            Load3DModel(localmodel);*/
         }
 
         private void B_3D_CancelBuilding_Click(object sender, EventArgs e)
         {
-
+            BWorkerForLoad3D.CancelAsync();
+            is3DBuilding_cancelled = true;
         }
     }
 }
