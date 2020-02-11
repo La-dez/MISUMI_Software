@@ -122,8 +122,11 @@ namespace Stereo_Vision
                 myBuffer.Graphics.DrawLine(PencilForDraw_green_1px, CenterX - 5, CenterY - i, CenterX + 5, CenterY - i);
                 myBuffer.Graphics.DrawLine(PencilForDraw_green_1px, CenterX - 5, CenterY + i, CenterX + 5, CenterY + i);
             }
-            myBuffer.Graphics.DrawRectangle(PencilForDraw_green_1px, CurrentStereoImage.ROI_ctrl_left);
-            myBuffer.Graphics.DrawRectangle(PencilForDraw_green_1px, CurrentStereoImage.ROI_ctrl_right); 
+            if (CurrentStereoImage != null)
+            {
+                myBuffer.Graphics.DrawRectangle(PencilForDraw_green_1px, CurrentStereoImage.ROI_ctrl_left);
+                myBuffer.Graphics.DrawRectangle(PencilForDraw_green_1px, CurrentStereoImage.ROI_ctrl_right);
+            }
         }
      
         public void Draw_closed_Measurements()

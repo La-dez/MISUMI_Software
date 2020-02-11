@@ -69,53 +69,71 @@ namespace Stereo_Vision
             return;*/
             //Load3DModel("demo.ply"); return;
 
-
+            List<string> ErrorStack = new List<string>();
             this.Visible = false;
             try
             {
-                
-                Build_Interface();
 
-                MaximizeWindow();
-                CreateAttachmentFactor(ref AttachmentFactor, LBConsole);
-                PrepareTheCamera();
-                SetResolution(1280, 720);
-                SwitchAdminMode(AdminMode);
-                OpenMainPanel();
-                HideSomeThings();
-                Read_and_Load_Settings();
-                System.Threading.Thread.CurrentThread.Priority = System.Threading.ThreadPriority.Highest;
-                BGWR_ChargeLev.WorkerSupportsCancellation = true;
-                BGWR_ChargeLev.RunWorkerAsync();
-                Set_ChargeBMP(BMP2set_chargelev);
-                Set_ChargeTEXT(Text2set);
-                Load_Correction_Matrix(ref CMatrix); 
-                StartCapture();
-
-
-                this.DoubleBuffered = true;
-                CurrentFrame = new Mat();
-                CurrentFrame2 = new Mat();
-                CurrentFrame_wb = new Mat();
-                resizedim = new Mat();
-                if(FullScrin) Size_for_Resizing = new Size(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height - 185);
-                else Size_for_Resizing = new Size(this.Width, this.Height - 185);
+                try { Build_Interface(); } catch (Exception exc) { ErrorStack.Add("Ошибка построения интерфейса"); }
+                try { MaximizeWindow(); } catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 1"); }
+                try { CreateAttachmentFactor(ref AttachmentFactor, LBConsole); } catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 2"); }
+                try { PrepareTheCamera(); } catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 3"); }
+                try { SetResolution(1280, 720); } catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 4"); }
+                try { SwitchAdminMode(AdminMode); } catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 5"); }
+                try { OpenMainPanel(); } catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 6"); }
+                try { HideSomeThings(); } catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 7"); }
+                try { Read_and_Load_Settings(); } catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 8"); }
+                try { System.Threading.Thread.CurrentThread.Priority = System.Threading.ThreadPriority.Highest; } catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 9"); }
+                try { BGWR_ChargeLev.WorkerSupportsCancellation = true; } catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 10"); }
+                try { BGWR_ChargeLev.RunWorkerAsync(); } catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 11"); }
+                try { Set_ChargeBMP(BMP2set_chargelev); } catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 12"); }
+                try { Set_ChargeTEXT(Text2set); } catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 13"); }
+                try { Load_Correction_Matrix(ref CMatrix); } catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 14"); }
+                try { StartCapture(); } catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 15"); }
 
 
-                myBuffer = currentContext.Allocate(PB_MeasurementPB.CreateGraphics(), PB_MeasurementPB.DisplayRectangle);
-                Draw_Base(false);
-                myBuffer.Render();
-                myBuffer.Dispose();
+                try
+                {
+                    this.DoubleBuffered = true;
+                    CurrentFrame = new Mat();
+                    CurrentFrame2 = new Mat();
+                    CurrentFrame_wb = new Mat();
+                    resizedim = new Mat();
+                }
+                catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 16"); }
+                try
+                {
+                    if (FullScrin) Size_for_Resizing = new Size(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height - 185);
+                    else Size_for_Resizing = new Size(this.Width, this.Height - 185);
+                }
+                catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 17"); }
 
-                Models_view_init();
-                Restore_CaptureDirectory();
+
+                try
+                {
+                    myBuffer = currentContext.Allocate(PB_MeasurementPB.CreateGraphics(), PB_MeasurementPB.DisplayRectangle);
+                    Draw_Base(false);
+                    myBuffer.Render();
+                    myBuffer.Dispose();
+                }
+                catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 18"); }
+
+                try { Models_view_init(); } catch (Exception exc) { ErrorStack.Add(""); }
+                try { Restore_CaptureDirectory(); }
+                catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 19"); }
                 // Width_for_Resizing = CV_ImBox_Capture.Width;
                 //  Height_for_Resizing = CV_ImBox_Capture.Height;
                 // Size_for_Resizing = new Size(Width_for_Resizing, Height_for_Resizing);
             }
-            catch(Exception exc) { LogError(exc.Message); }
-            finally { this.Visible = true; }
+            catch (Exception exc) { LogError(exc.Message); }
+            finally
+            {
+                foreach (string exc in ErrorStack)
+                    LogError(exc);
+                this.Visible = true;
+            }
         }
+            
         private void Load_Correction_Matrix(ref double[,,] pMat)
         {
             try
