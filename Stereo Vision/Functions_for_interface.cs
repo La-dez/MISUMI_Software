@@ -184,6 +184,62 @@ namespace Stereo_Vision
                 LogMessage("Состояние видимости TB = " + Ctrl.Visible.ToString());
             }
         }
+        private void Build_Interface()
+        {
+            //Pan_pl_Base Restruct
+            this.Pan_Pl_Base_forAnyPLCtrls.Controls.Add(this.Pan_Pl_Photo);
+            this.Pan_Pl_Base_forAnyPLCtrls.Controls.Add(this.Pan_Pl_3D);
+            this.Pan_Pl_Base_forAnyPLCtrls.Controls.Add(this.Pan_Pl_Video);
+            Pan_Pl_Photo.Dock = DockStyle.Fill;
+            Pan_Pl_Video.Dock = DockStyle.Fill;
+            Pan_Pl_3D.Dock = DockStyle.Fill;
+
+            //MainPanel Restruct
+            Pan_BASE_BackgroundPanel.Controls.Add(this.Pan_Settings);
+            Pan_BASE_BackgroundPanel.Controls.Add(this.Pan_Export);
+            Pan_BASE_BackgroundPanel.Controls.Add(this.Pan_Player);
+            Pan_BASE_BackgroundPanel.Controls.Add(this.Pan_MainMenu);
+            Pan_BASE_BackgroundPanel.Controls.Add(this.Pan_Measurements);
+            Pan_Settings.Dock = DockStyle.Fill;
+            Pan_Export.Dock = DockStyle.Fill;
+            Pan_Player.Dock = DockStyle.Fill;
+            Pan_MainMenu.Dock = DockStyle.Fill;
+            Pan_Measurements.Dock = DockStyle.Fill;
+            Pan_MainMenu.BringToFront();
+
+            //ViewRegion restruct
+            this.Pan_ViewRegion.Controls.Add(this.CV_ImBox_VidPhoto_Player);
+            this.Pan_ViewRegion.Controls.Add(this.CV_ImBox_Capture);
+            this.Pan_ViewRegion.Controls.Add(this.PB_MeasurementPB);
+            this.Pan_ViewRegion.Controls.Add(this.OTK_3D_Control);
+            this.Pan_ViewRegion.Controls.Add(this.L_SnapShotSaved);
+            this.Pan_ViewRegion.Controls.Add(this.P_ChargeLev);
+            this.Pan_ViewRegion.Controls.Add(this.PB_Indicator);
+            this.Pan_ViewRegion.Controls.Add(this.LBConsole);
+
+            CV_ImBox_VidPhoto_Player.Dock = DockStyle.Fill;
+            CV_ImBox_Capture.Dock = DockStyle.Fill;
+            PB_MeasurementPB.Dock = DockStyle.Fill;
+            OTK_3D_Control.Dock = DockStyle.Fill;
+            L_SnapShotSaved.BringToFront();
+        }
+        private void Prepare_drawing_objects()
+        {
+            this.DoubleBuffered = true;
+            CurrentFrame = new Mat();
+            CurrentFrame2 = new Mat();
+            CurrentFrame_wb = new Mat();
+            resizedim = new Mat();
+            if (FullScrin) Size_for_Resizing = new Size(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height - 185);
+            else Size_for_Resizing = new Size(this.Width, this.Height - 185);
+        }
+        private void Prepare_drawing_buffer()
+        {
+            myBuffer = currentContext.Allocate(PB_MeasurementPB.CreateGraphics(), PB_MeasurementPB.DisplayRectangle);
+            Draw_Base(false);
+            myBuffer.Render();
+            myBuffer.Dispose();
+        }
         private void OpenSettings()
         {
             TogglePanelsVisability(false,false,true);
@@ -216,35 +272,33 @@ namespace Stereo_Vision
             TogglePanelsVisability(false, false, false, true);
             bool AsyncBuilding = true;
             StopCapture();
+            Initialize_Player_Controls(Playing_mode, false);       
+        }
+        private void Build3D_fromstereo(bool AsyncBuilding = true)
+        {
             Bitmap data = new Bitmap(CurrentStereoImage.BasicImage);
-            Initialize_Player_Controls(Playing_mode, false);
-
-            if (Build3D_fromstereo)
+            Pan_3D_Building.Show();
+            B_Pl_ModelNext.BackgroundImage = BMP_PlNext_off;
+            B_Pl_ModelPrevious.BackgroundImage = BMP_PlBack_off;
+            B_Pl_ModelNext.Enabled = false;
+            B_Pl_ModelPrevious.Enabled = false;
+            if (AsyncBuilding)
             {
-                Pan_3D_Building.Show();
-                B_Pl_ModelNext.BackgroundImage = BMP_PlNext_off;
-                B_Pl_ModelPrevious.BackgroundImage = BMP_PlBack_off;
-                B_Pl_ModelNext.Enabled = false;
-                B_Pl_ModelPrevious.Enabled = false;
-                if (AsyncBuilding)
+                if (!BWorkerForLoad3D.IsBusy)
                 {
-                    if (!BWorkerForLoad3D.IsBusy)
-                    {
-                        is3DBuilding_cancelled = false;
-                        BWorkerForLoad3D.RunWorkerAsync();//BuildModel3D();
-                    }
-                    else
-                    {
-                        BWorkerForLoad3D.CancelAsync();
-                        BWG_restart = true;
-                    }
+                    is3DBuilding_cancelled = false;
+                    BWorkerForLoad3D.RunWorkerAsync();//BuildModel3D();
                 }
                 else
                 {
-
-                    BuildModel3D(null, data, true);
+                    BWorkerForLoad3D.CancelAsync();
+                    BWG_restart = true;
                 }
             }
+            else
+            {
+                BuildModel3D(null, data, true);
+            }           
         }
         private void OpenMeasurementsPanel()
         {

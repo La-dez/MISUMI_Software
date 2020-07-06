@@ -71,59 +71,31 @@ namespace Stereo_Vision
 
             List<string> ErrorStack = new List<string>();
             this.Visible = false;
+
             try
             {
-
-                try { Build_Interface(); } catch (Exception exc) { ErrorStack.Add("Ошибка построения интерфейса"); }
-                try { MaximizeWindow(); } catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 1"); }
+                try { Init_calib_worker(); } catch (Exception exc) { ErrorStack.Add("Ошибка инициализации считывателя калибровочных моделей 1"); }
+                try { Build_Interface(); }      catch (Exception exc) { ErrorStack.Add("Ошибка построения интерфейса"); }
+                try { MaximizeWindow(); }       catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 1"); }
                 try { CreateAttachmentFactor(ref AttachmentFactor, LBConsole); } catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 2"); }
-                try { PrepareTheCamera(); } catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 3"); }
-                try { SetResolution(1280, 720); } catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 4"); }
+                try { PrepareTheCamera(); }         catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 3"); }
+                try { SetResolution(1280, 720); }   catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 4"); }
                 try { SwitchAdminMode(AdminMode); } catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 5"); }
-                try { OpenMainPanel(); } catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 6"); }
-                try { HideSomeThings(); } catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 7"); }
-                try { Read_and_Load_Settings(); } catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 8"); }
+                try { OpenMainPanel(); }            catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 6"); }
+                try { HideSomeThings(); }           catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 7"); }
+                try { Read_and_Load_Settings(); }   catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 8"); }
                 try { System.Threading.Thread.CurrentThread.Priority = System.Threading.ThreadPriority.Highest; } catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 9"); }
                 try { BGWR_ChargeLev.WorkerSupportsCancellation = true; } catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 10"); }
-                try { BGWR_ChargeLev.RunWorkerAsync(); } catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 11"); }
-                try { Set_ChargeBMP(BMP2set_chargelev); } catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 12"); }
-                try { Set_ChargeTEXT(Text2set); } catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 13"); }
-                try { Load_Correction_Matrix(ref CMatrix); } catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 14"); }
-                try { StartCapture(); } catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 15"); }
+                try { BGWR_ChargeLev.RunWorkerAsync(); }                  catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 11"); }
+                try { Set_ChargeBMP(BMP2set_chargelev); }                 catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 12"); }
+                try { Set_ChargeTEXT(Text2set); }                         catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 13"); }
+                try { Load_Correction_Matrix(ref CMatrix); }              catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 14"); }
+                try { StartCapture(); }                                   catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 15"); }
+                try { Prepare_drawing_objects(); }                        catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 16"); }       
+                try { Prepare_drawing_buffer(); }                         catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 17"); }
+                try { Models_view_init(); }                               catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 18"); }
+                try { Restore_CaptureDirectory(); }                       catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 19"); }
 
-
-                try
-                {
-                    this.DoubleBuffered = true;
-                    CurrentFrame = new Mat();
-                    CurrentFrame2 = new Mat();
-                    CurrentFrame_wb = new Mat();
-                    resizedim = new Mat();
-                }
-                catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 16"); }
-                try
-                {
-                    if (FullScrin) Size_for_Resizing = new Size(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height - 185);
-                    else Size_for_Resizing = new Size(this.Width, this.Height - 185);
-                }
-                catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 17"); }
-
-
-                try
-                {
-                    myBuffer = currentContext.Allocate(PB_MeasurementPB.CreateGraphics(), PB_MeasurementPB.DisplayRectangle);
-                    Draw_Base(false);
-                    myBuffer.Render();
-                    myBuffer.Dispose();
-                }
-                catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 18"); }
-
-                try { Models_view_init(); } catch (Exception exc) { ErrorStack.Add(""); }
-                try { Restore_CaptureDirectory(); }
-                catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 19"); }
-                // Width_for_Resizing = CV_ImBox_Capture.Width;
-                //  Height_for_Resizing = CV_ImBox_Capture.Height;
-                // Size_for_Resizing = new Size(Width_for_Resizing, Height_for_Resizing);
             }
             catch (Exception exc) { LogError(exc.Message); }
             finally
@@ -147,45 +119,7 @@ namespace Stereo_Vision
                 DigitalWB_Active = false;
             }
         }
-        private void Build_Interface()
-        {
-            //Pan_pl_Base Restruct
-            this.Pan_Pl_Base_forAnyPLCtrls.Controls.Add(this.Pan_Pl_Photo);
-            this.Pan_Pl_Base_forAnyPLCtrls.Controls.Add(this.Pan_Pl_3D);
-            this.Pan_Pl_Base_forAnyPLCtrls.Controls.Add(this.Pan_Pl_Video);
-            Pan_Pl_Photo.Dock = DockStyle.Fill;
-            Pan_Pl_Video.Dock = DockStyle.Fill;
-            Pan_Pl_3D.Dock = DockStyle.Fill;
-
-            //MainPanel Restruct
-            Pan_BASE_BackgroundPanel.Controls.Add(this.Pan_Settings);
-            Pan_BASE_BackgroundPanel.Controls.Add(this.Pan_Export);
-            Pan_BASE_BackgroundPanel.Controls.Add(this.Pan_Player);
-            Pan_BASE_BackgroundPanel.Controls.Add(this.Pan_MainMenu);
-            Pan_BASE_BackgroundPanel.Controls.Add(this.Pan_Measurements);
-            Pan_Settings.Dock = DockStyle.Fill;
-            Pan_Export.Dock = DockStyle.Fill;
-            Pan_Player.Dock = DockStyle.Fill;
-            Pan_MainMenu.Dock = DockStyle.Fill;
-            Pan_Measurements.Dock = DockStyle.Fill;
-            Pan_MainMenu.BringToFront();
-
-            //ViewRegion restruct
-            this.Pan_ViewRegion.Controls.Add(this.CV_ImBox_VidPhoto_Player);
-            this.Pan_ViewRegion.Controls.Add(this.CV_ImBox_Capture);
-            this.Pan_ViewRegion.Controls.Add(this.PB_MeasurementPB);
-            this.Pan_ViewRegion.Controls.Add(this.OTK_3D_Control);
-            this.Pan_ViewRegion.Controls.Add(this.L_SnapShotSaved);
-            this.Pan_ViewRegion.Controls.Add(this.P_ChargeLev);
-            this.Pan_ViewRegion.Controls.Add(this.PB_Indicator);
-            this.Pan_ViewRegion.Controls.Add(this.LBConsole);
-
-            CV_ImBox_VidPhoto_Player.Dock = DockStyle.Fill;
-            CV_ImBox_Capture.Dock = DockStyle.Fill;
-            PB_MeasurementPB.Dock = DockStyle.Fill;
-            OTK_3D_Control.Dock = DockStyle.Fill;
-            L_SnapShotSaved.BringToFront();
-        }
+        
         private void MainWindow_KeyDown(object sender, KeyEventArgs e)
         {
             if ((e.KeyCode == Keys.Q) && e.Alt)
@@ -778,6 +712,7 @@ namespace Stereo_Vision
             Allow3DInvalidate = false;
             Playing_mode = Modes.Models3D;
             Open_3DViewPanel(true);
+            Build3D_fromstereo();
 
          /*   ActivatePreviousMode = new Action(() =>
             {

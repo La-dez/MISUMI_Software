@@ -49,6 +49,10 @@ namespace Stereo_Vision
         bool Allow3DInvalidate = true;
 
         bool MeshesFixedByEachOther = false;
+        
+        //Объявление стереообъектов для построения 3D
+        ICameraPair stereoPair = null;
+        IStereoDenseEstimator stereoEstimator = null;
 
         private void Models_view_init()
         {
@@ -318,7 +322,7 @@ namespace Stereo_Vision
 
                 MF4_Multiply(ref M3D_dataMatrix2, M4_to_MF4(zr * yr * xr)); //поворот
 
-                zf = M3D_Figure.GetZoomFactor();
+                zf = M3D_Figure.GetZoomFactor()* 2;
                 MF4_Multiply(ref M3D_dataMatrix2, M4_to_MF4(Matrix4.CreateScale(zf, zf, zf))); // увеличение
                 MF4_Multiply(M3D_modelViewProjectionMatrix, M3D_viewProjectionMatrix, M3D_dataMatrix2); //матрица проекций
 
@@ -419,69 +423,12 @@ namespace Stereo_Vision
                 OTK_3D_Control.SwapBuffers();
             }
         }
-        private void Init3M()
-        {
-            /*if (Mode == 1)
-            {
-                try { TransformC(6); LoadMeasurements(); }
-                catch
-                { }
-            }*/
-          
+        
+        private void Init_calib_worker()
+        {         
             try
             {
-              /*  OTK_3D_Control.Visible = true; ExitBut.Visible = true;
-                GrBVisibleObjects.Visible = true; GrB3DSettings.Visible = true;
-                icImagingControl1.LiveStop(); LSurfaceType.Visible = true; LRadius.Visible = true;
-                LAngMX.Visible = true; ChkBFixMesh.Visible = true; ChkBPoints.Visible = true;
-                ChkBModel.Visible = true; ChkBRealSurface.Visible = true; LAngles.Visible = true;
-                LInfo.Visible = true; LInfo2.Visible = true; LBDataBase.Visible = true;
-                TRBarMAngX.Visible = true; TRBarMAngY.Visible = true; TRBarMAngZ.Visible = true;
-                TRBarSAngX.Visible = true; TRBarSAngY.Visible = true; TRBarSAngZ.Visible = true;
-                TRBarMAngX.Value = 0; os_x = 1; os_y = 0; os_z = 0; LDataBase.Visible = true;
-                LModelAngles.Visible = true; BDeleteElement.Visible = true; LSurfaceAngles.Visible = true;
-                LZModifier.Visible = true; TrBZModifier.Visible = true; LZDistValue.Visible = true;
-                Mode = 2; ChkBRealSurface.Checked = true; ChkBPoints.Checked = true;
-                LAngMX.Visible = true; LAngMY.Visible = true; LAngMZ.Visible = true;
-                LAngSX.Visible = true; LAngSY.Visible = true; LAngSZ.Visible = true;
-                TRBarMAngX.Value = 0; TRBarMAngY.Value = 0; TRBarMAngZ.Value = 0;
-                TRBarSAngY.Value = 0; TRBarSAngZ.Value = 0;
-                TrBMZoom.Value = 100; BasicMesh.SetZoomFactor(1.0f);
-                TrBSZoom.Value = 100; Figure.SetZoomFactor(1.0f);
-                TrBZModifier.Value = 500; ModifyZCoord();
-                LAngMX.Text = "X: " + TRBarMAngX.Value.ToString(); BasicMesh.SetGetElementRotation(0, 0);
-                LAngMY.Text = "Y: " + TRBarMAngY.Value.ToString(); BasicMesh.SetGetElementRotation(0, 1);
-                LAngMZ.Text = "Z: " + TRBarMAngZ.Value.ToString(); BasicMesh.SetGetElementRotation(0, 2);
-                LAngSX.Text = "X: " + TRBarSAngZ.Value.ToString(); Figure.SetGetElementRotation(0, 0);
-                LAngSY.Text = "Y: " + TRBarSAngY.Value.ToString(); Figure.SetGetElementRotation(0, 1);
-                LAngSZ.Text = "Z: " + TRBarSAngZ.Value.ToString(); Figure.SetGetElementRotation(0, 2);
-                LMZoomX.Text = "x" + (((float)TrBMZoom.Value) / 100.0f).ToString();
-                LSZoomX.Text = "x" + (((float)TrBSZoom.Value) / 100.0f).ToString();
-                LZDistValue.Text = ((float)(TrBZModifier.Value) / 100.0f).ToString();
-                LZoom3D.Visible = true; TrBMZoom.Visible = true; TrBSZoom.Visible = true;
-                LMZoomX.Visible = true; LSZoomX.Visible = true;
-                BCalculateQD.Visible = true; LDeviance.Visible = true; LDeviance.Text = "СКО(мм):"; TBDeviance.Visible = true;
-                TBEtDeviance.Visible = true; LEtDeviance.Visible = true;
-                Visual3MChkBox.Visible = true;
-                if (BasicMesh.GetTypeID() == 4)
-                {
-                    LRealDist.Visible = true; string text = null;
-                    int countofp = 0;
-                    for (int i = 0; i < TransformedP.Count(); i++)
-                        for (int j = 0; j < TransformedP[i].Count; j++)
-                            for (int k = 0; k < TransformedP[i][j].points.Count; k++)
-                            { countofp++; }
-                    if (countofp == 0) { text = "не определена,\n так как отсутствуют опорные точки."; BCalculateQD.Enabled = false; }
-                    else { text = Math.Abs(PerfectRounding(BasicMesh.CenterZ, 2)).ToString(); BCalculateQD.Enabled = true; }
-                    LRealDist.Text = "Дистанция до объекта(мм): " + text;
-                }
-                LDeviance.Location = new Point(LDeviance.Location.X + 41, LDeviance.Location.Y);
-                TBRadius.Visible = true; CBSurfaceType.Visible = true;
-                if (TBRadius.Text == "") TBRadius.Text = "1,0";
-                var ListBoxDataBase = LBDataBase;
-                var List = DataBaseFull;
-                if (Figure.GetTypeID() == 2) { TBRadius.Enabled = false; }
-                WFunc.LoadDataBase(ref ListBoxDataBase, ref List, "Defects Base\\DataBase.db", ref databaseloaded);*/
+  
             }
             catch (Exception exw)
             {
@@ -503,9 +450,25 @@ namespace Stereo_Vision
             }
             LogMessage("Начало построения 3D...");      
             bool bDenseStereoCorrTestPassed = true;
-            ICameraPair stereoPair = null;
+            try
+            {
+                stereoPair = XMLLoader.ReadCameraPair(XMLCalib_path);
+                stereoEstimator = null;
+            }
+            catch(Exception exc)
+            {
+                throw new Exception("Ошибка на этапе чтения калибровочного файла.\nПостроение 3D модели завершено с ошибкой.");
+            }
+
+            try
+            {
+
+            }
+            catch(Exception exc)
+            {
+
+            }
             Bitmap img = null;
-            IStereoDenseEstimator stereoEstimator = null;
             System.Drawing.Imaging.PixelFormat PxForm = System.Drawing.Imaging.PixelFormat.Format24bppRgb;
             var trPtArray = new TriangPointArray3f();
             IndexTriplet[] TriangleModelMass;
@@ -523,6 +486,7 @@ namespace Stereo_Vision
                     if (img.PixelFormat != System.Drawing.Imaging.PixelFormat.Format24bppRgb)
                     { img = img.Clone(new Rectangle(0, 0, img.Width, img.Height), PxForm); }
                     try { bw.ReportProgress(5); } catch { }
+                    LogMessage("Загрузка изображения прошла успешно!");
                 }
                 catch
                 {
@@ -531,12 +495,34 @@ namespace Stereo_Vision
                 // Read camera pair parameters from XML file
 
                 try
-                { stereoPair = XMLLoader.ReadCameraPair(XMLCalib_path); }
-                catch
                 {
-                    throw new Exception("Ошибка на этапе чтения калибровочного файла.\nПостроение 3D модели завершено с ошибкой.");
+                    stereoPair = XMLLoader.ReadCameraPair(XMLCalib_path);
+                    LogMessage("Загрузка калибровки прошла успешно!");
                 }
-                LogMessage("Загрузка изображения и калибровки успешна!");
+                catch (Exception exc)
+                {
+
+                }
+                try
+                {
+                    var rectROI1 = new Rect2d(40.0, 40.0, 560.0, 640.0);
+                    var rectROI2 = new Rect2d(40.0, 680.0, 550.0, 640.0);
+                    var zPlane = new Plane3d(new Point3d(0.0, 0.0, 1.0), -17.0);
+                    stereoEstimator = StereoDenseCorrFactory.GetRectifStereoDenseEstimator(stereoPair, rectROI1, rectROI2, zPlane);
+                    // Load parameters from file
+                    bool waserror = stereoEstimator.ReadParam("stereo_params_new.xml");
+                    // Set distance range (mm)
+                    stereoEstimator.SetZDiap(10.0, 70.00);//17+-
+                    System.Threading.Thread.Sleep(200);//little fix
+                    if (waserror) throw new Exception();
+
+                    LogMessage("Загрузка калибровки прошла успешно!");
+                }
+                catch (Exception exc)
+                {
+
+                }
+                
                 try { bw.ReportProgress(10); } catch { }
 
                 // SetProgress(10);
@@ -561,29 +547,18 @@ namespace Stereo_Vision
                     int ROI_h = image.Height - GRPX_x2;
                  /*   var rectROI1 = new Rect2d(GRPX, GRPX, ROI_w, ROI_h);
                     var rectROI2 = new Rect2d(GRPX, image.Width / 2 + GRPX, ROI_w, ROI_h);*/
-                    var rectROI1 = new Rect2d(40.0, 40.0, 560.0, 640.0);
-                    var rectROI2 = new Rect2d(40.0, 680.0, 550.0, 640.0);
 
 
                     if (bw.CancellationPending || is3DBuilding_cancelled)
                     { if (e != null) e.Cancel = true; MyMesh res; MyMesh.CreateNullMesh(out res); return res; }
 
                     // Initialize stereo correspondence finder
-                    if (IsPrism)
-                    {
-                        var zPlane = new Plane3d(new Point3d(0.0, 0.0, 1.0), -17.0);
-                        stereoEstimator = StereoDenseCorrFactory.GetPrismRectifStereoDenseEstimator(stereoPair, rectROI1, rectROI2, zPlane);
-                    }
-                    else
-                    {
-                        stereoEstimator = StereoDenseCorrFactory.GetProjRectifStereoDenseEstimator(stereoPair, rectROI1, rectROI2);
-                    }
-                    // Load parameters from file
-                    bDenseStereoCorrTestPassed = bDenseStereoCorrTestPassed && stereoEstimator.ReadParam("stereo_params_new.xml");
-                    // Set distance range (mm)
+                  
+                        
+                  
+                    
                     //  stereoEstimator.SetZDiap(5.0, 15.00);//17+-
-                    stereoEstimator.SetZDiap(10.0, 70.00);//17+-
-                    System.Threading.Thread.Sleep(200);//little fix
+                    
                                                        //  SetProgress(15);
                     try { bw.ReportProgress(15); } catch { }
                 }
