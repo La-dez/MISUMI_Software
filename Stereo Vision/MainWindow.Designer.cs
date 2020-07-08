@@ -187,6 +187,7 @@ namespace Stereo_Vision
             this.BGW_3DRotator = new System.ComponentModel.BackgroundWorker();
             this.BWorkerForLoad3D = new System.ComponentModel.BackgroundWorker();
             this.T_3DCancellingChecker = new System.Windows.Forms.Timer(this.components);
+            this.BGW_StereoInitializer = new System.ComponentModel.BackgroundWorker();
             this.TLP_BASE.SuspendLayout();
             this.Pan_ViewRegion.SuspendLayout();
             this.Pan_Pl_3D.SuspendLayout();
@@ -2651,6 +2652,11 @@ namespace Stereo_Vision
             // 
             this.T_3DCancellingChecker.Tick += new System.EventHandler(this.T_3DCancellingChecker_Tick);
             // 
+            // BGW_StereoInitializer
+            // 
+            this.BGW_StereoInitializer.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BGW_StereoInitializer_DoWork);
+            this.BGW_StereoInitializer.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.BGW_StereoInitializer_RunWorkerCompleted);
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -2886,6 +2892,7 @@ namespace Stereo_Vision
         private System.Windows.Forms.ProgressBar PrB_3D_Building;
         private System.Windows.Forms.Button B_3D_CancelBuilding;
         private System.Windows.Forms.Timer T_3DCancellingChecker;
+        private System.ComponentModel.BackgroundWorker BGW_StereoInitializer;
     }
 }
 

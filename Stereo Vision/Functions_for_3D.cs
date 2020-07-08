@@ -54,6 +54,55 @@ namespace Stereo_Vision
         ICameraPair stereoPair = null;
         IStereoDenseEstimator stereoEstimator = null;
 
+        private void Init_calibration_readers(int mode = 1)
+        {
+          
+            string calib_path = "";
+            var a = System.IO.File.Exists("xml_spec/CalibRes_Model1_Our070318_WI_chess_x2.xml");
+            switch(mode)
+            {
+                case 0: { calib_path = "xml_spec/CalibRes_Model1_GE250216_chess.xml"; break; } //SimpleProjWSD
+                case 1: { calib_path = XMLCalib_path; break; }//SimplePrismWSD //CalibRes_Model5_GE250216_chess.xml
+                case 2: { calib_path = "xml_spec/CalibRes_Model1_Our070318_WI_chess_x2.xml"; break; }//SimpleProjWSDOur
+                case 3: { calib_path = "xml_spec/CalibRes_Model5_Our070318_WI_chess_x2.xml"; break; }//SimplePrismWSDOur
+                case 4: { calib_path = "xml_spec/CalibRes_Model5_Our070318_WI_IR_chess_x2.xml"; break; }//SimplePrismWBRDOur
+                case 5: { calib_path = "xml_spec/CalibRes_Model5_Our070318_WI_IRPF_chess_x2.xml"; break; }//SimplePrismWBRDPAOur
+            }
+            try// Read camera pair parameters from XML file
+            {
+                stereoPair = XMLLoader.ReadCameraPair(calib_path);
+                if (stereoPair == null) throw new Exception("Ошибка при считке файла калибровки");
+                LogMessage("Загрузка калибровки прошла успешно!");
+            }
+            catch (Exception exc)
+            {
+                throw new Exception("Ошибка на этапе чтения калибровочного файла.\nПостроение 3D модели завершено с ошибкой.");
+            }
+
+            try
+            {
+                stereoEstimator = null;
+                var rectROI1 = new Rect2d(40.0, 40.0, 560.0, 640.0);
+                var rectROI2 = new Rect2d(40.0, 680.0, 550.0, 640.0);
+                var zPlane = new Plane3d(new Point3d(0.0, 0.0, 1.0), -17.0);
+
+               /* rectROI1 = new Rect2d(50.0, 50.0, 380.0, 435.0); //при этих ROi все работает, по крайней мере вторая (mode = 2) модель
+                rectROI2 = new Rect2d(50.0, 530.0, 380.0, 435.0);*/
+                stereoEstimator = StereoDenseCorrFactory.GetRectifStereoDenseEstimator(stereoPair, rectROI1, rectROI2, zPlane);
+                // Load parameters from file
+                bool waserror = stereoEstimator.ReadParam("stereo_params_new.xml");
+                // Set distance range (mm)
+                stereoEstimator.SetZDiap(10.0, 70.00);//17+-
+                System.Threading.Thread.Sleep(200);//little fix
+                if (waserror) throw new Exception();
+                LogMessage("Загрузка калибровки прошла успешно!");
+            }
+            catch (Exception exc)
+            {
+                throw new Exception("Ошибка при инициализации объекта stereoEstimator. Вероятно, неправильно считаны файлы stereo_params_new.xml");
+            }
+        }
+
         private void Models_view_init()
         {
             LoadShaders();
@@ -322,7 +371,7 @@ namespace Stereo_Vision
 
                 MF4_Multiply(ref M3D_dataMatrix2, M4_to_MF4(zr * yr * xr)); //поворот
 
-                zf = M3D_Figure.GetZoomFactor()* 2;
+                zf = M3D_Figure.GetZoomFactor()* 2; //масштабирование отображения введено для удобства
                 MF4_Multiply(ref M3D_dataMatrix2, M4_to_MF4(Matrix4.CreateScale(zf, zf, zf))); // увеличение
                 MF4_Multiply(M3D_modelViewProjectionMatrix, M3D_viewProjectionMatrix, M3D_dataMatrix2); //матрица проекций
 
@@ -428,7 +477,9 @@ namespace Stereo_Vision
         {         
             try
             {
-  
+                B_Mes_Reconstruct3D.BackgroundImage = BMP_Build3D_off;
+                B_Mes_Reconstruct3D.Enabled = false;
+                BGW_StereoInitializer.RunWorkerAsync();
             }
             catch (Exception exw)
             {
@@ -450,24 +501,12 @@ namespace Stereo_Vision
             }
             LogMessage("Начало построения 3D...");      
             bool bDenseStereoCorrTestPassed = true;
-            try
-            {
-                stereoPair = XMLLoader.ReadCameraPair(XMLCalib_path);
-                stereoEstimator = null;
-            }
-            catch(Exception exc)
-            {
-                throw new Exception("Ошибка на этапе чтения калибровочного файла.\nПостроение 3D модели завершено с ошибкой.");
-            }
 
-            try
-            {
+       
 
-            }
-            catch(Exception exc)
-            {
-
-            }
+           /* if (stereoPair == null || stereoEstimator == null)
+                throw new Exception("3D не восстановлено из-за неинициализированных настроек стереопары.");
+                */
             Bitmap img = null;
             System.Drawing.Imaging.PixelFormat PxForm = System.Drawing.Imaging.PixelFormat.Format24bppRgb;
             var trPtArray = new TriangPointArray3f();
@@ -476,6 +515,38 @@ namespace Stereo_Vision
             //string cfgFilePath = IsPrism ? "M5_chess_shiftM11.xml": "M1_chess.xml";
             //string cfgFilePath = IsPrism ? "M5_chess.xml" : "M1_chess.xml";
             MyMesh result = null;
+
+            /*  try// Read camera pair parameters from XML file
+              {
+                  stereoPair = XMLLoader.ReadCameraPair(XMLCalib_path);
+                  
+
+                  LogMessage("Загрузка калибровки прошла успешно!");
+              }
+              catch (Exception exc)
+              {
+                  throw new Exception("Ошибка на этапе чтения калибровочного файла.\nПостроение 3D модели завершено с ошибкой.");
+              }
+
+              try
+              {
+                  stereoEstimator = null;
+                  var rectROI1 = new Rect2d(40.0, 40.0, 560.0, 640.0);
+                  var rectROI2 = new Rect2d(40.0, 680.0, 550.0, 640.0);
+                  var zPlane = new Plane3d(new Point3d(0.0, 0.0, 1.0), -17.0);
+                  stereoEstimator = StereoDenseCorrFactory.GetRectifStereoDenseEstimator(stereoPair, rectROI1, rectROI2, zPlane);
+                  // Load parameters from file
+                  bool waserror = stereoEstimator.ReadParam("stereo_params_new.xml");
+                  // Set distance range (mm)
+                  stereoEstimator.SetZDiap(10.0, 70.00);//17+-
+                  System.Threading.Thread.Sleep(200);//little fix
+                  if (waserror) throw new Exception();
+                  LogMessage("Загрузка калибровки прошла успешно!");
+              }
+              catch (Exception exc)
+              {
+                //  throw new Exception("Ошибка при инициализации объекта stereoEstimator");
+              }*/
 
             if (!bw.CancellationPending || !is3DBuilding_cancelled)
             {
@@ -492,36 +563,7 @@ namespace Stereo_Vision
                 {
                     throw new Exception("Ошибка на этапе загрузки изображения.\nПостроение 3D модели завершено с ошибкой.");
                 }
-                // Read camera pair parameters from XML file
 
-                try
-                {
-                    stereoPair = XMLLoader.ReadCameraPair(XMLCalib_path);
-                    LogMessage("Загрузка калибровки прошла успешно!");
-                }
-                catch (Exception exc)
-                {
-
-                }
-                try
-                {
-                    var rectROI1 = new Rect2d(40.0, 40.0, 560.0, 640.0);
-                    var rectROI2 = new Rect2d(40.0, 680.0, 550.0, 640.0);
-                    var zPlane = new Plane3d(new Point3d(0.0, 0.0, 1.0), -17.0);
-                    stereoEstimator = StereoDenseCorrFactory.GetRectifStereoDenseEstimator(stereoPair, rectROI1, rectROI2, zPlane);
-                    // Load parameters from file
-                    bool waserror = stereoEstimator.ReadParam("stereo_params_new.xml");
-                    // Set distance range (mm)
-                    stereoEstimator.SetZDiap(10.0, 70.00);//17+-
-                    System.Threading.Thread.Sleep(200);//little fix
-                    if (waserror) throw new Exception();
-
-                    LogMessage("Загрузка калибровки прошла успешно!");
-                }
-                catch (Exception exc)
-                {
-
-                }
                 
                 try { bw.ReportProgress(10); } catch { }
 

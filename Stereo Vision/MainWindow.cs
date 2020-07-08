@@ -13,6 +13,7 @@ using Emgu.Util;
 using System.IO;
 using Microsoft.Win32;
 using OpenTK_3DMesh;
+using CameraMath.Wrapper;
 
 namespace Stereo_Vision
 {
@@ -1103,6 +1104,20 @@ namespace Stereo_Vision
                 T_3DCancellingChecker.Stop();
 
             }
+        }
+
+        private void BGW_StereoInitializer_DoWork(object sender, DoWorkEventArgs e)
+        {
+            Init_calibration_readers();
+        }
+
+        private void BGW_StereoInitializer_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+           Action alpha = ( ()=> {
+               B_Mes_Reconstruct3D.BackgroundImage = BMP_Build3D_on;
+               B_Mes_Reconstruct3D.Enabled = true;
+           });
+            this.Invoke(alpha);
         }
     }
 }
