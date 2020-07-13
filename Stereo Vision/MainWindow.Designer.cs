@@ -188,6 +188,7 @@ namespace Stereo_Vision
             this.BWorkerForLoad3D = new System.ComponentModel.BackgroundWorker();
             this.T_3DCancellingChecker = new System.Windows.Forms.Timer(this.components);
             this.BGW_StereoInitializer = new System.ComponentModel.BackgroundWorker();
+            this.T_CameraPluggedIn_Checker = new System.Windows.Forms.Timer(this.components);
             this.TLP_BASE.SuspendLayout();
             this.Pan_ViewRegion.SuspendLayout();
             this.Pan_Pl_3D.SuspendLayout();
@@ -2657,6 +2658,11 @@ namespace Stereo_Vision
             this.BGW_StereoInitializer.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BGW_StereoInitializer_DoWork);
             this.BGW_StereoInitializer.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.BGW_StereoInitializer_RunWorkerCompleted);
             // 
+            // T_CameraPluggedIn_Checker
+            // 
+            this.T_CameraPluggedIn_Checker.Interval = 200;
+            this.T_CameraPluggedIn_Checker.Tick += new System.EventHandler(this.T_CameraPluggedIn_Checker_Tick);
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -2893,6 +2899,7 @@ namespace Stereo_Vision
         private System.Windows.Forms.Button B_3D_CancelBuilding;
         private System.Windows.Forms.Timer T_3DCancellingChecker;
         private System.ComponentModel.BackgroundWorker BGW_StereoInitializer;
+        private System.Windows.Forms.Timer T_CameraPluggedIn_Checker;
     }
 }
 

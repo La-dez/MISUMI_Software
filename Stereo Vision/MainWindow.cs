@@ -42,6 +42,7 @@ namespace Stereo_Vision
         int Width_Current = 1280;
         int Height_Current = 720;
 
+        int MS_in_cameraChecker = 0;
 
         int Saving_ShowLabel_time = 3;
 
@@ -1108,7 +1109,7 @@ namespace Stereo_Vision
 
         private void BGW_StereoInitializer_DoWork(object sender, DoWorkEventArgs e)
         {
-            Init_calibration_readers();
+            Init_calibration_readers(6);
         }
 
         private void BGW_StereoInitializer_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -1118,6 +1119,15 @@ namespace Stereo_Vision
                B_Mes_Reconstruct3D.Enabled = true;
            });
             this.Invoke(alpha);
+        }
+
+        private void T_CameraPluggedIn_Checker_Tick(object sender, EventArgs e)
+        {
+            MS_in_cameraChecker += T_CameraPluggedIn_Checker.Interval;
+            if(MS_in_cameraChecker>500 && FramesGotten==0 && isInTranslation)
+            {
+                Draw_Frame_NoCamera();
+            }
         }
     }
 }

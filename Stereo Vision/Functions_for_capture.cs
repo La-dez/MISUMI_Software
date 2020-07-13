@@ -194,10 +194,10 @@ namespace Stereo_Vision
             lastFrame_processed = false;
 
 
-              try
-              {
-                  if (_capture != null && _capture.Ptr != IntPtr.Zero)
-                  {
+            try
+            {
+                if (_capture != null && _capture.Ptr != IntPtr.Zero)
+                {
 
                     _capture.Retrieve(CurrentFrame, 0); //Получение кадра. Переодический промер FPS
 
@@ -300,9 +300,9 @@ namespace Stereo_Vision
                         STW_Resizing.Reset();
                     }
 
-                     //  Refresh_image_Invoke(resizedim);
+                    //  Refresh_image_Invoke(resizedim);
                     CV_ImBox_Capture.Image = resizedim;
-                   // CV_ImBox_Capture.Image = CurrentFrame;
+                    // CV_ImBox_Capture.Image = CurrentFrame;
                     FramesDrawen++;
                     STW_Resizing.Stop();
                     FrameDrawen = true;
@@ -365,17 +365,17 @@ namespace Stereo_Vision
                     }
                     if (isSnapShot_needed)
                     {
-                      /*  using (CurrentFrame2 = resizedim.Clone())
-                        {*/
-                            Photo_name_lastcaptured = CalculatenName_forNewPhoto_withoutPath();
-                            CurrentFrame.Save(Rec_Photos_path + "\\" + Photo_name_lastcaptured);
-                            Photo_name_lastcaptured_fullpath = Rec_Photos_path + "\\" + Photo_name_lastcaptured;
-                            LastNumber_Photo++;
-                            isSnapShot_needed = false;
-                            UpdateTextBox("Кадр " + Photo_name_lastcaptured + " сохранен!" , L_SnapShotSaved);
-                      //  }
+                        /*  using (CurrentFrame2 = resizedim.Clone())
+                          {*/
+                        Photo_name_lastcaptured = CalculatenName_forNewPhoto_withoutPath();
+                        CurrentFrame.Save(Rec_Photos_path + "\\" + Photo_name_lastcaptured);
+                        Photo_name_lastcaptured_fullpath = Rec_Photos_path + "\\" + Photo_name_lastcaptured;
+                        LastNumber_Photo++;
+                        isSnapShot_needed = false;
+                        UpdateTextBox("Кадр " + Photo_name_lastcaptured + " сохранен!", L_SnapShotSaved);
+                        //  }
                     }
-                    if(L_SnapShotSaved.Visible)
+                    if (L_SnapShotSaved.Visible)
                     {
                         if (STW_2HideLabel.Elapsed.TotalSeconds > Saving_ShowLabel_time)
                         {
@@ -384,16 +384,17 @@ namespace Stereo_Vision
                             STW_2HideLabel.Stop();
                         }
                     }
-                      
-                      //if (throwed_to_hiber) System.Windows.Forms.Application.SetSuspendState(System.Windows.Forms.PowerState.Hibernate, true, false);
-                  }
-              }
-              catch
-              {
+
+                    //if (throwed_to_hiber) System.Windows.Forms.Application.SetSuspendState(System.Windows.Forms.PowerState.Hibernate, true, false);
+                }
+            }
+            catch
+            {
                 lastFrame_processed = true;
                 return;
                 //Попробуем в следующий раз
             }
+            if (T_CameraPluggedIn_Checker.Enabled == true) T_CameraPluggedIn_Checker.Stop();
             lastFrame_processed = true;
         }
         
@@ -473,13 +474,14 @@ namespace Stereo_Vision
         }
         private void StartCapture()
         {
-            if (_capture != null)
+            if (_capture != null && _capture.Ptr != null)
             {
                 //start the capture
                 LogMessage("Камера не нуль");
                 _capture.Start();
                 LogMessage("Запись включена");
                 isInTranslation = !isInTranslation;
+                T_CameraPluggedIn_Checker.Start();
             }
             else
             {

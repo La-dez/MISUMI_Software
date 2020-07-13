@@ -54,19 +54,19 @@ namespace Stereo_Vision
         ICameraPair stereoPair = null;
         IStereoDenseEstimator stereoEstimator = null;
 
-        private void Init_calibration_readers(int mode = 1)
+        private void Init_calibration_readers(int mode = 0)
         {
           
             string calib_path = "";
-            var a = System.IO.File.Exists("xml_spec/CalibRes_Model1_Our070318_WI_chess_x2.xml");
             switch(mode)
             {
-                case 0: { calib_path = "xml_spec/CalibRes_Model1_GE250216_chess.xml"; break; } //SimpleProjWSD
-                case 1: { calib_path = XMLCalib_path; break; }//SimplePrismWSD //CalibRes_Model5_GE250216_chess.xml
+                case 0: { calib_path = XMLCalib_path; break; } //SimpleProjWSD
+                case 1: { calib_path = "xml_spec/CalibRes_Model1_GE250216_chess.xml"; break; } //SimpleProjWSD
                 case 2: { calib_path = "xml_spec/CalibRes_Model1_Our070318_WI_chess_x2.xml"; break; }//SimpleProjWSDOur
-                case 3: { calib_path = "xml_spec/CalibRes_Model5_Our070318_WI_chess_x2.xml"; break; }//SimplePrismWSDOur
-                case 4: { calib_path = "xml_spec/CalibRes_Model5_Our070318_WI_IR_chess_x2.xml"; break; }//SimplePrismWBRDOur
-                case 5: { calib_path = "xml_spec/CalibRes_Model5_Our070318_WI_IRPF_chess_x2.xml"; break; }//SimplePrismWBRDPAOur
+                case 3: { calib_path = "xml_spec/M5_chess.xml"; break; }//SimplePrismWSD //         //сделать выбор из последних пяти моделей
+                case 4: { calib_path = "xml_spec/M5_chess_shiftS8M10.xml"; break; }//SimplePrismWSDOur //
+                case 5: { calib_path = "xml_spec/M5_IR_chess_shiftS8M10.xml"; break; }//SimplePrismWBRDOur //
+                case 6: { calib_path = "xml_spec/M5_IRPF_chess_shiftS8M10.xml"; break; }//SimplePrismWBRDPAOur //
             }
             try// Read camera pair parameters from XML file
             {

@@ -310,7 +310,7 @@ namespace Stereo_Vision
             CV_ImBox_VidPhoto_Player.Visible = false;
             PB_MeasurementPB.Visible = true;
             PB_MeasurementPB.Show();
-            Timer_InvalidateAfter_EnteringMes.Start();
+            Timer_InvalidateAfter_EnteringMes.Start(); //Баг, связанный с некорректной отрисовкой (картинка отрисовывалась поверх всего)
             //DB_Invalidate();
 
         }
@@ -1203,7 +1203,15 @@ namespace Stereo_Vision
             }
             else return TargetString;
         }
-
+        private void Draw_Frame_NoCamera()
+        {
+            Mat Image_NoCamera = new Mat(1080, 1920,DepthType.Cv8U,1);
+            Image<Gray, byte> Image_NoCamera2 = new Image<Gray, byte>(1920, 1080);
+            
+            CvInvoke.PutText(Image_NoCamera,"No camera detected!", new Point(250,500), FontFace.HersheyDuplex, 4.0, new Bgr(255, 255, 255).MCvScalar);
+            var a = Image_NoCamera.ToImage<Gray, byte>();
+            CV_ImBox_Capture.Image = Image_NoCamera; 
+        }
 
     }
 }
