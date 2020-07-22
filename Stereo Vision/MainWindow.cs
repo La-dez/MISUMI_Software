@@ -46,6 +46,8 @@ namespace Stereo_Vision
 
         int Saving_ShowLabel_time = 3;
 
+        OnLoadingForm newForm = null;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -63,16 +65,17 @@ namespace Stereo_Vision
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            /*bool isPr = false;
-            string img_plane_pre = "pl";
-            string img_cilindric_pre = "cil";
-            string img_real_pre = "real";
-            BuildModel3D(new BackgroundWorker(), new Bitmap("TestImages\\"+ img_plane_pre + "1.tiff"), isPr);
-            return;*/
-            //Load3DModel("demo.ply"); return;
+     
 
             List<string> ErrorStack = new List<string>();
             this.Visible = false;
+/*
+            newForm = new OnLoadingForm(false);
+            newForm.TopMost = true;
+            BackgroundWorker bgw_load = new BackgroundWorker();
+            bgw_load.DoWork += Bgw_load_DoWork;
+            bgw_load.RunWorkerAsync();*/
+
 
             try
             {
@@ -105,9 +108,16 @@ namespace Stereo_Vision
                 foreach (string exc in ErrorStack)
                     LogError(exc);
                 this.Visible = true;
+                newForm.Close();
             }
         }
-            
+
+        private void Bgw_load_DoWork(object sender, DoWorkEventArgs e)
+        {
+            newForm.Show();
+         //   this.Invoke(new Action(() => newForm.Show()));
+        }
+
         private void Load_Correction_Matrix(ref double[,,] pMat)
         {
             try
