@@ -47,7 +47,10 @@ namespace Stereo_Vision
         int Saving_ShowLabel_time = 3;
 
         OnLoadingForm newForm = null;
+        Action<int, string> ReportProgress = null;
 
+        public const string MEOW_CurrentVerion = "2.71";
+        
         public MainWindow()
         {
             InitializeComponent();
@@ -62,44 +65,56 @@ namespace Stereo_Vision
             SystemEvents.PowerModeChanged += new PowerModeChangedEventHandler(SystemEvents_PowerModeChanged);
           //  SystemEvents.Wake
         }
-
+        public void SetReporter(Action<int,string> pReporter)
+        {
+            ReportProgress = pReporter;
+        }
         private void Form1_Load(object sender, EventArgs e)
         {
      
 
             List<string> ErrorStack = new List<string>();
             this.Visible = false;
-/*
-            newForm = new OnLoadingForm(false);
-            newForm.TopMost = true;
-            BackgroundWorker bgw_load = new BackgroundWorker();
-            bgw_load.DoWork += Bgw_load_DoWork;
-            bgw_load.RunWorkerAsync();*/
-
 
             try
             {
+                ReportProgress(0, "Инициализация калибровочных параметров..."); System.Threading.Thread.Sleep(1000);
                 try { Init_calib_worker(); } catch (Exception exc) { ErrorStack.Add("Ошибка инициализации считывателя калибровочных моделей 1"); }
-                try { Build_Interface(); }      catch (Exception exc) { ErrorStack.Add("Ошибка построения интерфейса"); }
-                try { MaximizeWindow(); }       catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 1"); }
+                ReportProgress(5, "Построение интерфейса..."); System.Threading.Thread.Sleep(1000);
+                try { Build_Interface(); } catch (Exception exc) { ErrorStack.Add("Ошибка построения интерфейса"); }
+                ReportProgress(10, "Построение интерфейса..."); System.Threading.Thread.Sleep(1000);
+                try { MaximizeWindow(); ; } catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 1"); }
+                ReportProgress(15, "Построение интерфейса..."); System.Threading.Thread.Sleep(1000);
                 try { CreateAttachmentFactor(ref AttachmentFactor, LBConsole); } catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 2"); }
-                try { PrepareTheCamera(); }         catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 3"); }
-                try { SetResolution(1280, 720); }   catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 4"); }
-                try { SwitchAdminMode(AdminMode); } catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 5"); }
-                try { OpenMainPanel(); }            catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 6"); }
-                try { HideSomeThings(); }           catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 7"); }
-                try { Read_and_Load_Settings(); }   catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 8"); }
+                ReportProgress(20, "Подготовка камеры..."); System.Threading.Thread.Sleep(1000);
+                try { PrepareTheCamera(); }                               catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 3"); }
+                ReportProgress(25, "Подготовка камеры..."); System.Threading.Thread.Sleep(1000);
+                try { SetResolution(1280, 720); }                         catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 4"); }
+                ReportProgress(30, "Подготовка камеры..."); System.Threading.Thread.Sleep(1000);
+                try { SwitchAdminMode(AdminMode); }                       catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 5"); }
+                ReportProgress(35, "Подготовка интерфейса..."); System.Threading.Thread.Sleep(1000);
+                try { OpenMainPanel(); }                                  catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 6"); }
+                ReportProgress(40, "Подготовка интерфейса..."); System.Threading.Thread.Sleep(1000);
+                try { HideSomeThings(); }                                 catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 7"); }
+                ReportProgress(45, "Подготовка интерфейса..."); System.Threading.Thread.Sleep(1000);
+                try { Read_and_Load_Settings(); }                         catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 8"); }
+                ReportProgress(50, "Подготовка интерфейса..."); System.Threading.Thread.Sleep(1000);
                 try { System.Threading.Thread.CurrentThread.Priority = System.Threading.ThreadPriority.Highest; } catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 9"); }
-                try { BGWR_ChargeLev.WorkerSupportsCancellation = true; } catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 10"); }
-                try { BGWR_ChargeLev.RunWorkerAsync(); }                  catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 11"); }
-                try { Set_ChargeBMP(BMP2set_chargelev); }                 catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 12"); }
-                try { Set_ChargeTEXT(Text2set); }                         catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 13"); }
+                ReportProgress(55, "Подготовка интерфейса..."); System.Threading.Thread.Sleep(1000);
+                try { ChargeLevel_preparence(); }                         catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 14"); }
+                ReportProgress(60, "Загрузка цветокоррекционной матрицы..."); System.Threading.Thread.Sleep(1000);
                 try { Load_Correction_Matrix(ref CMatrix); }              catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 14"); }
+                ReportProgress(65, "Запуск камеры..."); System.Threading.Thread.Sleep(1000);
                 try { StartCapture(); }                                   catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 15"); }
-                try { Prepare_drawing_objects(); }                        catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 16"); }       
+                ReportProgress(70, "Запуск камеры..."); System.Threading.Thread.Sleep(1000);
+                try { Prepare_frame_objects(); }                        catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 16"); }
+                ReportProgress(80, "Подготовка буферов отрисовки..."); System.Threading.Thread.Sleep(1000);
                 try { Prepare_drawing_buffer(); }                         catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 17"); }
+                ReportProgress(85, "Подготовка к просмотру 3D моделей..."); System.Threading.Thread.Sleep(1000);
                 try { Models_view_init(); }                               catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 18"); }
+                ReportProgress(95, "Инициализация директорий сохранения..."); System.Threading.Thread.Sleep(1000);
                 try { Restore_CaptureDirectory(); }                       catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 19"); }
+                ReportProgress(100, "Готово!"); System.Threading.Thread.Sleep(1000);
 
             }
             catch (Exception exc) { LogError(exc.Message); }
@@ -108,10 +123,8 @@ namespace Stereo_Vision
                 foreach (string exc in ErrorStack)
                     LogError(exc);
                 this.Visible = true;
-                newForm.Close();
             }
         }
-
         private void Bgw_load_DoWork(object sender, DoWorkEventArgs e)
         {
             newForm.Show();

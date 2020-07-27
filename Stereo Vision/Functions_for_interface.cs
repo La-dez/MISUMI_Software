@@ -184,6 +184,16 @@ namespace Stereo_Vision
                 LogMessage("Состояние видимости TB = " + Ctrl.Visible.ToString());
             }
         }
+        
+        private void ChargeLevel_preparence()
+        {
+            string FirstError = "";
+            try { BGWR_ChargeLev.WorkerSupportsCancellation = true; } catch (Exception exc) { FirstError = FirstError == "" ? exc.Message : FirstError; }
+            try { BGWR_ChargeLev.RunWorkerAsync(); } catch (Exception exc) { FirstError = FirstError == "" ? exc.Message : FirstError; }
+            try { Set_ChargeBMP(BMP2set_chargelev); } catch (Exception exc) { FirstError = FirstError == "" ? exc.Message : FirstError; }
+            try { Set_ChargeTEXT(Text2set); } catch (Exception exc) { FirstError = FirstError == "" ? exc.Message : FirstError; }
+            if (FirstError != "") throw new Exception(FirstError);
+        }
         private void Build_Interface()
         {
             //Pan_pl_Base Restruct
@@ -223,7 +233,7 @@ namespace Stereo_Vision
             OTK_3D_Control.Dock = DockStyle.Fill;
             L_SnapShotSaved.BringToFront();
         }
-        private void Prepare_drawing_objects()
+        private void Prepare_frame_objects()
         {
             this.DoubleBuffered = true;
             CurrentFrame = new Mat();
