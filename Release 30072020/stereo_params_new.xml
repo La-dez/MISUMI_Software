@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<opencv_storage>
+<pointFinderParam>
+  <winSize_x>21</winSize_x>
+  <winSize_y>21</winSize_y>
+  <useGaussian>0</useGaussian>
+  <useSubPix>1</useSubPix>
+  <sigma>0.1</sigma>
+  <searchRectSize_x>5</searchRectSize_x>
+  <searchRectSize_y>5</searchRectSize_y>
+  <zMin>10.0</zMin>
+  <zMax>40.0</zMax>
+  <zStep>2.0</zStep>
+  <imgHeight>480</imgHeight>
+  <imgWidth>640</imgWidth>
+  <useDeltaCrit>1</useDeltaCrit>
+  <deltaCritMin>0.003</deltaCritMin>
+  <deltaCritSlope>33.3</deltaCritSlope>
+  <useStdCrit>1</useStdCrit>
+  <stdCritMin>10.0</stdCritMin>
+  <stdCritSlope>0.0225</stdCritSlope>
+</pointFinderParam>
+<oneLevStParam>
+  <dispParam>
+    <dmin>-50</dmin>
+    <dmax>-10</dmax>
+    <drange>41</drange></dispParam>
+  <MFinitParam>
+    <isColor>0</isColor>
+    <useBTMeasure>0</useBTMeasure>
+    <isSquared>0</isSquared>
+    <isTruncated>0</isTruncated>
+    <truncValue>10.</truncValue>
+    <useGrad>0</useGrad>
+    <gradWeight>1.0</gradWeight></MFinitParam>
+  <MFaggrParam>
+    <aggrType>2</aggrType>
+    <useMFilter>0</useMFilter>
+    <winSize_x>51</winSize_x>
+    <winSize_y>51</winSize_y>
+    <useGaussian>0</useGaussian>
+    <sigma>1.</sigma>
+    <beta>7.</beta>
+    <gamma>21.</gamma></MFaggrParam>
+  <MFOptimParam>
+    <optimType>0</optimType>
+    <bpnumLevel>4</bpnumLevel>
+    <bpmaxIter type_id="opencv-matrix">
+      <rows>4</rows>
+      <cols>1</cols>
+      <dt>i</dt>
+      <data>
+        10 10 10 10</data></bpmaxIter>
+    <bpro_data>1.0000000000000001e-001</bpro_data>
+    <bplambda_data>3.</bplambda_data>
+    <bpro_smooth>1.</bpro_smooth>
+    <bplambda_smooth>5.</bplambda_smooth>
+    <usebpGradAdapt>1</usebpGradAdapt>
+    <usebpGradColor>1</usebpGradColor>
+    <bpminGrad>30.</bpminGrad>
+    <bplambda_grad>6.9999999999999996e-001</bplambda_grad>
+    <findUniqQual>0</findUniqQual>
+    <threshUniqQual>1.0000000000000000e-003</threshUniqQual></MFOptimParam>
+  <MFrefParam>
+    <useSubPix>1</useSubPix>
+    <useAdaptDFilt>0</useAdaptDFilt>
+    <winSizeADF_x>9</winSizeADF_x>
+    <winSizeADF_y>9</winSizeADF_y>
+    <dfiltThresh>1.</dfiltThresh>
+    <useDeltaCrit>0</useDeltaCrit>
+    <deltaThresh>0.01</deltaThresh>
+    <useAbsValCrit>0</useAbsValCrit>
+    <absValThresh>0.4</absValThresh>
+    <useStdevCrit>0</useStdevCrit>
+    <stdevThresh>5.0</stdevThresh>
+    <cropDispBorders>1</cropDispBorders></MFrefParam>
+</oneLevStParam>
+</opencv_storage>

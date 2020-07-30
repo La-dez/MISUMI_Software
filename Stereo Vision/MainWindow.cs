@@ -78,43 +78,43 @@ namespace Stereo_Vision
 
             try
             {
-                ReportProgress(0, "Инициализация калибровочных параметров..."); System.Threading.Thread.Sleep(1000);
+                ReportProgress(0, "Инициализация калибровочных параметров..."); //System.Threading.Thread.Sleep(1000);
                 try { Init_calib_worker(); } catch (Exception exc) { ErrorStack.Add("Ошибка инициализации считывателя калибровочных моделей 1"); }
-                ReportProgress(5, "Построение интерфейса..."); System.Threading.Thread.Sleep(1000);
+                ReportProgress(5, "Построение интерфейса..."); //System.Threading.Thread.Sleep(1000);
                 try { Build_Interface(); } catch (Exception exc) { ErrorStack.Add("Ошибка построения интерфейса"); }
-                ReportProgress(10, "Построение интерфейса..."); System.Threading.Thread.Sleep(1000);
+                ReportProgress(10, "Построение интерфейса...");// System.Threading.Thread.Sleep(1000);
                 try { MaximizeWindow(); ; } catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 1"); }
-                ReportProgress(15, "Построение интерфейса..."); System.Threading.Thread.Sleep(1000);
+                ReportProgress(15, "Построение интерфейса..."); //System.Threading.Thread.Sleep(1000);
                 try { CreateAttachmentFactor(ref AttachmentFactor, LBConsole); } catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 2"); }
-                ReportProgress(20, "Подготовка камеры..."); System.Threading.Thread.Sleep(1000);
+                ReportProgress(20, "Подготовка камеры..."); //System.Threading.Thread.Sleep(1000);
                 try { PrepareTheCamera(); }                               catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 3"); }
-                ReportProgress(25, "Подготовка камеры..."); System.Threading.Thread.Sleep(1000);
+                ReportProgress(25, "Подготовка камеры...");// System.Threading.Thread.Sleep(1000);
                 try { SetResolution(1280, 720); }                         catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 4"); }
-                ReportProgress(30, "Подготовка камеры..."); System.Threading.Thread.Sleep(1000);
+                ReportProgress(30, "Подготовка камеры..."); //System.Threading.Thread.Sleep(1000);
                 try { SwitchAdminMode(AdminMode); }                       catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 5"); }
-                ReportProgress(35, "Подготовка интерфейса..."); System.Threading.Thread.Sleep(1000);
+                ReportProgress(35, "Подготовка интерфейса..."); //System.Threading.Thread.Sleep(1000);
                 try { OpenMainPanel(); }                                  catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 6"); }
-                ReportProgress(40, "Подготовка интерфейса..."); System.Threading.Thread.Sleep(1000);
+                ReportProgress(40, "Подготовка интерфейса..."); //System.Threading.Thread.Sleep(1000);
                 try { HideSomeThings(); }                                 catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 7"); }
-                ReportProgress(45, "Подготовка интерфейса..."); System.Threading.Thread.Sleep(1000);
+                ReportProgress(45, "Подготовка интерфейса...");// System.Threading.Thread.Sleep(1000);
                 try { Read_and_Load_Settings(); }                         catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 8"); }
-                ReportProgress(50, "Подготовка интерфейса..."); System.Threading.Thread.Sleep(1000);
+                ReportProgress(50, "Подготовка интерфейса...");// System.Threading.Thread.Sleep(1000);
                 try { System.Threading.Thread.CurrentThread.Priority = System.Threading.ThreadPriority.Highest; } catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 9"); }
-                ReportProgress(55, "Подготовка интерфейса..."); System.Threading.Thread.Sleep(1000);
+                ReportProgress(55, "Подготовка интерфейса...");// System.Threading.Thread.Sleep(1000);
                 try { ChargeLevel_preparence(); }                         catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 14"); }
-                ReportProgress(60, "Загрузка цветокоррекционной матрицы..."); System.Threading.Thread.Sleep(1000);
+                ReportProgress(60, "Загрузка цветокоррекционной матрицы..."); //System.Threading.Thread.Sleep(1000);
                 try { Load_Correction_Matrix(ref CMatrix); }              catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 14"); }
-                ReportProgress(65, "Запуск камеры..."); System.Threading.Thread.Sleep(1000);
+                ReportProgress(65, "Запуск камеры...");// System.Threading.Thread.Sleep(1000);
                 try { StartCapture(); }                                   catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 15"); }
-                ReportProgress(70, "Запуск камеры..."); System.Threading.Thread.Sleep(1000);
+                ReportProgress(70, "Запуск камеры...");// System.Threading.Thread.Sleep(1000);
                 try { Prepare_frame_objects(); }                        catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 16"); }
-                ReportProgress(80, "Подготовка буферов отрисовки..."); System.Threading.Thread.Sleep(1000);
+                ReportProgress(80, "Подготовка буферов отрисовки..."); //System.Threading.Thread.Sleep(1000);
                 try { Prepare_drawing_buffer(); }                         catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 17"); }
-                ReportProgress(85, "Подготовка к просмотру 3D моделей..."); System.Threading.Thread.Sleep(1000);
+                ReportProgress(85, "Подготовка к просмотру 3D моделей...");// System.Threading.Thread.Sleep(1000);
                 try { Models_view_init(); }                               catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 18"); }
-                ReportProgress(95, "Инициализация директорий сохранения..."); System.Threading.Thread.Sleep(1000);
+                ReportProgress(95, "Инициализация директорий сохранения..."); //System.Threading.Thread.Sleep(1000);
                 try { Restore_CaptureDirectory(); }                       catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 19"); }
-                ReportProgress(100, "Готово!"); System.Threading.Thread.Sleep(1000);
+                ReportProgress(100, "Готово!"); //System.Threading.Thread.Sleep(1000);
 
             }
             catch (Exception exc) { LogError(exc.Message); }
