@@ -80,7 +80,7 @@ namespace Stereo_Vision
                     try { p_arduino = new Arduino(); pp_isArdclosed = false; }
                     catch { p_arduino = null; pp_isArdclosed = true; }
                     Check_2CloseThisArd(ref ppWorker, ref p_arduino, ref pp_isArdclosed);
-                    for (int i = 0; i < 50; i++)
+                    for (int i = 0; i < 1; i++)
                     {
                         Check_2CloseThisArd(ref ppWorker, ref p_arduino,ref pp_isArdclosed);
                         // Console.WriteLine("Reading from pin " + 0 + "...");
@@ -104,7 +104,7 @@ namespace Stereo_Vision
                     end_val /= vol_mass.Count();
                     end_val = end_val * 0.0048876f;//аналог ((end_val / 1023.00f) * 5);
                                                    // end_val = ((end_val / 1023.00f) * 5);
-                   
+                    end_val = 4.5f;
                     // p_arduino.callAnalogPinUpdated(0, 1);
                    
                     return end_val;

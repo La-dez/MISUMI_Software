@@ -837,6 +837,7 @@ namespace Stereo_Vision
             this.TLP_ChargeLev.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.TLP_ChargeLev.Size = new System.Drawing.Size(116, 29);
             this.TLP_ChargeLev.TabIndex = 6;
+            this.TLP_ChargeLev.Paint += new System.Windows.Forms.PaintEventHandler(this.TLP_ChargeLev_Paint);
             // 
             // PB_ChargeVal
             // 

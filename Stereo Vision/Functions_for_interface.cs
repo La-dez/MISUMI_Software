@@ -232,6 +232,7 @@ namespace Stereo_Vision
             PB_MeasurementPB.Dock = DockStyle.Fill;
             OTK_3D_Control.Dock = DockStyle.Fill;
             L_SnapShotSaved.BringToFront();
+            P_ChargeLev.BringToFront();
         }
         private void Prepare_frame_objects()
         {
@@ -876,10 +877,11 @@ namespace Stereo_Vision
             {
 
                 float CurVoltage = Charge.GetChargeLevel_Voltage(ref pWorker,false,ref p_isArdClosed);
-               
+               // TLP_ChargeLev.BringToFront(); //не работает
                 if (CurVoltage >= 1.0f)
                 {
-                    LastChargeLevel = Charge.TimeLeft2Percents(Charge.Gained_voltage_2_timeleft(CurVoltage));
+                    var TimeLeft = Charge.Gained_voltage_2_timeleft(CurVoltage);
+                    LastChargeLevel = Charge.TimeLeft2Percents(TimeLeft);
                     Charge.ToogleCharge_Level(ref BMP2set_chargelev, ref Text2set, LastChargeLevel);
                     Set_ChargeTEXT(Text2set);
                     Set_ChargeBMP(BMP2set_chargelev);

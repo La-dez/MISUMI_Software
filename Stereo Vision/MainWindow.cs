@@ -1152,6 +1152,11 @@ namespace Stereo_Vision
                 Draw_Frame_NoCamera();
             }
         }
+
+        private void TLP_ChargeLev_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
     }
 }
 
