@@ -5,6 +5,7 @@ using System.Text;
 using System.Drawing;
 using System.IO;
 using Emgu.CV;
+using Emgu.CV.UI;
 
 using Emgu.CV.CvEnum;
 
@@ -45,8 +46,9 @@ namespace Stereo_Vision
         {
             string InitialFilePath = null;
             if (FilesToView.Count == 0)
-            {               
-                CurrentFrame = (new Image<Emgu.CV.Structure.Bgr, byte>(Create_ImageOfEmptyness())).Mat;
+            {
+                CurrentFrame = Create_ImageOfEmptyness().ToImage<Emgu.CV.Structure.Bgr, byte>().Mat;
+               // CurrentFrame = (new Image<Emgu.CV.Structure.Bgr, byte>(Create_ImageOfEmptyness())).Mat; //старая версия
                 CV_ImBox_VidPhoto_Player.Image = CurrentFrame;
             }
             else

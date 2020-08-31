@@ -192,6 +192,44 @@ namespace Stereo_Vision
                 {
 
                     _capture.Retrieve(CurrentFrame, 0); //Получение кадра. Переодический промер FPS
+                    FramesGotten++;
+                    CvInvoke.Resize(CurrentFrame, resizedim, Size_for_Resizing, 0, 0, Inter.Linear);
+
+                    CV_ImBox_Capture.Image = resizedim;
+                    //ресайз кадра
+
+
+                    //Переодический замер физического FPS
+                    if ((STW_FPS.Elapsed.Seconds > 5)) //случается примерно раз в 10 секунд
+                    {
+                        LogMessage("Скорость получения кадров: " + ((float)FramesGotten / STW_FPS.Elapsed.TotalSeconds).ToString());
+                        FramesGotten = 0;
+                        STW_FPS.Restart();
+                    }
+
+                }
+            }
+            catch (Exception eee)
+            {
+                lastFrame_processed = true;
+                return;
+                //Попробуем в следующий раз
+            }
+            lastFrame_processed = true;
+        }
+
+        private void ProcessFrame2(object sender, EventArgs arg) //Все, что происходит при получении кадра
+        {
+
+            lastFrame_processed = false;
+
+
+            try
+            {
+                if (_capture != null && _capture.Ptr != IntPtr.Zero)
+                {
+
+                    _capture.Retrieve(CurrentFrame, 0); //Получение кадра. Переодический промер FPS
                     FrameBalanced = false;
                     //wb
                     using (CurrentFrame_wb = CurrentFrame.Clone())

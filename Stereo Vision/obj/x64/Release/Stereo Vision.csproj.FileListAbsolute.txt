@@ -89,7 +89,6 @@ E:\Работа Саша\Эндоскопы\MISUMI_Software\Release\vcruntime140
 E:\Работа Саша\Эндоскопы\MISUMI_Software\Release\x64\concrt140.dll
 E:\Работа Саша\Эндоскопы\MISUMI_Software\Release\x64\cvextern.dll
 E:\Работа Саша\Эндоскопы\MISUMI_Software\Release\x64\msvcp140.dll
-E:\Работа Саша\Эндоскопы\MISUMI_Software\Release\x64\opencv_ffmpeg341_64.dll
 E:\Работа Саша\Эндоскопы\MISUMI_Software\Release\x64\vcruntime140.dll
 E:\Работа Саша\Эндоскопы\MISUMI_Software\Release\HDVision.exe.config
 E:\Работа Саша\Эндоскопы\MISUMI_Software\Release\HDVision.exe
@@ -134,3 +133,8 @@ D:\Работа\Программы (мои разработки)\Техниче�
 D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Stereo Vision\obj\x64\Release\Stereo Vision.csprojResolveAssemblyReference.cache
 D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Stereo Vision\obj\x64\Release\Stereo_Vision.OnLoadingForm.resources
 E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\obj\x64\Release\Stereo_Vision.OnLoadingForm.resources
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Release\x64\opencv_videoio_ffmpeg430_64.dll
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Release\x64\msvcp140_1.dll
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Release\x64\msvcp140_2.dll
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Release\x64\msvcp140_codecvt_ids.dll
+E:\Работа Саша\Эндоскопы\MISUMI_Software\Release\x64\vcruntime140_1.dll
