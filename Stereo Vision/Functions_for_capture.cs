@@ -251,7 +251,7 @@ namespace Stereo_Vision
                                 try
                                 {
                                     double CorrectionPower = Convert.ToDouble(L_WB_CorPower.Text);
-                                    WhiteBalance.CorrectionMatrix_Normalize(ref DWB_CorrectionMatrix, NumOfImages_WB_needed, Height_Current, Width_Current);
+                                    WhiteBalance.CorrectionMatrix_AverageFromImages(ref DWB_CorrectionMatrix, NumOfImages_WB_needed, Height_Current, Width_Current);
                                     WhiteBalance.CorrectionMatrix_FromNormilizedMatrix_Fastest(ref DWB_CorrectionMatrix, CorrectionPower, Width_Current, Height_Current);
                                     Mat datamat = new Mat(new System.Drawing.Size(Width_Current, Height_Current), DepthType.Cv8U, 3);
                                     WhiteBalance.Image_InitByValue(ref datamat);

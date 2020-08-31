@@ -20,7 +20,7 @@ namespace Stereo_Vision
         int AttachmentFactor = 10;
         bool FullScrin = false;
         TabPage[] adminPages = null;
-        int LastChargeLevel = 100;
+        int LastChargeLevel_percents = 100;
         Bitmap BMP2set_chargelev = new Bitmap("Resources\\20-0.png");
         public static Bitmap BMP2set_chargelev_100_80 = new Bitmap("Resources\\100-80.png");
         public static Bitmap BMP2set_chargelev_80_60 = new Bitmap("Resources\\80-60.png");
@@ -463,7 +463,7 @@ namespace Stereo_Vision
                         case "LastChargeLevel":
                             {
                                 string toObject = CutFromEdges(AllLines[i]);
-                                LastChargeLevel = Convert.ToInt16(toObject);
+                                LastChargeLevel_percents = Convert.ToInt16(toObject);
                                 break;
                             }
                         case "Brightness":
@@ -589,7 +589,7 @@ namespace Stereo_Vision
         }
         private void Read_and_Load_Default_Settings() //На случай, если что-то пойдет не так
         {
-            LastChargeLevel = 100;
+            LastChargeLevel_percents = 100;
             User_Name = "PNTZ";
             Lenght_secs = 60;                           
             Fps_toWrite = 30;
@@ -688,7 +688,7 @@ namespace Stereo_Vision
                 TB_Ex_PathTo.Text = Export_Photos_to;
             }
 
-            Charge.ToogleCharge_Level(ref BMP2set_chargelev, ref Text2set, LastChargeLevel);
+            Charge.ToogleCharge_Level(ref BMP2set_chargelev, ref Text2set, LastChargeLevel_percents);
             CB_Ex_ChooseExportMode.SelectedIndex = Export_style;
             TB_Ex_Count.Text = Number_of_FilesorHours.ToString();
         }
@@ -725,7 +725,7 @@ namespace Stereo_Vision
                 
                 sw.WriteLine("<Export_style>" + Export_style + "</Export_style>");
                 sw.WriteLine("<Number_of_FilesorHours>" + Number_of_FilesorHours + "</Number_of_FilesorHours>");
-                sw.WriteLine("<LastChargeLevel>" + LastChargeLevel + "</LastChargeLevel>");
+                sw.WriteLine("<LastChargeLevel>" + LastChargeLevel_percents + "</LastChargeLevel>");
 
                 sw.WriteLine("<Brightness>" + Brightness_Value + "</Brightness>");
                 sw.WriteLine("<Contrast>" + Contrast_Value + "</Contrast>");
@@ -881,11 +881,11 @@ namespace Stereo_Vision
                 if (CurVoltage >= 1.0f)
                 {
                     var TimeLeft = Charge.Gained_voltage_2_timeleft(CurVoltage);
-                    LastChargeLevel = Charge.TimeLeft2Percents(TimeLeft);
-                    Charge.ToogleCharge_Level(ref BMP2set_chargelev, ref Text2set, LastChargeLevel);
+                    LastChargeLevel_percents = Charge.TimeLeft2Percents(TimeLeft);
+                    Charge.ToogleCharge_Level(ref BMP2set_chargelev, ref Text2set, LastChargeLevel_percents);
                     Set_ChargeTEXT(Text2set);
                     Set_ChargeBMP(BMP2set_chargelev);
-                    if (LastChargeLevel < 5)
+                    if (LastChargeLevel_percents < 5)
                     {
                         HiberNoAsk = true;
                         System.Threading.Thread.Sleep(2000);
@@ -1218,10 +1218,11 @@ namespace Stereo_Vision
         private void Draw_Frame_NoCamera()
         {
             Mat Image_NoCamera = new Mat(1080, 1920,DepthType.Cv8U,1);
-            Image<Gray, byte> Image_NoCamera2 = new Image<Gray, byte>(1920, 1080);
             
-            CvInvoke.PutText(Image_NoCamera,"No camera detected!", new Point(250,500), FontFace.HersheyDuplex, 4.0, new Bgr(255, 255, 255).MCvScalar);
-            var a = Image_NoCamera.ToImage<Gray, byte>();
+            CvInvoke.PutText(Image_NoCamera,"No camera detected!", new Point(250,550), FontFace.HersheyDuplex, 4.0, new Bgr(255, 255, 255).MCvScalar);
+
+            CvInvoke.Resize(Image_NoCamera, Image_NoCamera, new Size(CV_ImBox_Capture.Width,CV_ImBox_Capture.Height), 0, 0, Inter.Linear);
+
             CV_ImBox_Capture.Image = Image_NoCamera; 
         }
 

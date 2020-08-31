@@ -80,7 +80,7 @@ namespace Stereo_Vision
                     try { p_arduino = new Arduino(); pp_isArdclosed = false; }
                     catch { p_arduino = null; pp_isArdclosed = true; }
                     Check_2CloseThisArd(ref ppWorker, ref p_arduino, ref pp_isArdclosed);
-                    for (int i = 0; i < 1; i++)
+                    for (int i = 0; i < 30; i++)
                     {
                         Check_2CloseThisArd(ref ppWorker, ref p_arduino,ref pp_isArdclosed);
                         // Console.WriteLine("Reading from pin " + 0 + "...");

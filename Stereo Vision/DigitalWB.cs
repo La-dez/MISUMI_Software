@@ -16,6 +16,8 @@ namespace Stereo_Vision
     {
 
         private double percentForBalance = 0.6;
+        const byte BYTE_MAX = (byte)255;
+        const double DOUBLE_BYTE_MAX = 255.0;
 
         [DllImport("Multiply_BMP_DLL.dll")]
         public static extern System.Text.StringBuilder EI_GetName();
@@ -91,10 +93,8 @@ namespace Stereo_Vision
 
         private static byte LimitToByte(double value)
         {
-            if (value < 0) return 0;
-            else if (value > 255)
-                return (byte)255;
-            else return (byte)value;
+            return (byte)value;
+           // return (byte)(((value > 255) ? DOUBLE_BYTE_MAX : value)); //не рассматривается случай с 0, так как этого не бывает
         }
 
         /**
@@ -517,13 +517,22 @@ namespace Stereo_Vision
         }
         public static unsafe void CorrectImage_viaCorrectionMatrix_Color(double[,,] res, ref Mat pframe)
         {
+            System.Diagnostics.Stopwatch STW = new System.Diagnostics.Stopwatch();
             byte* curpos;
-            int IMISS = 0;
-          
+
+            STW.Restart();
             byte[,,] data = pframe.ToImage<Bgr, Byte>().Data;
+            STW.Stop();
+            var aa = STW.Elapsed.TotalMilliseconds;
+
+            STW.Restart();
             int height = pframe.Height;
             int width = pframe.Width;
             int WH = width * height;
+            STW.Stop();
+            var b = STW.Elapsed.TotalMilliseconds;
+
+            STW.Restart();
             try
             {
                 fixed (double* _res = res)
@@ -534,14 +543,14 @@ namespace Stereo_Vision
                         double* _r = _res, _g = _res + WH, _b = _res + 2*WH;
                         for (int i = 0; i < WH; i++)
                         {
-                            *(curpos) = LimitToByte(*(curpos) * (*_b++)); curpos++; IMISS++;
-                            *(curpos) = LimitToByte(*(curpos) * (*_g++)); curpos++; IMISS++;
-                            *(curpos) = LimitToByte(*(curpos) * (*_r++)); curpos++; IMISS++;
+                            *(curpos) = LimitToByte(*(curpos) * (*_b++)); curpos++; 
+                            *(curpos) = LimitToByte(*(curpos) * (*_g++)); curpos++; 
+                            *(curpos) = LimitToByte(*(curpos) * (*_r++)); curpos++; 
                         }                       
                     }
                 }
-                var a = new Image<Bgr, Byte>(data);
-                pframe = a.Mat;
+                var dat = new Image<Bgr, Byte>(data);
+                pframe = dat.Mat;
             }
             catch
             {
@@ -551,6 +560,8 @@ namespace Stereo_Vision
                         *(pData + i) = (byte)(i % width);
                 }
             }
+            STW.Stop();
+            var c = STW.Elapsed.TotalMilliseconds;
         }
         public static  void Save_double_mass_2xml(double[,,] source, string pPath)
         {
@@ -857,7 +868,7 @@ namespace Stereo_Vision
             WhiteBalance.Convert_Mat2DoubleMass(out result, source);
             return result;
         }
-        public static unsafe void CorrectionMatrix_Normalize(ref double[,,] res, int NumOfIMG, int height, int width)
+        public static unsafe void CorrectionMatrix_AverageFromImages(ref double[,,] res, int NumOfIMG, int height, int width)
         {
             int WH = width * height;
             try
@@ -896,6 +907,8 @@ namespace Stereo_Vision
                         for (int w = 0; w < width; w++)
                         {
                             sred = (((*_b) + (*_g) + (*_r)) / 3.0);
+                            sred = TripleMin(*_b, *_g, *_r); //31082020. Сделано, как временное решение для того, чтобы избежать использования 
+                                                             //в сравнении в далее применяемой функции LimitToByte. Сравнение сильно замедляло
                             *_b = RevCPower + CPower * (sred / (*_b + 1));  // Самая упрощенная интерпритация выражения
                             *_g = RevCPower + CPower * (sred / (*_g + 1)); //(sred / (*_b+1)) + (1-(sred / (*_b+1)))*(1-CPower)
                             *_r = RevCPower + CPower * (sred / (*_r + 1));
@@ -924,7 +937,7 @@ namespace Stereo_Vision
             }
             //           double[] b32 = new double[3]; b32[0] = res[0, 0, 0]; b32[1] = res[1, 0, 0]; b32[2] = res[2, 0,0];
         }
-        public static unsafe void CorrectionMatrix_NormalizeByValue(ref double[,,] res, int width, int height,double val)
+        public static unsafe void CorrectionMatrix_NormalizeByValue(ref double[,,] res, int width, int height, double val)
         {
             int WH = width * height;
             double sred = 0.0;
@@ -940,8 +953,8 @@ namespace Stereo_Vision
                         curpos = /*startpix + h * bd.Stride*/_res;
                         for (int w = 0; w < width; w++)
                         {
-                            *_b = (*_b)/ (double)val; 
-                            *_g = (*_g) / (double)val; 
+                            *_b = (*_b) / (double)val;
+                            *_g = (*_g) / (double)val;
                             *_r = (*_r) / (double)val;
 
                             ++_b; ++_g; ++_r;
@@ -951,20 +964,9 @@ namespace Stereo_Vision
             }
             finally
             {
-            }          
+            }
         }
-        /* public static unsafe void ImageEdit_Mono(ref Image<Gray, byte> pframe)
-         {
-             var data = pframe.Data;
-            // pframe.SetRandUniform(new MCvScalar(), new MCvScalar(255));
-              int stride = pframe.MIplImage.widthStep;
-             int H = pframe.Height;
-              fixed (byte* pData = data)
-              {
-                  for (int i = 0; i < H * stride; i+=2) 
-                      *(pData + i) = (byte)(i % stride);
-              }
-         }*/
+
         public static unsafe void CorrectImage_viaCorrectionMatrix(double[,,] res, ref dynamic pframe)
         {
             int width = pframe.Width, height = pframe.Height, WH = width * height;

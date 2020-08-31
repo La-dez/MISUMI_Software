@@ -75,7 +75,7 @@ namespace Stereo_Vision
         }
         private void Form1_Load(object sender, EventArgs e)
         {
-     
+            
 
             List<string> ErrorStack = new List<string>();
             this.Visible = false;
