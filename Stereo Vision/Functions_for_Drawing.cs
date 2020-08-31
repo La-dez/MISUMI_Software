@@ -46,7 +46,7 @@ namespace Stereo_Vision
                     /* Bitmap Current = CurrentFrame.Bitmap.Clone(new Rectangle(0, 0, CurrentFrame.Width, CurrentFrame.Height),
                          System.Drawing.Imaging.PixelFormat.Format24bppRgb);*/
                     //CurrentStereoImage = new StereoImage(CurrentFrame.Bitmap, PB_MeasurementPB.Size, XMLCalib_path);
-                    WhiteBalance.CorrectImage_viaCorrectionMatrix_Color(CMatrix, ref CurrentFrame);
+                    if(!FrameBalanced) WhiteBalance.CorrectImage_viaCorrectionMatrix_Color(DWB_CorrectionMatrix, ref CurrentFrame);
                     CurrentStereoImage = new StereoImage(new Bitmap(CurrentFrame.Bitmap), PB_MeasurementPB.Size, XMLCalib_path,GRPX);
                     
                 }

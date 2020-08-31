@@ -62,7 +62,7 @@ namespace Stereo_Vision
 
         string XMLCalib_path = "M5_chess.xml"; //string cfgFilePath = IsPrism ? "M5_chess.xml" : "M1_chess.xml"
         const string RGBCalib_visual_path = "RGB_calib_matrix.bmp";
-        const string RGBCalib_math_path = "RGB_calib_matrix.bmp";
+        const string RGBCalib_math_path = "RGB_calib_matrix.cm";
         string RGBCalib_path = RGBCalib_visual_path;
 
         string Photo_name_lastcaptured_fullpath = null;
@@ -98,14 +98,16 @@ namespace Stereo_Vision
         bool All_isPrepared_forCapture = false;
         VideoWriter VidWriter = null;
         bool CaptureStoped_byUser = false;
-        System.Diagnostics.Stopwatch STW = new System.Diagnostics.Stopwatch();
+        System.Diagnostics.Stopwatch STW_FPS = new System.Diagnostics.Stopwatch();
         System.Diagnostics.Stopwatch STW_Draw = new System.Diagnostics.Stopwatch();
         System.Diagnostics.Stopwatch STW_Resizing = new System.Diagnostics.Stopwatch();
         System.Diagnostics.Stopwatch STW_2HideLabel = new System.Diagnostics.Stopwatch();
         
         int FramesGotten = 0;
-        float FramesDrawen = 0;
-        bool FrameDrawen = true;
+        float FramesDrawn = 0;
+        bool FrameDrawn = true;
+        bool FrameBalanced = false;
+      
 
         // List<string> Captured_names_Vids = new List<string>(); Вместо этого пишу цифры просто
         // List<string> Captured_names_Photos = new List<string>();
@@ -116,7 +118,7 @@ namespace Stereo_Vision
             try
             {
 
-                _capture = new VideoCapture(/*CaptureType.*/);
+                _capture = new VideoCapture();
              /*  double Aexp = _capture.GetCaptureProperty(CapProp.AutoExposure);
                 _capture.SetCaptureProperty(CapProp.AutoExposure, 0.25);
                 Aexp = _capture.GetCaptureProperty(CapProp.AutoExposure);*/
@@ -128,12 +130,9 @@ namespace Stereo_Vision
                 _capture.SetCaptureProperty(CapProp.Exposure,-7);
                 exposure = _capture.GetCaptureProperty(CapProp.Exposure);*/
                 //Тоже не раотает
-                /*_capture.SetCaptureProperty(CapProp.AutoExposure,  0.25);
+                //_capture.SetCaptureProperty(CapProp.AutoExposure,  0.25);
                 
-                Aexp = Convert.ToBoolean(_capture.GetCaptureProperty(CapProp.AutoExposure));
-                double exp = _capture.GetCaptureProperty(CapProp.Exposure);
-                Timer_Frame.Start();*/
-                // _capture.
+              
                 _capture.ImageGrabbed += ProcessFrame;
             }
             catch (NullReferenceException excpt)
@@ -142,20 +141,13 @@ namespace Stereo_Vision
             }
             CurrentFrame = new Mat();
 
-            int FourCC_MJPG = VideoWriter.Fourcc('M', 'J', 'P', 'G');
+            int FourCC_MJPG = VideoWriter.Fourcc('M', 'J', 'P', 'G'); //с Misumi работает это и 
             int FourCC_MPEG = VideoWriter.Fourcc('M', 'P', 'E', 'G');
-            int FourCC_YUY2 = VideoWriter.Fourcc('Y', 'U', 'Y', '2');
+            int FourCC_YUY2 = VideoWriter.Fourcc('Y', 'U', 'Y', '2'); // это
             int FourCC_MP4 = VideoWriter.Fourcc('M', 'P', '4', 'V');
             int FourCC_LAGS = VideoWriter.Fourcc('L', 'A', 'G', 'S');
             int FourCC_H264 = VideoWriter.Fourcc('H', '2', '6', '4');
             int FCC_2set = FourCC_MJPG;
-            // int FourCC_noc = 0;
-            // int FourCC_noc2 = -466162819;
-            //Current_FourCC = FourCC_MJPG;
-            /* int FourCC_MP4 = VideoWriter.Fourcc('M', 'P', '4', 'V'); 
-             int FourCC_LAGS = VideoWriter.Fourcc('L', 'A', 'G', 'S');
-             int FourCC_H264 = VideoWriter.Fourcc('H', '2', '6', '4');
-             int FourCC_YUY2 = VideoWriter.Fourcc('Y', 'U', 'Y', '2');*/
 
             char[] FourCC_MJPG_str = FourCC_int_2_str(FourCC_MJPG);
 
@@ -170,7 +162,7 @@ namespace Stereo_Vision
             int CurrentWidth = (int)_capture.GetCaptureProperty(CapProp.FrameWidth);
 
 
-            STW.Start();
+            STW_FPS.Start();
             STW_Draw.Start();
 
             // 
@@ -200,112 +192,81 @@ namespace Stereo_Vision
                 {
 
                     _capture.Retrieve(CurrentFrame, 0); //Получение кадра. Переодический промер FPS
-
+                    FrameBalanced = false;
                     //wb
                     using (CurrentFrame_wb = CurrentFrame.Clone())
                     {
-                        if (Camulating_isActive)
+                        if (DWB_Camulating_isActive)
                         {
                             if (NumOfImages_WB_current < NumOfImages_WB_needed)
                             {
-                                WhiteBalance.CorrectionMatrix_AddImage(ref CMatrix, ref CurrentFrame_wb);
+                                WhiteBalance.CorrectionMatrix_AddImage(ref DWB_CorrectionMatrix, ref CurrentFrame_wb);
                                 NumOfImages_WB_current++;
                             }
                             else
                             {
-                                Camulating_isActive = false; DigitalWB_Active = true;
+                                DWB_Camulating_isActive = false; DWB_Active = true;
 
-                                System.Diagnostics.Stopwatch lfa = new System.Diagnostics.Stopwatch();
-                                System.Diagnostics.Stopwatch lfa2 = new System.Diagnostics.Stopwatch();
-                                lfa.Start();
+                                System.Diagnostics.Stopwatch STW_WBMatrixCalculation = new System.Diagnostics.Stopwatch();
+                                STW_WBMatrixCalculation.Start();
                                 try
                                 {
-                                    lfa2.Reset(); lfa2.Start();
                                     double CorrectionPower = Convert.ToDouble(L_WB_CorPower.Text);
-                                    WhiteBalance.CorrectionMatrix_Normalize(ref CMatrix, NumOfImages_WB_needed, Height_Current, Width_Current);
-                                    WhiteBalance.CorrectionMatrix_FromNormilizedMatrix_Fastest(ref CMatrix, CorrectionPower, Width_Current, Height_Current);
+                                    WhiteBalance.CorrectionMatrix_Normalize(ref DWB_CorrectionMatrix, NumOfImages_WB_needed, Height_Current, Width_Current);
+                                    WhiteBalance.CorrectionMatrix_FromNormilizedMatrix_Fastest(ref DWB_CorrectionMatrix, CorrectionPower, Width_Current, Height_Current);
                                     Mat datamat = new Mat(new System.Drawing.Size(Width_Current, Height_Current), DepthType.Cv8U, 3);
                                     WhiteBalance.Image_InitByValue(ref datamat);
-                                    WhiteBalance.CorrectImage_viaCorrectionMatrix_Color(CMatrix, ref datamat);
+                                    WhiteBalance.CorrectImage_viaCorrectionMatrix_Color(DWB_CorrectionMatrix, ref datamat);
                                     datamat.Save(RGBCalib_visual_path);
-
-                                    //new
-                                    /*     WhiteBalance.Save_double_mass_2xml(CMatrix, "shit.xml");
-                                         Mat datamat2 = new Mat(new System.Drawing.Size(Width_Current, Height_Current), DepthType.Cv64F, 3);
-                                         WhiteBalance.Convert_DoubleMass2Mat(CMatrix, ref datamat2);
-                                         double[,,] test_mass = null;
-                                        // WhiteBalance.Convert_Mat2DoubleMass(out test_mass, datamat2);                            
-
-
-
-                                         //datamat2 saving
-                                         Matrix<Double> datamat3 = new Matrix<Double>(Width_Current, Height_Current, 3);
-                                         datamat2.CopyTo(datamat3);
-
-                                         System.Xml.Linq.XDocument alpha = Emgu.Util.Toolbox.XmlSerialize<Matrix<Double>>(datamat3);
-                                         alpha.Save("shit.xml");                               
-
-                                         System.Xml.XmlDocument xDoc_rd = new System.Xml.XmlDocument();
-                                         FileStream fs = new FileStream("shit.xml", FileMode.Open, FileAccess.Read);
-                                         xDoc_rd.Load(fs);
-
-                                         Matrix<Double> matrix = (Matrix<Double>)
-                                             (new System.Xml.Serialization.XmlSerializer(typeof(Matrix<Double>))).Deserialize(new System.Xml.XmlNodeReader(xDoc_rd));
-                                         matrix.Mat.CopyTo(datamat2);
-                                         WhiteBalance.Convert_Mat2DoubleMass(out test_mass, datamat2);*/
-
-
-
-                                    //  Emgu.CV.FileStorage
-                                    //datamat
-                                    // Mat data = new Mat(,)
-
-                                    // CMatrix = WhiteBalance.CorrectionMatrix_FromWhiteImage_Fastest(NewCalibrationBMP, CorrectionPower);
-                                    lfa2.Stop();
-                                    LogMessage("Вычисление коррекционной матрицы Методом Указателей завершено. Прошло времени: " + (lfa2.ElapsedMilliseconds / 1000.0).ToString());
+                                    WhiteBalance.Save_Correction_Matrix(RGBCalib_math_path,DWB_CorrectionMatrix);
+                                   // var f = WhiteBalance.Test_convertion_3dm_2_1dm();
+                                    //var f2 = WhiteBalance.Test_RW_ofCorrMatrix();                                   
                                 }
                                 catch (Exception exc) { LogError(exc.Message); }
-                                lfa.Stop();
-                                LogMessage("Файлы обработаны. Прошло времени: " + (lfa.ElapsedMilliseconds / 1000.0).ToString());
+                                STW_WBMatrixCalculation.Stop();
+                                LogMessage("Вычисление коррекционной матрицы Методом Указателей завершено. Прошло времени: " + (STW_WBMatrixCalculation.ElapsedMilliseconds / 1000.0).ToString());
                             }
                         }
                         else
                         {
 
-                            WhiteBalance.CorrectImage_viaCorrectionMatrix_Color(CMatrix, ref CurrentFrame_wb);
+                            WhiteBalance.CorrectImage_viaCorrectionMatrix_Color(DWB_CorrectionMatrix, ref CurrentFrame_wb);
                             CurrentFrame = CurrentFrame_wb.Clone();
+                            FrameBalanced = true;
                         }
                     }
 
 
                     FramesGotten++;
-                    if ((STW.Elapsed.Seconds > 5) && (STW.Elapsed.Seconds % 10 == 0))
-                    {
-
-                        LogMessage("Current exp is: " + exposure.ToString());
-                        LogMessage("Скорость получения кадров: " + ((float)FramesGotten / STW.Elapsed.TotalSeconds).ToString());
-                        FramesGotten = 0;
-                        STW.Restart();
-                    }
-
-                    FrameDrawen = false; //отрисовка кадра. Переодический промер скорости отрисовки
-                    CvInvoke.Resize(CurrentFrame, resizedim, Size_for_Resizing, 0, 0, Inter.Linear);
+                    
+                    FrameDrawn = false; 
+                    //ресайз кадра
                     STW_Resizing.Start();
-                    if ((STW_Draw.Elapsed.Seconds > 5) && (STW_Draw.Elapsed.Seconds % 10 == 0))
+                    CvInvoke.Resize(CurrentFrame, resizedim, Size_for_Resizing, 0, 0, Inter.Linear);
+                    STW_Resizing.Stop();
+
+                    //Переодический замер скорости отрисовки и физического FPS
+                    if ((STW_FPS.Elapsed.Seconds > 5) && (STW_FPS.Elapsed.Seconds % 10 == 0)) //случается примерно раз в 10 секунд
                     {
-                        LogMessage("Время перерисовки кадра: " + (STW_Resizing.Elapsed.TotalSeconds / FramesDrawen).ToString());
-                        LogMessage("Скорость отрисовки кадров: " + (FramesDrawen / STW_Draw.Elapsed.TotalSeconds).ToString());
-                        FramesDrawen = 0;
-                        STW_Draw.Restart();
+                        LogMessage("Скорость получения кадров: " + ((float)FramesGotten / STW_FPS.Elapsed.TotalSeconds).ToString());
+                        LogMessage("Время изменения размера кадра: " + (STW_Resizing.Elapsed.TotalSeconds / FramesDrawn).ToString());
+                        LogMessage("Скорость отрисовки кадров: " + (FramesDrawn / STW_Draw.Elapsed.TotalSeconds).ToString());
+                        FramesGotten = 0;
+                        FramesDrawn = 0;
+                        STW_Draw.Reset();
                         STW_Resizing.Reset();
+                        STW_FPS.Restart();
                     }
 
                     //  Refresh_image_Invoke(resizedim);
+                    // отрисовка кадра
+                    STW_Draw.Start();
                     CV_ImBox_Capture.Image = resizedim;
+                    STW_Draw.Stop();
+                    
                     // CV_ImBox_Capture.Image = CurrentFrame;
-                    FramesDrawen++;
-                    STW_Resizing.Stop();
-                    FrameDrawen = true;
+                    FramesDrawn++;
+                    FrameDrawn = true;
 
                     if (isRecording)
                     {
@@ -607,7 +568,7 @@ namespace Stereo_Vision
             Width_Current = (int)_capture.GetCaptureProperty(CapProp.FrameWidth);
             Height_Current = (int)_capture.GetCaptureProperty(CapProp.FrameHeight);
 
-            WhiteBalance.InitializeMatrix(1, ref CMatrix, Width_Current, Height_Current, 3);
+            WhiteBalance.InitializeMatrix(1, ref DWB_CorrectionMatrix, Width_Current, Height_Current, 3);
         }
         private void Adjust_Brightness()
         {

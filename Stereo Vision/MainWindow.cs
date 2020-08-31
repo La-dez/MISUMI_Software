@@ -36,9 +36,9 @@ namespace Stereo_Vision
         int NumOfImages_WB_max= 10;
         int NumOfImages_WB_min = 0;
 
-        bool Camulating_isActive = false;
-        bool DigitalWB_Active = false;
-        double[,,] CMatrix = null;
+        bool DWB_Camulating_isActive = false;
+        bool DWB_Active = false;
+        double[,,] DWB_CorrectionMatrix = null;
         int Width_Current = 1280;
         int Height_Current = 720;
 
@@ -68,6 +68,10 @@ namespace Stereo_Vision
         public void SetReporter(Action<int,string> pReporter)
         {
             ReportProgress = pReporter;
+        }
+        public string Get_Version()
+        {
+            return MEOW_CurrentVerion;
         }
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -103,7 +107,7 @@ namespace Stereo_Vision
                 ReportProgress(55, "Подготовка интерфейса...");// System.Threading.Thread.Sleep(1000);
                 try { ChargeLevel_preparence(); }                         catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 14"); }
                 ReportProgress(60, "Загрузка цветокоррекционной матрицы..."); //System.Threading.Thread.Sleep(1000);
-                try { Load_Correction_Matrix(ref CMatrix); }              catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 14"); }
+                try { Load_Correction_Matrix(ref DWB_CorrectionMatrix); }              catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 14"); }
                 ReportProgress(65, "Запуск камеры...");// System.Threading.Thread.Sleep(1000);
                 try { StartCapture(); }                                   catch (Exception exc) { ErrorStack.Add("Ошибка на этапе инициализации 15"); }
                 ReportProgress(70, "Запуск камеры...");// System.Threading.Thread.Sleep(1000);
@@ -135,13 +139,13 @@ namespace Stereo_Vision
         {
             try
             {
-                pMat = WhiteBalance.CorrectionMatrix_fromImage(RGBCalib_visual_path);
-               // pMat = WhiteBalance.CorrectionMatrix_fromMatFile(RGBCalib_path);
-                DigitalWB_Active = true;
+               // pMat = WhiteBalance.CorrectionMatrix_fromImage(RGBCalib_visual_path);
+                WhiteBalance.Read_Correction_Matrix(RGBCalib_math_path, out pMat);
+                DWB_Active = true;
             }
             catch
             {
-                DigitalWB_Active = false;
+                DWB_Active = false;
             }
         }
         
@@ -471,11 +475,11 @@ namespace Stereo_Vision
             //  Refresh_image_Invoke(CurrentFrame);
             // CV_ImBox_Capture.Image = CurrentFrame;
             FramesGotten++;
-            if ((STW.Elapsed.Seconds > 5) && (STW.Elapsed.Seconds % 10 == 0))
+            if ((STW_FPS.Elapsed.Seconds > 5) && (STW_FPS.Elapsed.Seconds % 10 == 0))
             {
-                LogMessage(((float)FramesGotten / STW.Elapsed.TotalSeconds).ToString());
+                LogMessage(((float)FramesGotten / STW_FPS.Elapsed.TotalSeconds).ToString());
                 FramesGotten = 0;
-                STW.Restart();
+                STW_FPS.Restart();
             }
             lastFrame_processed = true;
         }
@@ -1011,16 +1015,16 @@ namespace Stereo_Vision
 
         private void B_WB_Calculate_Click(object sender, EventArgs e)
         {
-            if (!DigitalWB_Active)
+            if (!DWB_Active)
             {
-                WhiteBalance.InitializeMatrix(1, ref CMatrix, 3, Height_Current, Width_Current);//CMatrix
-                NumOfImages_WB_current = 0; Camulating_isActive = (NumOfImages_WB_needed == 0) ? false:true;
+                WhiteBalance.InitializeMatrix(1, ref DWB_CorrectionMatrix, 3, Height_Current, Width_Current);//CMatrix
+                NumOfImages_WB_current = 0; DWB_Camulating_isActive = (NumOfImages_WB_needed == 0) ? false:true;
             }
             else
             {
-                WhiteBalance.InitializeMatrix(1, ref CMatrix, 3, Height_Current, Width_Current);
+                WhiteBalance.InitializeMatrix(1, ref DWB_CorrectionMatrix, 3, Height_Current, Width_Current);
                 NumOfImages_WB_current = 0;
-                Camulating_isActive = (NumOfImages_WB_needed == 0) ? false : true;
+                DWB_Camulating_isActive = (NumOfImages_WB_needed == 0) ? false : true;
             }
         }
 

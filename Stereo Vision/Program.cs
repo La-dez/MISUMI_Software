@@ -21,7 +21,7 @@ namespace Stereo_Vision
 
             //Creating of forms
             MainForm = new MainWindow();
-            SplashScreen = new OnLoadingForm("2.71");
+            SplashScreen = new OnLoadingForm((MainForm as MainWindow).Get_Version());
 
             //Show Splash Form
             var splashThread = new Thread(new ThreadStart(

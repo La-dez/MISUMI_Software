@@ -3,7 +3,8 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
-
+using System.Linq;
+using System.Collections.Generic;
 using Emgu.CV;
 using Emgu.CV.Structure;
 using Emgu.Util;
@@ -234,6 +235,138 @@ namespace Stereo_Vision
                 }
             }
         }
+        public static T[] Convert_mass_to_linear<T>(T[,,] mass)
+        {
+            Int64 l1 = mass.GetLength(0);
+            Int64 l2 = mass.GetLength(1);
+            Int64 l3 = mass.GetLength(2);
+
+            T[] result = new T[l1*l2*l3];
+            T[,] data = new T[l1*l3,l2];
+
+            //3 dimensional -> 2 dimensional
+            for(int i =0;i<l1;i++)
+            {
+                for(int j=0;j<l2;j++)
+                {
+                    for (int k = 0; k < l3; k++)
+                        data[i + k * l1, j] = mass[i, j, k];
+                }
+            }
+            //2 dimensional - > 1 dimensional
+            Buffer.BlockCopy(data, 0, result, 0, data.Length* sizeof(double)); //[4,3] => [1,12] = [12]
+
+            return result;
+        }
+        public static T[,,] Convert_mass_to_3DM<T>(T[] linear,Int64 l1,Int64 l2, Int64 l3)
+        {
+            T[,,] result = new T[l1,l2,l3];
+            T[,] data = new T[l1 * l3, l2];
+
+            //1 dimensional - > 2 dimensional
+            for (int i = 0; i < l1*l3; i++)
+            {
+                for (int j = 0; j < l2; j++)
+                {
+                    data[i, j] = linear[i*l2 + j];
+                }
+            }
+
+            //2 dimensional -> 3 dimensional
+            for (int i = 0; i < l1; i++)
+            {
+                for (int j = 0; j < l2; j++)
+                {
+                    for (int k = 0; k < l3; k++)
+                        result[i, j, k] = data[i + k * l1, j];
+                }
+            }
+            return result;
+        }
+        public static void Save_Correction_Matrix(string FilePath, double[,,] array)
+        {
+            //запоминаем размерности
+            Int64 l1 = array.GetLength(0);
+            Int64 l2 = array.GetLength(1);
+            Int64 l3 = array.GetLength(2);
+            //конвертим в линейный
+            var linear = Convert_mass_to_linear(array);
+            //дописываем размерности в конце и конвертим в массив double 
+            List<double> DoubleList = linear.ToList();
+            DoubleList.Add(l1);
+            DoubleList.Add(l2);
+            DoubleList.Add(l3);           
+            List<string> finalList = new List<string>();
+            foreach (double element in DoubleList)
+            {
+                finalList.Add(element.ToString());
+            }
+            //пишем
+            LDZ_code.MiniHelp.Files.Write_txt(FilePath, finalList);
+        }
+        public static void Read_Correction_Matrix(string FilePath,out double[,,] array)
+        {
+            //читаем
+            var ListfromDisk = LDZ_code.MiniHelp.Files.Read_txt(FilePath);
+            List<double> LinearList = new List<double>();
+            //читаем лист с диска, конвертируя в double
+            double data = 0;
+            foreach (string element in ListfromDisk)
+            {               
+                double.TryParse((element.Replace(',', '.')), System.Globalization.NumberStyles.Number, System.Globalization.CultureInfo.InvariantCulture, out data);
+                LinearList.Add(data);
+            }
+            //запоминаем размерности и удаляем ненужные данные
+            Int64 l1 = Convert.ToInt64(LinearList[LinearList.Count - 3]);
+            Int64 l2 = Convert.ToInt64(LinearList[LinearList.Count - 2]);
+            Int64 l3 = Convert.ToInt64(LinearList[LinearList.Count - 1]);
+            LinearList.RemoveRange(LinearList.Count - 3, 3);
+            //конвертим в массив нужной размерности
+            array = Convert_mass_to_3DM(LinearList.ToArray(), l1, l2, l3);
+        }
+        public static bool Test_RW_ofCorrMatrix()
+        {
+            double[,,] data_test = new double[4, 2, 3]
+                                   {
+                                        {  {1,2,3 },  {4,5,6 } },
+                                        {  {7,8,9 },  {10,11,12 } },
+                                        {  {13,14,15 },  {16,17,18 } },
+                                        {  {19,20,21 },  {22,23,24 } }
+                                   };
+            Save_Correction_Matrix("CorMatrix.cm",data_test);
+
+            double[,,] resultmass;
+            Read_Correction_Matrix("CorMatrix.cm",out resultmass);
+            return (CompareMassives(data_test, resultmass) == "true");
+
+
+        }
+        public static bool Test_convertion_3dm_2_1dm()
+        {
+            bool testpassed = true;
+            double[,,] data_test = new double[4, 2, 3]
+                                   {
+                                        {  {1,2,3 },  {4,5,6 } },
+                                        {  {7,8,9 },  {10,11,12 } },
+                                        {  {13,14,15 },  {16,17,18 } },
+                                        {  {19,20,21 },  {22,23,24 } }
+                                   };
+
+
+            var a = WhiteBalance.Convert_mass_to_linear<double>(data_test);
+            var b = WhiteBalance.Convert_mass_to_3DM<double>(a, 4, 2, 3);
+
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < 2; j++)
+                {
+                    for (int k = 0; k < 3; k++)
+                        testpassed = testpassed && (data_test[i, j, k] == b[i, j, k]);
+                }
+            }
+            return testpassed;
+        }
+
         public static string CompareMassives(Bitmap bmp, double[,,] m1, double[,,] m2)
         {
             string res = "true";
@@ -247,13 +380,28 @@ namespace Stereo_Vision
                     }
             return res;
         }
-        public static string CompareMassives_special(Bitmap bmp, double[,,] m1, double[,,] m2)
+        public static string CompareMassives(double[,,] m1, double[,,] m2)
         {
             string res = "true";
-            int width = bmp.Width, height = bmp.Height;
-            for (int i = 0; i < width; i++)
-                for (int j = 0; j < height; j++)
-                    for (int k = 0; k < 3; k++)
+            int d3 = m1.GetLength(2);
+            int d1 = m1.GetLength(0), d2 = m1.GetLength(1);
+            for (int i = 0; i < d1; i++)
+                for (int j = 0; j < d2; j++)
+                    for (int k = 0; k < d3; k++)
+                    {
+                        if (m1[i, j, k] != m2[i, j, k])
+                        { res = string.Format("false. Index:{0},{1},{2}", i, j, k); return res; }
+                    }
+            return res;
+        }
+        public static string CompareMassives_special(double[,,] m1, double[,,] m2)
+        {
+            string res = "true";
+            int d3 = m1.GetLength(2);
+            int d1 = m1.GetLength(0), d2 = m1.GetLength(1);
+            for (int i = 0; i < d1; i++)
+                for (int j = 0; j < d2; j++)
+                    for (int k = 0; k < d3; k++)
                     {
                         if (m1[i, j, k] != m2[k, j, i])
                         { res = string.Format("false. Index:{0},{1},{2}", i, j, k); return res; }
@@ -638,7 +786,7 @@ namespace Stereo_Vision
             byte* curpos;
             byte[,,] data = pframe.ToImage<Bgr, Byte>().Data;
             int height = pframe.Height;
-            int width =/* pframe.MIplImage.widthStep;*/ pframe.Width;
+            int width =  pframe.Width;
             int WH = width * height;
             try
             {
