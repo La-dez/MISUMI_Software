@@ -4,7 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
-using Emgu.CV.UI;
+using Emgu.CV;
+
 
 namespace Stereo_Vision
 {
@@ -48,7 +49,7 @@ namespace Stereo_Vision
                          System.Drawing.Imaging.PixelFormat.Format24bppRgb);*/
                     //CurrentStereoImage = new StereoImage(CurrentFrame.Bitmap, PB_MeasurementPB.Size, XMLCalib_path);
                     if(!FrameBalanced) WhiteBalance.CorrectImage_viaCorrectionMatrix_Color(DWB_CorrectionMatrix, ref CurrentFrame);
-                   // CurrentStereoImage = new StereoImage(new Bitmap(CurrentFrame.ToImage<Emgu.CV.Structure.Bgr, byte>().), PB_MeasurementPB.Size, XMLCalib_path,GRPX);
+                    CurrentStereoImage = new StereoImage(new Bitmap(CurrentFrame.ToImage<Emgu.CV.Structure.Bgr, byte>().AsBitmap()), PB_MeasurementPB.Size, XMLCalib_path,GRPX);
                     
                 }
                 catch { }
