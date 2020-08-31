@@ -9,7 +9,6 @@ using OpenTK.Graphics.OpenGL;
 using System.Drawing;
 using System.Windows.Forms;
 using CameraMath.Wrapper;
-using OpenTK_3DMesh;
 
 
 namespace Stereo_Vision

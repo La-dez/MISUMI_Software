@@ -180,7 +180,7 @@ namespace Stereo_Vision
 
 
         }
-        private void ProcessFrame(object sender, EventArgs arg) //Все, что происходит при получении кадра
+        private void ProcessFrame2(object sender, EventArgs arg) //Все, что происходит при получении кадра
         {
 
             lastFrame_processed = false;
@@ -218,7 +218,7 @@ namespace Stereo_Vision
             lastFrame_processed = true;
         }
 
-        private void ProcessFrame2(object sender, EventArgs arg) //Все, что происходит при получении кадра
+        private void ProcessFrame(object sender, EventArgs arg) //Все, что происходит при получении кадра
         {
 
             lastFrame_processed = false;
@@ -232,6 +232,7 @@ namespace Stereo_Vision
                     _capture.Retrieve(CurrentFrame, 0); //Получение кадра. Переодический промер FPS
                     FrameBalanced = false;
                     //wb
+                    //Зарезает частоту с 29FPS до 17FPS
                     using (CurrentFrame_wb = CurrentFrame.Clone())
                     {
                         if (DWB_Camulating_isActive)
