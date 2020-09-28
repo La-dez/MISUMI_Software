@@ -1,9 +1,10 @@
 ﻿using System;
-//using OSGeo.GDAL;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 using Emgu.CV;
 using Emgu.CV.Structure;
@@ -552,21 +553,29 @@ namespace Stereo_Vision
                         double* _r = _res, _g = _res + WH, _b = _res + 2*WH;
                         for (int i = 0; i < WH; i++)
                         {
-                           /* *(_pdval) = *(curpos) * (*_b++); *(curpos) = (byte)((*(_pdval)> *_DBM) ? *_DBM : *(_pdval)); curpos++; //fastest
-                            *(_pdval) = *(curpos) * (*_g++); *(curpos) = (byte)((*(_pdval) > *_DBM) ? *_DBM : *(_pdval)); curpos++;
-                            *(_pdval) = *(curpos) * (*_r++); *(curpos) = (byte)((*(_pdval) > *_DBM) ? *_DBM : *(_pdval)); curpos++;*/
+                            //*(_pdval) = *(curpos) * (*_b++); *(curpos) = (byte)((*(_pdval)> *_DBM) ? *_DBM : *(_pdval)); curpos++; //fastest
+                            //*(_pdval) = *(curpos) * (*_g++); *(curpos) = (byte)((*(_pdval) > *_DBM) ? *_DBM : *(_pdval)); curpos++;
+                            //*(_pdval) = *(curpos) * (*_r++); *(curpos) = (byte)((*(_pdval) > *_DBM) ? *_DBM : *(_pdval)); curpos++;
 
-                            *(curpos) = LimitToByte(*(curpos) * (*_b++)); curpos++;
-                            *(curpos) = LimitToByte(*(curpos) * (*_g++)); curpos++;
-                            *(curpos) = LimitToByte(*(curpos) * (*_r++)); curpos++;
+                            *(curpos) = LimitToByte(*(curpos) * (*_b)); ++_b; ++curpos;
+                            *(curpos) = LimitToByte(*(curpos) * (*_g)); ++_g; ++curpos;
+                            *(curpos) = LimitToByte(*(curpos) * (*_r)); ++_r; ++curpos;                          
+                        }
 
-                            /* *(_pdval) = *(curpos) * (*_b++); *(curpos) = LimitToByte(_pdval); curpos++;
-                             *(_pdval) = *(curpos) * (*_g++); *(curpos) = LimitToByte(_pdval); curpos++;
-                             *(_pdval) = *(curpos) * (*_r++); *(curpos) = LimitToByte(_pdval); curpos++;*/
-                            //(byte)(((value > 255) ? DOUBLE_BYTE_MAX : value))
-
-
-                        }                       
+                      /*  for (int i = 0; i < WH; i++)
+                        {
+                            *(curpos) = LimitToByte(*(curpos) * (*_b++)); curpos+=3;
+                        }
+                        curpos = pData+1;
+                        for (int i = 0; i < WH; i++)
+                        {
+                            *(curpos) = LimitToByte(*(curpos) * (*_g++)); curpos+=3;
+                        }
+                        curpos = pData + 2;
+                        for (int i = 0; i < WH; i++)
+                        {
+                            *(curpos) = LimitToByte(*(curpos) * (*_r++)); curpos+=3;
+                        }*/
                     }
                 }
                 var dat = new Image<Bgr, Byte>(data);
@@ -583,6 +592,88 @@ namespace Stereo_Vision
            // STW.Stop();
            // var c = STW.Elapsed.TotalMilliseconds;
         }
+
+        public static unsafe void CorrectImage_viaCorrectionMatrix_Color_p(double[,,] res, ref Mat pframe)
+        {
+            byte* data = (byte*)pframe.DataPointer;
+          //  try
+          //  {
+                fixed (double* _res = res)
+                {
+                    //fixed (byte* pData = data)
+                    {
+                        //  byte* nf_pData = pData;
+                        double* nf_pRes = _res;
+                        Parallel.For(0, 3, (j_par) =>
+                        {                          
+                            byte* _curpos_loc = data + j_par; ;
+                            double* _color_loc = nf_pRes + MainWindow.WH_global * (2 - j_par);
+                            for (int i = 0; i != MainWindow.WH_global; ++i)
+                            {
+                                // *(_curpos_loc) = LimitToByte(*(_curpos_loc) * (*_color_loc)); ++_color_loc; _curpos_loc += 3;
+                                *(_curpos_loc) = (byte)(*(_curpos_loc) * (*_color_loc)); ++_color_loc; _curpos_loc += 3;
+                                //*(curpos) = (byte)((*(_pdval) > *_DBM) ? *_DBM : *(_pdval));
+                            }                          
+                        }
+                        );
+
+                    
+                    }
+                }
+                //pframe = (new Image<Bgr, Byte>(MainWindow.Width_Current, MainWindow.Height_Current, 3 * MainWindow.Width_Current, (IntPtr)data)).Mat;
+          //  }
+          //  catch
+          //  {
+             /*   fixed (byte* pData = data)
+                {
+                    for (int i = 0; i < 255 * width; i += 4)
+                        *(pData + i) = (byte)(i % width);
+                }*/
+           // }
+        }
+
+        public static unsafe void CorrectImage_viaCorrectionMatrix_Color_p_bckp(double[,,] res, ref Mat pframe)
+        {
+            byte[,,] data = pframe.ToImage<Bgr, Byte>().Data;
+            int height = pframe.Height;
+            int width = pframe.Width;
+            int WH = width * height;
+            try
+            {
+                fixed (double* _res = res)
+                {
+                    fixed (byte* pData = data)
+                    {
+                        byte* nf_pData = pData;
+                        double* nf_pRes = _res;
+                        Parallel.For(0, 3, (j_par) =>
+                        {
+                            byte* _curpos_loc = nf_pData + j_par; ;
+                            double* _color_loc = nf_pRes + WH * (2 - j_par);
+                            for (int i = 0; i != WH; ++i)
+                            {
+                                // *(_curpos_loc) = LimitToByte(*(_curpos_loc) * (*_color_loc)); ++_color_loc; _curpos_loc += 3;
+                                *(_curpos_loc) = (byte)(*(_curpos_loc) * (*_color_loc)); ++_color_loc; _curpos_loc += 3;
+                                //*(curpos) = (byte)((*(_pdval) > *_DBM) ? *_DBM : *(_pdval));
+                            }
+                        }
+                        );
+
+                    }
+                }
+                var dat = new Image<Bgr, Byte>(data);
+                pframe = dat.Mat;
+            }
+            catch
+            {
+                   fixed (byte* pData = data)
+                   {
+                       for (int i = 0; i < 255 * width; i += 4)
+                           *(pData + i) = (byte)(i % width);
+                   }
+            }
+        }
+
         public static  void Save_double_mass_2xml(double[,,] source, string pPath)
         {
             int Width_Current = source.GetLength(2);

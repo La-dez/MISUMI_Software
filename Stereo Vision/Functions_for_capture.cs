@@ -256,7 +256,7 @@ namespace Stereo_Vision
                                     WhiteBalance.CorrectionMatrix_FromNormilizedMatrix_Fastest(ref DWB_CorrectionMatrix, CorrectionPower, Width_Current, Height_Current);
                                     Mat datamat = new Mat(new System.Drawing.Size(Width_Current, Height_Current), DepthType.Cv8U, 3);
                                     WhiteBalance.Image_InitByValue(ref datamat);
-                                    WhiteBalance.CorrectImage_viaCorrectionMatrix_Color(DWB_CorrectionMatrix, ref datamat);
+                                    WhiteBalance.CorrectImage_viaCorrectionMatrix_Color_p(DWB_CorrectionMatrix, ref datamat);
                                     datamat.Save(RGBCalib_visual_path);
                                     WhiteBalance.Save_Correction_Matrix(RGBCalib_math_path,DWB_CorrectionMatrix);
                                    // var f = WhiteBalance.Test_convertion_3dm_2_1dm();
@@ -269,7 +269,7 @@ namespace Stereo_Vision
                         } //если сбор кадров для балансирования активен
                         else //иначе
                         {
-                            WhiteBalance.CorrectImage_viaCorrectionMatrix_Color(DWB_CorrectionMatrix, ref CurrentFrame_wb);
+                            WhiteBalance.CorrectImage_viaCorrectionMatrix_Color_p(DWB_CorrectionMatrix, ref CurrentFrame_wb);
                             CurrentFrame = CurrentFrame_wb.Clone();
                             FrameBalanced = true;
                         }

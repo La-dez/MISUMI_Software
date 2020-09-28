@@ -167,6 +167,7 @@
     <Compile Include="OnLoadingForm.Designer.cs">
       <DependentUpon>OnLoadingForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="ParallelDataUnit.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Export_files_form.resx">

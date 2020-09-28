@@ -39,8 +39,9 @@ namespace Stereo_Vision
         bool DWB_Camulating_isActive = false;
         bool DWB_Active = false;
         double[,,] DWB_CorrectionMatrix = null;
-        int Width_Current = 1280;
-        int Height_Current = 720;
+        public static int Width_Current = 1280;
+        public static int Height_Current = 720;
+        public static int WH_global = 1280 * 720;
 
         int MS_in_cameraChecker = 0;
 
@@ -1021,13 +1022,18 @@ namespace Stereo_Vision
             if (!DWB_Active)
             {
                 WhiteBalance.InitializeMatrix(1, ref DWB_CorrectionMatrix, 3, Height_Current, Width_Current);//CMatrix
-                NumOfImages_WB_current = 0; DWB_Camulating_isActive = (NumOfImages_WB_needed == 0) ? false:true;
+                NumOfImages_WB_current = 0;
+                DWB_Camulating_isActive = (NumOfImages_WB_needed == 0) ? false:true;
             }
             else
             {
                 WhiteBalance.InitializeMatrix(1, ref DWB_CorrectionMatrix, 3, Height_Current, Width_Current);
                 NumOfImages_WB_current = 0;
                 DWB_Camulating_isActive = (NumOfImages_WB_needed == 0) ? false : true;
+            }
+            if(NumOfImages_WB_needed == 0) //обычно сохранение происходит после накопления изображений и вычисления матрицы. Поскольку кол-во изобр.=0, сохр.тут
+            {
+                WhiteBalance.Save_Correction_Matrix(RGBCalib_math_path, DWB_CorrectionMatrix);
             }
         }
 
