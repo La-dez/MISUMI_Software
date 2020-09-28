@@ -112,7 +112,7 @@ namespace Stereo_Vision
         // List<string> Captured_names_Vids = new List<string>(); Вместо этого пишу цифры просто
         // List<string> Captured_names_Photos = new List<string>();
 
-        private void PrepareTheCamera()
+        private void PrepareTheCamera(ref string StrErr)
         {
             CvInvoke.UseOpenCL = false;
             try
@@ -142,11 +142,11 @@ namespace Stereo_Vision
             CurrentFrame = new Mat();
 
             int FourCC_MJPG = VideoWriter.Fourcc('M', 'J', 'P', 'G'); //с Misumi работает это и 
-            int FourCC_MPEG = VideoWriter.Fourcc('M', 'P', 'E', 'G');
+           // int FourCC_MPEG = VideoWriter.Fourcc('M', 'P', 'E', 'G');
             int FourCC_YUY2 = VideoWriter.Fourcc('Y', 'U', 'Y', '2'); // это
-            int FourCC_MP4 = VideoWriter.Fourcc('M', 'P', '4', 'V');
-            int FourCC_LAGS = VideoWriter.Fourcc('L', 'A', 'G', 'S');
-            int FourCC_H264 = VideoWriter.Fourcc('H', '2', '6', '4');
+            //int FourCC_MP4 = VideoWriter.Fourcc('M', 'P', '4', 'V');
+            //int FourCC_LAGS = VideoWriter.Fourcc('L', 'A', 'G', 'S');
+           // int FourCC_H264 = VideoWriter.Fourcc('H', '2', '6', '4');
             int FCC_2set = FourCC_MJPG;
 
             char[] FourCC_MJPG_str = FourCC_int_2_str(FourCC_MJPG);
@@ -157,18 +157,22 @@ namespace Stereo_Vision
             _capture.SetCaptureProperty(CapProp.FourCC, FCC_2set);
             _capture.SetCaptureProperty(CapProp.FrameWidth, 1280);
             _capture.SetCaptureProperty(CapProp.FrameHeight, 720);
-            FourCC_Current = (int)_capture.GetCaptureProperty(CapProp.FourCC);
-            FourCC_Current_str = FourCC_int_2_str(FourCC_Current);
-            int CurrentWidth = (int)_capture.GetCaptureProperty(CapProp.FrameWidth);
+          /*  FourCC_Current = (int)_capture.GetCaptureProperty(CapProp.FourCC);
+            FourCC_Current_str = FourCC_int_2_str(FourCC_Current);         
+            int CurrentWidth = (int)_capture.GetCaptureProperty(CapProp.FrameWidth);*/
 
 
             STW_FPS.Start();
             STW_Draw.Start();
 
             // 
-            /*FourCC_Current = (int)_capture.GetCaptureProperty(CapProp.FourCC);
+      /*      FourCC_Current = (int)_capture.GetCaptureProperty(CapProp.FourCC);
             FourCC_Current_str = FourCC_int_2_str(FourCC_Current);
-            int CurFps = (int)_capture.GetCaptureProperty(CapProp.Fps);*/
+            StrErr = new string(FourCC_Current_str);*/
+
+           
+
+            // int CurFps = (int)_capture.GetCaptureProperty(CapProp.Fps);*/
 
 
             /*   _capture.SetCaptureProperty(CapProp.FourCC, FourCC_YUY2);
@@ -193,11 +197,9 @@ namespace Stereo_Vision
 
                     _capture.Retrieve(CurrentFrame, 0); //Получение кадра. Переодический промер FPS
                     FramesGotten++;
-                    CvInvoke.Resize(CurrentFrame, resizedim, Size_for_Resizing, 0, 0, Inter.Linear);
-
-                    CV_ImBox_Capture.Image = resizedim;
                     //ресайз кадра
-
+                    CvInvoke.Resize(CurrentFrame, resizedim, Size_for_Resizing, 0, 0, Inter.Linear);
+                    CV_ImBox_Capture.Image = resizedim;
 
                     //Переодический замер физического FPS
                     if ((STW_FPS.Elapsed.Seconds > 5)) //случается примерно раз в 10 секунд
@@ -232,7 +234,6 @@ namespace Stereo_Vision
                     _capture.Retrieve(CurrentFrame, 0); //Получение кадра. Переодический промер FPS
                     FrameBalanced = false;
                     //wb
-                    //Зарезает частоту с 29FPS до 17FPS
                     using (CurrentFrame_wb = CurrentFrame.Clone())
                     {
                         if (DWB_Camulating_isActive)
@@ -265,10 +266,9 @@ namespace Stereo_Vision
                                 STW_WBMatrixCalculation.Stop();
                                 LogMessage("Вычисление коррекционной матрицы Методом Указателей завершено. Прошло времени: " + (STW_WBMatrixCalculation.ElapsedMilliseconds / 1000.0).ToString());
                             }
-                        }
-                        else
+                        } //если сбор кадров для балансирования активен
+                        else //иначе
                         {
-
                             WhiteBalance.CorrectImage_viaCorrectionMatrix_Color(DWB_CorrectionMatrix, ref CurrentFrame_wb);
                             CurrentFrame = CurrentFrame_wb.Clone();
                             FrameBalanced = true;
@@ -285,7 +285,7 @@ namespace Stereo_Vision
                     STW_Resizing.Stop();
 
                     //Переодический замер скорости отрисовки и физического FPS
-                    if ((STW_FPS.Elapsed.Seconds > 5) && (STW_FPS.Elapsed.Seconds % 10 == 0)) //случается примерно раз в 10 секунд
+                    if ((STW_FPS.Elapsed.Seconds > 5)) //случается примерно раз в 10 секунд
                     {
                         LogMessage("Скорость получения кадров: " + ((float)FramesGotten / STW_FPS.Elapsed.TotalSeconds).ToString());
                         LogMessage("Время изменения размера кадра: " + (STW_Resizing.Elapsed.TotalSeconds / FramesDrawn).ToString());
@@ -303,10 +303,11 @@ namespace Stereo_Vision
                     CV_ImBox_Capture.Image = resizedim;
                     STW_Draw.Stop();
                     
-                    // CV_ImBox_Capture.Image = CurrentFrame;
+                    
                     FramesDrawn++;
                     FrameDrawn = true;
 
+                    //захват кадра для видео
                     if (isRecording)
                     {
                         using (CurrentFrame2 = CurrentFrame.Clone())
@@ -363,6 +364,7 @@ namespace Stereo_Vision
                             }
                         }
                     }
+                    //захват кадра для фото
                     if (isSnapShot_needed)
                     {
                         /*  using (CurrentFrame2 = resizedim.Clone())
@@ -375,6 +377,7 @@ namespace Stereo_Vision
                         UpdateTextBox("Кадр " + Photo_name_lastcaptured + " сохранен!", L_SnapShotSaved);
                         //  }
                     }
+                    //скрывалка лэйбла с подписью о сохранении кадра
                     if (L_SnapShotSaved.Visible)
                     {
                         if (STW_2HideLabel.Elapsed.TotalSeconds > Saving_ShowLabel_time)
@@ -485,7 +488,8 @@ namespace Stereo_Vision
             }
             else
             {
-                PrepareTheCamera();
+                string fourcc_cur = "";
+                PrepareTheCamera(ref fourcc_cur);
                 SetResolution(1280, 720);
                 Read_and_Load_Settings();
                 _capture.Start();
@@ -571,6 +575,7 @@ namespace Stereo_Vision
             st[4] = (char)0;
             return st;
         }
+      
         private string CalculatenName_forNewVideo()
         {
             string Digit_PostFix = "";

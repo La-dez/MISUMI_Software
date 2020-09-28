@@ -12,12 +12,13 @@ using Emgu.Util;
 
 namespace Stereo_Vision
 {
-    public class WhiteBalance
+    public unsafe class WhiteBalance
     {
 
         private double percentForBalance = 0.6;
         const byte BYTE_MAX = (byte)255;
         const double DOUBLE_BYTE_MAX = 255.0;
+        
 
         [DllImport("Multiply_BMP_DLL.dll")]
         public static extern System.Text.StringBuilder EI_GetName();
@@ -94,9 +95,13 @@ namespace Stereo_Vision
         private static byte LimitToByte(double value)
         {
             return (byte)value;
-           // return (byte)(((value > 255) ? DOUBLE_BYTE_MAX : value)); //не рассматривается случай с 0, так как этого не бывает
+            //return (byte)(((value > 255) ? DOUBLE_BYTE_MAX : value)); //не рассматривается случай с 0, так как этого не бывает
         }
-
+        private unsafe static byte LimitToByte(double* value)
+        {
+            return (byte)(*value);
+           // return (byte)(((*value > DOUBLE_BYTE_MAX) ? DOUBLE_BYTE_MAX : *value)); //не рассматривается случай с 0, так как этого не бывает
+        }
         /**
       * Returns the band for an color (red, green, blue or alpha)
       * The dataset should have 4 bands
@@ -120,7 +125,7 @@ namespace Stereo_Vision
                   return ImageDataSet.GetRasterBand(4);
               }
           }*/
-       
+
         public static double[,,] GetCorrectionMatrixFromWhiteImage(Bitmap BMP)
         {
             int W = BMP.Width, H = BMP.Height;
@@ -517,22 +522,26 @@ namespace Stereo_Vision
         }
         public static unsafe void CorrectImage_viaCorrectionMatrix_Color(double[,,] res, ref Mat pframe)
         {
-            System.Diagnostics.Stopwatch STW = new System.Diagnostics.Stopwatch();
+           // System.Diagnostics.Stopwatch STW = new System.Diagnostics.Stopwatch();
             byte* curpos;
 
-            STW.Restart();
+           // STW.Restart();
             byte[,,] data = pframe.ToImage<Bgr, Byte>().Data;
-            STW.Stop();
-            var aa = STW.Elapsed.TotalMilliseconds;
+           // STW.Stop();
+           // var aa = STW.Elapsed.TotalMilliseconds;
 
-            STW.Restart();
+           // STW.Restart();
             int height = pframe.Height;
             int width = pframe.Width;
             int WH = width * height;
-            STW.Stop();
-            var b = STW.Elapsed.TotalMilliseconds;
+          //  STW.Stop();
+           // var b = STW.Elapsed.TotalMilliseconds;
+          /*  double dval = 0;
+            double* _pdval = &dval;
+            double DBM = 255.0;
+            double* _DBM = &DBM;*/
 
-            STW.Restart();
+          //  STW.Restart();
             try
             {
                 fixed (double* _res = res)
@@ -543,9 +552,20 @@ namespace Stereo_Vision
                         double* _r = _res, _g = _res + WH, _b = _res + 2*WH;
                         for (int i = 0; i < WH; i++)
                         {
-                            *(curpos) = LimitToByte(*(curpos) * (*_b++)); curpos++; 
-                            *(curpos) = LimitToByte(*(curpos) * (*_g++)); curpos++; 
-                            *(curpos) = LimitToByte(*(curpos) * (*_r++)); curpos++; 
+                           /* *(_pdval) = *(curpos) * (*_b++); *(curpos) = (byte)((*(_pdval)> *_DBM) ? *_DBM : *(_pdval)); curpos++; //fastest
+                            *(_pdval) = *(curpos) * (*_g++); *(curpos) = (byte)((*(_pdval) > *_DBM) ? *_DBM : *(_pdval)); curpos++;
+                            *(_pdval) = *(curpos) * (*_r++); *(curpos) = (byte)((*(_pdval) > *_DBM) ? *_DBM : *(_pdval)); curpos++;*/
+
+                            *(curpos) = LimitToByte(*(curpos) * (*_b++)); curpos++;
+                            *(curpos) = LimitToByte(*(curpos) * (*_g++)); curpos++;
+                            *(curpos) = LimitToByte(*(curpos) * (*_r++)); curpos++;
+
+                            /* *(_pdval) = *(curpos) * (*_b++); *(curpos) = LimitToByte(_pdval); curpos++;
+                             *(_pdval) = *(curpos) * (*_g++); *(curpos) = LimitToByte(_pdval); curpos++;
+                             *(_pdval) = *(curpos) * (*_r++); *(curpos) = LimitToByte(_pdval); curpos++;*/
+                            //(byte)(((value > 255) ? DOUBLE_BYTE_MAX : value))
+
+
                         }                       
                     }
                 }
@@ -560,8 +580,8 @@ namespace Stereo_Vision
                         *(pData + i) = (byte)(i % width);
                 }
             }
-            STW.Stop();
-            var c = STW.Elapsed.TotalMilliseconds;
+           // STW.Stop();
+           // var c = STW.Elapsed.TotalMilliseconds;
         }
         public static  void Save_double_mass_2xml(double[,,] source, string pPath)
         {
