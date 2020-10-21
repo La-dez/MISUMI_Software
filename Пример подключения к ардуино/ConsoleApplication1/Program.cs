@@ -30,7 +30,7 @@ namespace ConsoleApplication1
             delay(1000);
         }*/
 
-        static void Main(string[] args)
+        static void Main_1(string[] args)
         {
             //p_arduino.pinMode(0, Arduino.PWM);
             // SomeLEDTest_digital(ref p_arduino);
@@ -44,7 +44,8 @@ namespace ConsoleApplication1
                 List<float> vol_mass = new List<float>();
                 Console.WriteLine("\nReinit Arduino...");
                 Arduino p_arduino2 = new Arduino();
-                if (!p_arduino2.isOpen())
+                p_arduino2.pinMode(0, Arduino.ANALOG);
+                if (p_arduino2.isOpen())
                 {
                     for (int i = 0; i < 10; i++)
                     {
@@ -54,10 +55,11 @@ namespace ConsoleApplication1
                                                              // Console.WriteLine("Value=" + Value);
                         if (Value != 0) vol_mass.Add(Value);
                          Console.WriteLine("Voltage Value=" + ((Value * 5.00f) / 1023).ToString() +" v. ");
-                        p_arduino2.callAnalogPinUpdated(0, 1);
-                        Thread.Sleep(1000);
+                        //p_arduino2.callAnalogPinUpdated(0, 1);
+                        Thread.Sleep(500);
                     }
                     float end_val = 0;
+
                     for (int i = 0; i < vol_mass.Count(); i++)
                     {
                         end_val += vol_mass[i];
@@ -71,11 +73,121 @@ namespace ConsoleApplication1
                     p_arduino2.Close();
                 }
                 else
-                { //try again}
+                {
+                    Console.WriteLine("\n Failed to open Arduino...");
 
                 }
 
             }
+        }
+
+        static void Main_n(string[] args)
+        {
+            //p_arduino.pinMode(0, Arduino.PWM);
+            // SomeLEDTest_digital(ref p_arduino);
+            //        SomeLEDTest_analog(ref p_arduino);
+            ///Start_monitoring(ref p_arduino);
+            bool isDebug = false;
+            bool isdown = false;
+            Console.WriteLine("\nStarted!");
+            while (true)
+            {
+                if (isDebug) Console.WriteLine("\nReinit Arduino...");
+                Arduino p_arduino2 = new Arduino();
+                p_arduino2.pinMode(0, Arduino.ANALOG);
+                if (p_arduino2.isOpen())
+                {
+                    Measure_Voltage(isDebug, p_arduino2);
+                    p_arduino2.StopListen();
+                    p_arduino2.Close();
+                    Thread.Sleep(500);
+                }
+                else
+                {
+                    Console.WriteLine("\n Failed to open Arduino...");
+
+                }
+
+            }
+        }
+
+        static void Main(string[] args)
+        {
+            //p_arduino.pinMode(0, Arduino.PWM);
+            // SomeLEDTest_digital(ref p_arduino);
+            //        SomeLEDTest_analog(ref p_arduino);
+            ///Start_monitoring(ref p_arduino);
+            bool isDebug = false;
+            Console.WriteLine("\nStarted!");
+            if (isDebug) Console.WriteLine("\nReinit Arduino...");
+            Arduino p_arduino2 = new Arduino();
+            p_arduino2.pinMode(0, Arduino.ANALOG);
+
+            while (true)
+            {
+               
+                if (p_arduino2.isOpen())
+                {
+                    Measure_Voltage(isDebug, p_arduino2);                  
+                }
+                else
+                {
+                    Console.WriteLine("\n Failed to open Arduino...");
+                }
+
+            }
+        }
+
+        static void Main2(string[] args)
+        {
+            Arduino arduino = new Arduino();
+            arduino.pinMode(0, Arduino.ANALOG);
+            if (arduino.isOpen())
+            {
+                Console.WriteLine("Port state: " + (arduino.isOpen() ? "opened" : "closed"));
+                while (true)
+                {
+                    int state = (int)arduino.analogRead(0);
+                    if (state > 0)
+                        Console.WriteLine(state);
+                    else if (state == 0)
+                        Console.WriteLine("No one");
+                    Thread.Sleep(500);
+                }
+            }
+            else
+            {
+                Console.WriteLine("Port state: " + (arduino.isOpen() ? "opened" : "closed"));
+            }
+            
+           
+        }
+        private static void Measure_Voltage(bool p_isDebug,Arduino p_arduino2)
+        {
+            
+            List<float> vol_mass = new List<float>();
+            for (int i = 0; i < 10; i++)
+            {
+                if (p_isDebug) Console.WriteLine("Reading from pin " + 0 + "...");
+                int Value = p_arduino2.analogRead(0);//Read the state of pin 0
+                                                     // Console.WriteLine(Value);
+                                                     // Console.WriteLine("Value=" + Value);
+                if (Value != 0) vol_mass.Add(Value);
+                if (p_isDebug) Console.WriteLine("Voltage Value=" + ((Value * 5.00f) / 1023).ToString() + " v. ");
+                Thread.Sleep(500);
+            }
+            float end_val = 0;
+
+            for (int i = 0; i < vol_mass.Count(); i++)
+            {
+                end_val += vol_mass[i];
+            }
+            end_val /= vol_mass.Count();
+            end_val = ((float)((float)((end_val / 1023.00f) * 5))) / 1.00f;
+            Console.ForegroundColor = ConsoleColor.Green;
+            if (p_isDebug) Console.WriteLine("Measured voltage: " + ((float.IsNaN(end_val)) ? "?": end_val.ToString()) + " v");
+            Console.WriteLine("Real voltage: " + ((float.IsNaN(end_val)) ?  "?" : (end_val / 0.36f).ToString()) + " v");
+            Console.ForegroundColor = ConsoleColor.White;
         }
         private static void Start_monitoring(ref Arduino arduino)
         {

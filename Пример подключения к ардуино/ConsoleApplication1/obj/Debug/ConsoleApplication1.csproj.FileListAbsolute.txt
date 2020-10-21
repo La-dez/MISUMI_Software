@@ -10,3 +10,9 @@ D:\Работа\Программы (мои разработки)\Другие\П
 D:\Работа\Программы (мои разработки)\Другие\Пример подключения к ардуино\ConsoleApplication1\obj\Debug\ConsoleApplication1.csprojResolveAssemblyReference.cache
 D:\Работа\Программы (мои разработки)\Другие\Пример подключения к ардуино\ConsoleApplication1\bin\Debug\ConsoleApplication1.exe
 D:\Работа\Программы (мои разработки)\Другие\Пример подключения к ардуино\ConsoleApplication1\bin\Debug\ConsoleApplication1.pdb
+D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Пример подключения к ардуино\ConsoleApplication1\bin\Debug\ConsoleApplication1.exe.config
+D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Пример подключения к ардуино\ConsoleApplication1\obj\Debug\ConsoleApplication1.exe
+D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Пример подключения к ардуино\ConsoleApplication1\obj\Debug\ConsoleApplication1.pdb
+D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Пример подключения к ардуино\ConsoleApplication1\bin\Debug\ConsoleApplication1.exe
+D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Пример подключения к ардуино\ConsoleApplication1\bin\Debug\ConsoleApplication1.pdb
+D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Пример подключения к ардуино\ConsoleApplication1\obj\Debug\ConsoleApplication1.csprojResolveAssemblyReference.cache

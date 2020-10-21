@@ -126,7 +126,7 @@ namespace LattePanda.Firmata
         /// default baud rate (57600), and a reboot delay (8 seconds).
         /// and automatically opens the specified serial connection.
         /// </summary>
-        public Arduino() : this(Arduino.list().ElementAt(list().Length - 1), 9600, true, 1000) { }
+        public Arduino() : this(Arduino.list().ElementAt(list().Length - 1), 57600, true, 1000) { }
 
         ~Arduino()
         {
