@@ -113,10 +113,6 @@ namespace ConsoleApplication1
 
         static void Main(string[] args)
         {
-            //p_arduino.pinMode(0, Arduino.PWM);
-            // SomeLEDTest_digital(ref p_arduino);
-            //        SomeLEDTest_analog(ref p_arduino);
-            ///Start_monitoring(ref p_arduino);
             bool isDebug = false;
             Console.WriteLine("\nStarted!");
             if (isDebug) Console.WriteLine("\nReinit Arduino...");
