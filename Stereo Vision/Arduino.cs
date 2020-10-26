@@ -102,7 +102,7 @@ namespace LattePanda.Firmata
                 this.Open(autoListen);
             }
         }
-       
+
         /// <summary>
         /// Creates an instance of the Arduino object, based on a user-specified serial port.
         /// Assumes default values for baud rate (57600) and reboot delay (8 seconds)
@@ -127,6 +127,11 @@ namespace LattePanda.Firmata
         /// and automatically opens the specified serial connection.
         /// </summary>
         public Arduino() : this(Arduino.list().ElementAt(list().Length - 1), 57600, true, 1000) { }
+
+        ~Arduino()
+        {
+            this.Close();
+        }
         /// <summary>
         /// Opens the serial port connection, should it be required. By default the port is
         /// opened when the object is first created.
@@ -159,6 +164,13 @@ namespace LattePanda.Firmata
             {
                 this.StartListen();
             }
+        }
+        /// <summary>
+        /// Get the state of the port on Arduino.
+        /// </summary>
+        public bool isOpen() //ldz
+        {
+            return _serialPort.IsOpen;
         }
         /// <summary>
         /// Closes the serial port.
@@ -284,15 +296,6 @@ namespace LattePanda.Firmata
             message[0] = (byte)(ANALOG_MESSAGE | (pin & 0x0F));
             message[1] = (byte)(value & 0x7F);
             message[2] = (byte)(value >> 7);
-            _serialPort.Write(message, 0, 3);
-        }
-
-        public void analogWrite_Brightness(int pin, byte value)
-        {
-            byte[] message = new byte[3];
-            message[0] = (byte)(0x01);
-            message[1] = (byte)(0xFF);
-            message[2] = (byte)(value);//???
             _serialPort.Write(message, 0, 3);
         }
         /// <summary>
