@@ -21,6 +21,10 @@ namespace Stereo_Vision
         bool FullScrin = false;
         TabPage[] adminPages = null;
         int LastChargeLevel_percents = 100;
+        int CriticalLevel_percents = 5; // Critical TimeLeft in percents
+
+        Arduino_RW Arduino_bus;
+
         Bitmap BMP2set_chargelev = new Bitmap("Resources\\20-0.png");
         public static Bitmap BMP2set_chargelev_100_80 = new Bitmap("Resources\\100-80.png");
         public static Bitmap BMP2set_chargelev_80_60 = new Bitmap("Resources\\80-60.png");
@@ -187,13 +191,39 @@ namespace Stereo_Vision
         
         private void ChargeLevel_preparence()
         {
-            string FirstError = "";
+            Arduino_bus = new Arduino_RW(CriticalLevel_percents);
+            Arduino_bus.ChargeLevel_onUpdated += Arduino_bus_ChargeLevel_onUpdated;
+            Arduino_bus.ChargeLevel_OnCriticalLevel += Arduino_bus_ChargeLevel_OnCriticalLevel;
+            Arduino_bus.ChargeLevel_NewMessage += Arduino_bus_ChargeLevel_NewMessage;
+
+          /*  string FirstError = "";
             try { BGWR_ChargeLev.WorkerSupportsCancellation = true; } catch (Exception exc) { FirstError = FirstError == "" ? exc.Message : FirstError; }
             try { BGWR_ChargeLev.RunWorkerAsync(); } catch (Exception exc) { FirstError = FirstError == "" ? exc.Message : FirstError; }
             try { Set_ChargeBMP(BMP2set_chargelev); } catch (Exception exc) { FirstError = FirstError == "" ? exc.Message : FirstError; }
             try { Set_ChargeTEXT(Text2set); } catch (Exception exc) { FirstError = FirstError == "" ? exc.Message : FirstError; }
-            if (FirstError != "") throw new Exception(FirstError);
+            if (FirstError != "") throw new Exception(FirstError);*/
         }
+
+        private void Arduino_bus_ChargeLevel_NewMessage(string Message)
+        {
+            LogMessage(Message);
+        }
+
+        private void Arduino_bus_ChargeLevel_OnCriticalLevel(int percentage)
+        {
+            HiberNoAsk = true;
+            System.Threading.Thread.Sleep(2000);
+            B_Quit_Click(null, null);
+            HiberNoAsk = false;
+        }
+
+        private void Arduino_bus_ChargeLevel_onUpdated(int percentage)
+        {
+            Arduino_RW.ToogleCharge_Level(ref BMP2set_chargelev, ref Text2set, percentage);
+            Set_ChargeTEXT(Text2set);
+            Set_ChargeBMP(BMP2set_chargelev);
+        }
+
         private void Build_Interface()
         {
             //Pan_pl_Base Restruct
@@ -688,7 +718,7 @@ namespace Stereo_Vision
                 TB_Ex_PathTo.Text = Export_Photos_to;
             }
 
-            Charge.ToogleCharge_Level(ref BMP2set_chargelev, ref Text2set, LastChargeLevel_percents);
+            Arduino_RW.ToogleCharge_Level(ref BMP2set_chargelev, ref Text2set, LastChargeLevel_percents);
             CB_Ex_ChooseExportMode.SelectedIndex = Export_style;
             TB_Ex_Count.Text = Number_of_FilesorHours.ToString();
         }
@@ -870,7 +900,7 @@ namespace Stereo_Vision
         {
             CV_ImBox_Capture.Image = ppImage;
         }
-        private void RefreshChargeControls(ref System.ComponentModel.BackgroundWorker pWorker,ref bool p_isArdClosed)
+       /* private void RefreshChargeControls(ref System.ComponentModel.BackgroundWorker pWorker,ref bool p_isArdClosed)
         {
             System.Threading.Thread.CurrentThread.Priority = System.Threading.ThreadPriority.Lowest;
             while (true)
@@ -899,7 +929,7 @@ namespace Stereo_Vision
                 }
             }
             
-        }
+        }*/
         private void Open_Export_DirectoryFrom()
         {
             FolderBrowserDialog folderBrowser = new FolderBrowserDialog();

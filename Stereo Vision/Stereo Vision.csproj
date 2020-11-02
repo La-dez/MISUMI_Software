@@ -129,7 +129,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Arduino.cs" />
-    <Compile Include="Charge.cs" />
+    <Compile Include="Arduino_RW.cs" />
     <Compile Include="DigitalWB.cs" />
     <Compile Include="Export_files_form.cs">
       <SubType>Form</SubType>

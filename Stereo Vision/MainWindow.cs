@@ -158,8 +158,7 @@ namespace Stereo_Vision
             if ((e.KeyCode == Keys.Q) && e.Alt)
             {
                 // Thread_for_Refreshing_of_ChargeLev.Abort();
-                //Thread_for_Refreshing_of_ChargeLev.Join();              
-                try { BGWR_ChargeLev.CancelAsync(); } catch { }
+                //Thread_for_Refreshing_of_ChargeLev.Join(); 
                 try
                 { SaveSettings(); }
                 catch { }
@@ -221,7 +220,6 @@ namespace Stereo_Vision
                 SaveSettings();
                 throwed_to_hiber = true;
                 WakeUpTimer.Enabled = true;
-                BGWR_ChargeLev.CancelAsync();
                 // BGWR_ChargeLev.run
                 while ((!isArduino_closed) && (!lastFrame_processed))
                 {
@@ -335,8 +333,8 @@ namespace Stereo_Vision
         private void BGWR_ChargeLev_DoWork(object sender, DoWorkEventArgs e)
         {
             
-            BackgroundWorker worker = sender as BackgroundWorker;
-            RefreshChargeControls(ref worker,ref isArduino_closed);
+            /*BackgroundWorker worker = sender as BackgroundWorker;
+            RefreshChargeControls(ref worker,ref isArduino_closed);*/
         }
 
         private void L_Ex_Mode_Click(object sender, EventArgs e)

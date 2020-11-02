@@ -180,7 +180,6 @@ namespace Stereo_Vision
             this.CV_ImBox_VidPhoto_Player = new Emgu.CV.UI.ImageBox();
             this.PB_MeasurementPB = new System.Windows.Forms.PictureBox();
             this.OTK_3D_Control = new OpenTK.GLControl();
-            this.BGWR_ChargeLev = new System.ComponentModel.BackgroundWorker();
             this.WakeUpTimer = new System.Windows.Forms.Timer(this.components);
             this.Timer_InvalidateAfter_EnteringMes = new System.Windows.Forms.Timer(this.components);
             this.Timer_3DRenderer = new System.Windows.Forms.Timer(this.components);
@@ -2618,10 +2617,6 @@ namespace Stereo_Vision
             this.OTK_3D_Control.MouseUp += new System.Windows.Forms.MouseEventHandler(this.OTK_3D_Control_MouseUp);
             this.OTK_3D_Control.Resize += new System.EventHandler(this.OTK_3D_Control_Resize);
             // 
-            // BGWR_ChargeLev
-            // 
-            this.BGWR_ChargeLev.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BGWR_ChargeLev_DoWork);
-            // 
             // WakeUpTimer
             // 
             this.WakeUpTimer.Interval = 200;
@@ -2771,7 +2766,6 @@ namespace Stereo_Vision
         private System.Windows.Forms.Panel Pan_BASE_BackgroundPanel;
         private System.Windows.Forms.Panel Pan_MainMenu;
         private System.Windows.Forms.Panel P_ChargeLev;
-        private System.ComponentModel.BackgroundWorker BGWR_ChargeLev;
         private System.Windows.Forms.TableLayoutPanel TLP_ChargeLev;
         private System.Windows.Forms.PictureBox PB_ChargeVal;
         private System.Windows.Forms.Label L_ChargeLev;

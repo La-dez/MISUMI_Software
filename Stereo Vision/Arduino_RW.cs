@@ -11,15 +11,22 @@ namespace Stereo_Vision
     {
         //main things
         Arduino Panduino;
-       // float _Voltage_critical = 0;
+        float _Voltage_critical_measured = 0;
+        float TimeLeft_critical_percents = 0;
         float _Voltage_measure = 0;
         float Voltage_measure
         {
             set
             {
                 _Voltage_measure = value;
-                ChargeLevel_onUpdated(value);
-                //if() ChargeLevel_OnCriticalLevel();
+                var TL = Gained_voltage_2_timeleft(value);
+                var TL_p = TimeLeft_2_Percents(TL);
+                ChargeLevel_onUpdated(TL_p);
+
+                if (value < _Voltage_critical_measured)
+                {
+                    ChargeLevel_OnCriticalLevel(TL_p);
+                }
             }
             get
             {
@@ -28,39 +35,52 @@ namespace Stereo_Vision
         }
 
         //curves
+        //Real voltage values of battery. V(t) - this is V
         static float[] Real_Voltage_values = { 12.45f, 12.05f, 11.95f, 11.81f, 11.64f, 11.45f, 11.26f, 11.09f, 10.94f, 10.79f,
               10.66f, 10.47f, 10.21f, 9.68f, 8.91f, 8.63f, 8.3f, 8.17f};
-        static float Real2Gained_coef = 0.36f;
-
+        //Nearest coef identical to real voltage devider
+        static float C_Real2Gained = 0.36f;
+        //This is from math: Real_Voltage_values * Real2Gained_coef = Gained_Voltage_values_1
         static float[] Gained_Voltage_values_1 = { 4.482f, 4.338f, 4.302f, 4.2516f, 4.1904f, 4.122f, 4.0536f, 3.9924f, 3.9384f,
             3.8844f, 3.8376f, 3.7692f, 3.6756f, 3.4848f, 3.2076f, 3.1068f, 2.988f, 2.9412f };
+
+        // V(t) - this is t                                                                                  //fgfffffffffgfgjkjhfkj sasha durak i loh i ne umeet kodit`
         static float[] Times_minutes = { 0, 5f, 10f, 20f, 30f, 40f, 52f, 62f, 72f, 81f, 88f, 101f, 120f, 145f, 160f, 161f, 162f, 162.5f };
+        //This is max(t)-t
         static float[] Times_left_minutes = { 162.5f, 157.5f, 152.5f, 142.5f, 132.5f, 122.5f, 110.5f, 100.5f, 90.5f, 81.5f, 74.5f,61.5f,
             42.5f, 17.5f, 2.5f, 1.5f, 0.5f, 0f };
-        static float[] Percantage_left = {100f, 90.7f, 88.3f, 85.0f, 81.1f, 76.6f, 72.2f, 68.2f, 64.7f, 61.2f, 58.2f, 53.7f, 47.7f, 35.3f,
+
+        //Percents is calculated from timeleft, because it's linear in contrast to voltage, that is just close to linear
+        //Coef to linear convert Timeleft to %
+        static float C_TimeLeft2Percents = 0.615f; //  это 1/1.625 = 1/(162.5/100) , перевод в проценты по времени
+        //This  is result of t*TimeLeft2Percents
+        static float[] Percentage_left = {100f, 90.7f, 88.3f, 85.0f, 81.1f, 76.6f, 72.2f, 68.2f, 64.7f, 61.2f, 58.2f, 53.7f, 47.7f, 35.3f,
             17.3f, 10.7f, 3.0f, 0f };//проценты по аккуму
-        static float RimeLeft2Percents = 0.615f; //  это 1/1.625 = 1/(162.5/100) , перевод в проценты по времени
+        //Number of points
         static int points = Gained_Voltage_values_1.Count();
 
         //threads
         BackgroundWorker BGW_Thread = new BackgroundWorker();
 
         //events
-        public delegate void ChargeLevel(float percentage);
+        public delegate void ChargeLevel(int percentage);
         public event ChargeLevel ChargeLevel_onUpdated;
 
-        public delegate void ChargeLevelCritical(float percentage);
+        public delegate void ChargeLevelCritical(int percentage);
         public event ChargeLevelCritical ChargeLevel_OnCriticalLevel;
 
         public delegate void ChargeLevel_Message(string Message);
         public event ChargeLevel_Message ChargeLevel_NewMessage;
 
 
-        public Arduino_RW()
+        public Arduino_RW(float pTimeLeft_critical_percents)
         {        
             Log("\nStarted!");
             Log("\nInit Arduino...");
             Panduino = new Arduino();
+            TimeLeft_critical_percents = pTimeLeft_critical_percents;
+            _Voltage_critical_measured = Convert_CriticalPercent_toCritVoltage(pTimeLeft_critical_percents);
+
             Panduino.pinMode(0, Arduino.ANALOG);
             BGW_Thread.DoWork += new DoWorkEventHandler(this.BGW_Thread_DoWork);
             BGW_Thread.WorkerSupportsCancellation = true;
@@ -91,44 +111,41 @@ namespace Stereo_Vision
             }
         }
 
+        
+        public void Log(string pMes)
+        {
+            ChargeLevel_NewMessage?.Invoke(pMes);
+        }
+
         public static float Gained_voltage_2_timeleft(float pGained_voltage)
         {
             float result = 0;
             //Обнаруживаем, к какому отрезку линейности принадлежит наше напряжение
             int i = 0, MinIndex = 0, MaxIndex = points - 1;
-            for (i =0;i<points;i++)
+            for (i = 0; i < points; i++)
             {
-                float ad = Real_Voltage_values[i] * Real2Gained_coef;
-                if (Real_Voltage_values[i] * Real2Gained_coef - 0.001<= pGained_voltage)
-                { MinIndex = i-1; MaxIndex = i; break; }
+                float ad = Real_Voltage_values[i] * C_Real2Gained;
+                if (Real_Voltage_values[i] * C_Real2Gained - 0.001 <= pGained_voltage)
+                { MinIndex = i - 1; MaxIndex = i; break; }
             }
             if (MinIndex < 0) return 162.5f;
             if ((MinIndex == 0) && (MaxIndex == points - 1)) return 0;
-      
+
             result = Interpolate_Y(Times_left_minutes[MinIndex], Times_left_minutes[MaxIndex],
-                Real_Voltage_values[MinIndex] * Real2Gained_coef, Real_Voltage_values[MaxIndex] * Real2Gained_coef, pGained_voltage);
+                Real_Voltage_values[MinIndex] * C_Real2Gained, Real_Voltage_values[MaxIndex] * C_Real2Gained, pGained_voltage);
             return result;
         }
-        public void Log(string pMes)
+
+        public static int TimeLeft_2_Percents(float pTimeLeft) //Переводит время в процент от максимального времени жизни
         {
-            ChargeLevel_NewMessage?.Invoke(pMes);
+            return ((int)Math.Round(pTimeLeft * C_TimeLeft2Percents));
         }
-        public static int TimeLeft2Percents(float pTimeLeft)
+
+        public static float Percents_2_Timeleft(int pPercents) //Переводит процент от максимального времени жизни в время 
         {
-            return ((int)Math.Round(pTimeLeft * RimeLeft2Percents));
+            return ((float)pPercents / C_TimeLeft2Percents);
         }
-        public static string TimeLeft2Percents_s(float pTimeLeft)
-        {
-            int PerVal = ((int)Math.Round(pTimeLeft * RimeLeft2Percents));
-            if (PerVal > 4.9f) return (PerVal.ToString() + "%");
-            else return "<5%";
-        }
-        public static string Percents2Percents_s(int pPercents)
-        {
-            int PerVal = pPercents;
-            if (PerVal > 4.9f) return (PerVal.ToString() + "%");
-            else return "<5%";
-        }
+
         private static float Interpolate_Y(float maxY, float minY,float maxX, float minX, float currentX )
         {
             float res = -1.0f;
@@ -141,7 +158,10 @@ namespace Stereo_Vision
             if (res < 0) return -1;
             else return res;
         }
-
+        private float Convert_CriticalPercent_toCritVoltage(float TimeLeft_percents)
+        {
+            return 0.0f;
+        }
        /* static void Main(string[] args)
         {
             bool isDebug = false;
@@ -189,7 +209,7 @@ namespace Stereo_Vision
             end_val = ((float)((float)((end_val / 1023.00f) * 5))) / 1.00f;
             if (NeedLogging) pLog("Measured voltage: " + ((float.IsNaN(end_val)) ? "?" : end_val.ToString()) + " v");
             if (NeedLogging) pLog("Real voltage: " + ((float.IsNaN(end_val)) ? "?" : (end_val / 0.36f).ToString()) + " v");
-            return end_val;
+            return (float.IsNaN(end_val) ? 753 : end_val);
         }
 
         [Obsolete]
@@ -294,7 +314,7 @@ namespace Stereo_Vision
             {
                 pBMP_Charge = new System.Drawing.Bitmap(MainWindow.BMP2set_chargelev_20_0);
             }
-            pText_to_write = Percents2Percents_s(pPercents);
+            pText_to_write = pPercents.ToString()+"%";
         }
     }
 }
