@@ -163,9 +163,12 @@ namespace Stereo_Vision
                 { SaveSettings(); }
                 catch { }
                 StopCapture();
+
+                Arduino_bus.Dispose();
+
                 System.Diagnostics.Stopwatch stw_closing = new System.Diagnostics.Stopwatch();
                 stw_closing.Start();
-                while (/*(!isArduino_closed)&&*/(!lastFrame_processed)&&(stw_closing.Elapsed.TotalMilliseconds<3000))
+                while ((!lastFrame_processed)&&(stw_closing.Elapsed.TotalMilliseconds<3000))
                 {
                     //int a = 0;
                     //we will wait for closing
@@ -221,7 +224,7 @@ namespace Stereo_Vision
                 throwed_to_hiber = true;
                 WakeUpTimer.Enabled = true;
                 // BGWR_ChargeLev.run
-                while ((!isArduino_closed) && (!lastFrame_processed))
+                while (!lastFrame_processed)
                 {
                     //we will wait for closing
                 }

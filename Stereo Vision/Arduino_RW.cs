@@ -7,19 +7,32 @@ using System.ComponentModel;
 
 namespace Stereo_Vision
 {
-    class Arduino_RW
+    class Arduino_RW : IDisposable
     {
         //main things
         Arduino Panduino;
+        bool Measuring_Completed = true;
+
         float _Voltage_critical_measured = 0;
         float TimeLeft_critical_percents = 0;
-        float _Voltage_measure = 0;
-        float Voltage_measure
+        float _Voltage_measured_previous = 4.482f;
+        float? _Voltage_measured = 4.482f;
+        float? Voltage_measured
         {
             set
             {
-                _Voltage_measure = value;
-                var TL = Gained_voltage_2_timeleft(value);
+                // var 
+                if(value.Equals(null))
+                {
+                    _Voltage_measured = _Voltage_measured_previous;
+                }
+                else
+                {
+                    _Voltage_measured_previous = (float)_Voltage_measured;
+                    _Voltage_measured = value;
+                }
+
+                var TL = Gained_voltage_2_timeleft((float)_Voltage_measured);
                 var TL_p = TimeLeft_2_Percents(TL);
                 ChargeLevel_onUpdated(TL_p);
 
@@ -30,7 +43,8 @@ namespace Stereo_Vision
             }
             get
             {
-                return _Voltage_measure;
+                // this is done because _Voltage_measure can be null because of some errors.
+                return _Voltage_measured.Equals(null)? _Voltage_measured_previous : (float)_Voltage_measured;
             }
         }
 
@@ -73,24 +87,41 @@ namespace Stereo_Vision
         public event ChargeLevel_Message ChargeLevel_NewMessage;
 
 
-        public Arduino_RW(float pTimeLeft_critical_percents)
+        public Arduino_RW(float pTimeLeft_critical_percents, float Initial_percents)
         {        
             Log("\nStarted!");
             Log("\nInit Arduino...");
             Panduino = new Arduino();
             TimeLeft_critical_percents = pTimeLeft_critical_percents;
-            _Voltage_critical_measured = Convert_CriticalPercent_toCritVoltage(pTimeLeft_critical_percents);
-
+            _Voltage_critical_measured = Convert_TimePercent_toVoltage(pTimeLeft_critical_percents);
+            _Voltage_measured = 4.482f;//Convert_TimePercent_toVoltage(Initial_percents);
             Panduino.pinMode(0, Arduino.ANALOG);
             BGW_Thread.DoWork += new DoWorkEventHandler(this.BGW_Thread_DoWork);
+            BGW_Thread.RunWorkerCompleted += BGW_Thread_RunWorkerCompleted;
             BGW_Thread.WorkerSupportsCancellation = true;
             BGW_Thread.RunWorkerAsync();
         }
 
+        private void BGW_Thread_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            Measuring_Completed = true;
+        }
+
         ~Arduino_RW()
         {
-            Panduino.StopListen();
+            this.Dispose();
+        }
+
+        public virtual void Dispose()
+        {
+            BGW_Thread.CancelAsync();
+            while (!Measuring_Completed || BGW_Thread.IsBusy)
+            {
+                System.Threading.Thread.Sleep(200);
+                System.Windows.Forms.Application.DoEvents();   //waiting for closing
+            }
             Panduino.Close();
+            GC.SuppressFinalize(this);
         }
 
         private void BGW_Thread_DoWork(object sender, DoWorkEventArgs e)
@@ -99,16 +130,20 @@ namespace Stereo_Vision
 
             while (true)
             {
-                if (Panduino.isOpen())
+                Measuring_Completed = false;
+                if (Panduino.isOpen() && !BGW_Thread.CancellationPending)
                 {
-                    Voltage_measure = Measure_Voltage(true, Panduino, Log);
+                    Voltage_measured = Measure_Voltage(true, ref worker, Panduino, Log);
                 }
                 else
                 {
                     Log("\n Failed to open Arduino...");
                 }
-
+                Measuring_Completed = true;
+                if (BGW_Thread.CancellationPending)
+                    break;
             }
+            Measuring_Completed = true; //let it be here, just for case
         }
 
         
@@ -158,7 +193,7 @@ namespace Stereo_Vision
             if (res < 0) return -1;
             else return res;
         }
-        private float Convert_CriticalPercent_toCritVoltage(float TimeLeft_percents)
+        private float Convert_TimePercent_toVoltage(float TimeLeft_percents)
         {
             return 0.0f;
         }
@@ -185,10 +220,14 @@ namespace Stereo_Vision
             }
         }*/
 
-        private static float Measure_Voltage(bool p_isDebug, Arduino p_arduino, Action<string> pLog = null)
+        private static float? Measure_Voltage(bool p_isDebug,ref BackgroundWorker BGW, Arduino p_arduino, Action<string> pLog = null)
         {
+            bool cancelled = BGW.CancellationPending;
+            float? end_val = null;
+
             bool NeedLogging = p_isDebug && (pLog != null);
             List<float> vol_mass = new List<float>();
+
             for (int i = 0; i < 10; i++)
             {
                 if (NeedLogging) pLog("Reading from pin " + 0 + "...");
@@ -198,18 +237,23 @@ namespace Stereo_Vision
                 if (Value != 0) vol_mass.Add(Value);
                 if (NeedLogging) pLog("Voltage Value=" + ((Value * 5.00f) / 1023).ToString() + " v. ");
                 System.Threading.Thread.Sleep(500);
+                if (BGW.CancellationPending) return null;               
             }
-            float end_val = 0;
 
             for (int i = 0; i < vol_mass.Count(); i++)
             {
                 end_val += vol_mass[i];
             }
+            if (BGW.CancellationPending) return null;
+            if (end_val.Equals(null)) return null;
+            if (float.IsNaN((float)end_val)) return null;
+
             end_val /= vol_mass.Count();
             end_val = ((float)((float)((end_val / 1023.00f) * 5))) / 1.00f;
-            if (NeedLogging) pLog("Measured voltage: " + ((float.IsNaN(end_val)) ? "?" : end_val.ToString()) + " v");
-            if (NeedLogging) pLog("Real voltage: " + ((float.IsNaN(end_val)) ? "?" : (end_val / 0.36f).ToString()) + " v");
-            return (float.IsNaN(end_val) ? 753 : end_val);
+
+            if (NeedLogging) pLog("Measured voltage: " + ((float.IsNaN((float)end_val)) ? "?" : end_val.ToString()) + " v");
+            if (NeedLogging) pLog("Real voltage: " + ((float.IsNaN((float)end_val)) ? "?" : (end_val / 0.36f).ToString()) + " v");
+            return end_val;
         }
 
         [Obsolete]

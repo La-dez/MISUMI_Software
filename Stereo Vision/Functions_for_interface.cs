@@ -191,10 +191,12 @@ namespace Stereo_Vision
         
         private void ChargeLevel_preparence()
         {
-            Arduino_bus = new Arduino_RW(CriticalLevel_percents);
+            Arduino_bus = new Arduino_RW(CriticalLevel_percents, LastChargeLevel_percents);
             Arduino_bus.ChargeLevel_onUpdated += Arduino_bus_ChargeLevel_onUpdated;
             Arduino_bus.ChargeLevel_OnCriticalLevel += Arduino_bus_ChargeLevel_OnCriticalLevel;
             Arduino_bus.ChargeLevel_NewMessage += Arduino_bus_ChargeLevel_NewMessage;
+
+            Arduino_bus_ChargeLevel_onUpdated(LastChargeLevel_percents); //установка последнего уровня заряда (считано из файла)
 
           /*  string FirstError = "";
             try { BGWR_ChargeLev.WorkerSupportsCancellation = true; } catch (Exception exc) { FirstError = FirstError == "" ? exc.Message : FirstError; }
