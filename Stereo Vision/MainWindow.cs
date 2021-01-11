@@ -223,13 +223,19 @@ namespace Stereo_Vision
                 SaveSettings();
                 throwed_to_hiber = true;
                 WakeUpTimer.Enabled = true;
-                // BGWR_ChargeLev.run
-                while (!lastFrame_processed)
+
+                Arduino_bus.Dispose();
+
+                System.Diagnostics.Stopwatch stw_closing = new System.Diagnostics.Stopwatch();
+                stw_closing.Start();
+                while ((!lastFrame_processed) && (stw_closing.Elapsed.TotalMilliseconds < 3000))
                 {
                     //we will wait for closing
                 }
                 if (a == DialogResult.Yes) Application.SetSuspendState(PowerState.Hibernate, true, false);
                 else Application.Exit();
+
+              
             }
         }
        

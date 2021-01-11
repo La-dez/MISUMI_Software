@@ -133,7 +133,7 @@ namespace Stereo_Vision
                 Measuring_Completed = false;
                 if (Panduino.isOpen() && !BGW_Thread.CancellationPending)
                 {
-                    Voltage_measured = Measure_Voltage(true, ref worker, Panduino, Log);
+                    Voltage_measured = Measure_Voltage(false, ref worker, Panduino, Log);
                 }
                 else
                 {
