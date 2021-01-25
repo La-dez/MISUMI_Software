@@ -24,16 +24,20 @@ namespace Stereo_Vision
                 // var 
                 if(value.Equals(null))
                 {
+                    Log("Value is equal to NULL");
                     _Voltage_measured = _Voltage_measured_previous;
                 }
                 else
                 {
+                //    Log("Value is equal to " + value.ToString());
                     _Voltage_measured_previous = (float)_Voltage_measured;
                     _Voltage_measured = value;
                 }
 
                 var TL = Gained_voltage_2_timeleft((float)_Voltage_measured);
+                Log("Timeleft (minutes):" + TL.ToString());
                 var TL_p = TimeLeft_2_Percents(TL);
+              //  Log("Timeleft %:" + TL_p.ToString());
                 ChargeLevel_onUpdated(TL_p);
 
                 if (value < _Voltage_critical_measured)
@@ -94,7 +98,7 @@ namespace Stereo_Vision
             Panduino = new Arduino();
             TimeLeft_critical_percents = pTimeLeft_critical_percents;
             _Voltage_critical_measured = Convert_TimePercent_toVoltage(pTimeLeft_critical_percents);
-            _Voltage_measured = 4.482f;//Convert_TimePercent_toVoltage(Initial_percents);
+            _Voltage_measured = 4.482f; //Convert_TimePercent_toVoltage(Initial_percents);
             Panduino.pinMode(0, Arduino.ANALOG);
             BGW_Thread.DoWork += new DoWorkEventHandler(this.BGW_Thread_DoWork);
             BGW_Thread.RunWorkerCompleted += BGW_Thread_RunWorkerCompleted;
@@ -127,13 +131,15 @@ namespace Stereo_Vision
         private void BGW_Thread_DoWork(object sender, DoWorkEventArgs e)
         {
             BackgroundWorker worker = sender as BackgroundWorker;
-
+            Random a = new Random();
             while (true)
             {
                 Measuring_Completed = false;
                 if (Panduino.isOpen() && !BGW_Thread.CancellationPending)
                 {
                     Voltage_measured = Measure_Voltage(false, ref worker, Panduino, Log);
+                 //  Voltage_measured = (float)(3.48 + a.NextDouble());
+                   // System.Threading.Thread.Sleep(500);
                 }
                 else
                 {
@@ -197,53 +203,34 @@ namespace Stereo_Vision
         {
             return 0.0f;
         }
-       /* static void Main(string[] args)
-        {
-            bool isDebug = false;
-            Console.WriteLine("\nStarted!");
-            if (isDebug) Console.WriteLine("\nReinit Arduino...");
-            Arduino p_arduino2 = new Arduino();
-            p_arduino2.pinMode(0, Arduino.ANALOG);
-
-            while (true)
-            {
-
-                if (p_arduino2.isOpen())
-                {
-                    Measure_Voltage(isDebug, p_arduino2);
-                }
-                else
-                {
-                    Console.WriteLine("\n Failed to open Arduino...");
-                }
-
-            }
-        }*/
 
         private static float? Measure_Voltage(bool p_isDebug,ref BackgroundWorker BGW, Arduino p_arduino, Action<string> pLog = null)
         {
             bool cancelled = BGW.CancellationPending;
             float? end_val = null;
+            var endval2 = 0.0f;
 
             bool NeedLogging = p_isDebug && (pLog != null);
             List<float> vol_mass = new List<float>();
 
             for (int i = 0; i < 10; i++)
             {
-                if (NeedLogging) pLog("Reading from pin " + 0 + "...");
+              //  if (NeedLogging) pLog("Reading from pin " + 0 + "...");
                 int Value = p_arduino.analogRead(0);//Read the state of pin 0
                                                      // Console.WriteLine(Value);
                                                      // Console.WriteLine("Value=" + Value);
                 if (Value != 0) vol_mass.Add(Value);
-                if (NeedLogging) pLog("Voltage Value=" + ((Value * 5.00f) / 1023).ToString() + " v. ");
+               // if (NeedLogging) pLog("Voltage Value=" + ((Value * 5.00f) / 1023).ToString() + " v. ");
                 System.Threading.Thread.Sleep(500);
                 if (BGW.CancellationPending) return null;               
             }
-
             for (int i = 0; i < vol_mass.Count(); i++)
             {
-                end_val += vol_mass[i];
+                endval2 += vol_mass[i];
             }
+            if (!endval2.Equals(null)) end_val = endval2;
+            if (NeedLogging) pLog("Measured value " + end_val.ToString());
+
             if (BGW.CancellationPending) return null;
             if (end_val.Equals(null)) return null;
             if (float.IsNaN((float)end_val)) return null;

@@ -50,7 +50,7 @@ namespace Stereo_Vision
         OnLoadingForm newForm = null;
         Action<int, string> ReportProgress = null;
 
-        public const string MEOW_CurrentVerion = "2.71";
+        public const string CurrentVerion = "2.71";
         
         public MainWindow()
         {
@@ -72,7 +72,7 @@ namespace Stereo_Vision
         }
         public string Get_Version()
         {
-            return MEOW_CurrentVerion;
+            return CurrentVerion;
         }
         private void Form1_Load(object sender, EventArgs e)
         {

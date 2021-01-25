@@ -222,6 +222,8 @@ namespace Stereo_Vision
         private void Arduino_bus_ChargeLevel_onUpdated(int percentage)
         {
             Arduino_RW.ToogleCharge_Level(ref BMP2set_chargelev, ref Text2set, percentage);
+
+            LogMessage(String.Format("Осталось {0}", Text2set));
             Set_ChargeTEXT(Text2set);
             Set_ChargeBMP(BMP2set_chargelev);
         }
@@ -869,25 +871,37 @@ namespace Stereo_Vision
         delegate void DelegateForChargeLev_BMP(System.Drawing.Bitmap pBMP);
         private void Set_ChargeBMP(Bitmap pBMP2set)
         {
-
-            if (PB_ChargeVal.InvokeRequired)
+            try
             {
-                DelegateForChargeLev_BMP del = new DelegateForChargeLev_BMP(Set_ChargeBMP);
-                this.Invoke(del, new object[] { pBMP2set });
+                if (PB_ChargeVal.InvokeRequired)
+                {
+                    DelegateForChargeLev_BMP del = new DelegateForChargeLev_BMP(Set_ChargeBMP);
+                    this.Invoke(del, new object[] { pBMP2set });
+                }
+                else { PB_ChargeVal.Image = pBMP2set; }
             }
-            else { PB_ChargeVal.Image = pBMP2set; }
-            
+            catch
+            {
+                LogError("Ошибка при пересылки граф данных");
+            }
         }
         private void Set_ChargeTEXT(string pTextLevel)
         {
-            if (L_ChargeLev.InvokeRequired)
+            try
             {
-                DelegateForChargeLev_text del = new DelegateForChargeLev_text(Set_ChargeTEXT);
-                this.Invoke(del, new object[] { pTextLevel });
+                if (L_ChargeLev.InvokeRequired)
+                {
+                    DelegateForChargeLev_text del = new DelegateForChargeLev_text(Set_ChargeTEXT);
+                    this.Invoke(del, new object[] { pTextLevel });
+                }
+                else
+                {
+                    L_ChargeLev.Text = pTextLevel;
+                }
             }
-            else
+            catch
             {
-                L_ChargeLev.Text = pTextLevel;
+                LogError("Ошибка при пересылки текстовых данных");
             }
             
         }

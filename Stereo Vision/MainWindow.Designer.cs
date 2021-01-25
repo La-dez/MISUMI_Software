@@ -889,7 +889,7 @@ namespace Stereo_Vision
             this.LBConsole.Location = new System.Drawing.Point(0, 1);
             this.LBConsole.Margin = new System.Windows.Forms.Padding(0);
             this.LBConsole.Name = "LBConsole";
-            this.LBConsole.Size = new System.Drawing.Size(1278, 54);
+            this.LBConsole.Size = new System.Drawing.Size(1278, 108);
             this.LBConsole.TabIndex = 0;
             this.LBConsole.Visible = false;
             this.LBConsole.SelectedIndexChanged += new System.EventHandler(this.LBConsole_SelectedIndexChanged);
