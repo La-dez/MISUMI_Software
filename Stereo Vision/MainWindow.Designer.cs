@@ -139,7 +139,7 @@ namespace Stereo_Vision
             this.L_WB_CorPower = new System.Windows.Forms.Label();
             this.TrB_WB_CorPower = new System.Windows.Forms.TrackBar();
             this.B_WB_Calculate = new System.Windows.Forms.Button();
-            this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.TPAGE_AppSettings = new System.Windows.Forms.TabPage();
             this.TB_Set_CalibStereoFilePath = new System.Windows.Forms.TableLayoutPanel();
             this.label18 = new System.Windows.Forms.Label();
             this.label14 = new System.Windows.Forms.Label();
@@ -147,7 +147,19 @@ namespace Stereo_Vision
             this.TB_Set_CalibWBFilePath = new System.Windows.Forms.TextBox();
             this.B_Set_FindWBCalibFile = new System.Windows.Forms.Button();
             this.B_Set_FindStereoCalibFile = new System.Windows.Forms.Button();
-            this.tabPage5 = new System.Windows.Forms.TabPage();
+            this.TPAGE_ScreenSettings = new System.Windows.Forms.TabPage();
+            this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
+            this.B_ArdKey_4 = new System.Windows.Forms.Button();
+            this.B_ArdKey_3 = new System.Windows.Forms.Button();
+            this.B_ArdKey_2 = new System.Windows.Forms.Button();
+            this.B_ArdKey_1 = new System.Windows.Forms.Button();
+            this.B_ArdKey_0 = new System.Windows.Forms.Button();
+            this.TPAGE_EndoLight = new System.Windows.Forms.TabPage();
+            this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
+            this.B_Endo_DecreaseIntensity = new System.Windows.Forms.Button();
+            this.B_Endo_IncreaseIntensity = new System.Windows.Forms.Button();
+            this.TrB_LightAdjustment = new System.Windows.Forms.TrackBar();
+            this.TPAGE_AnotherSettings = new System.Windows.Forms.TabPage();
             this.label6 = new System.Windows.Forms.Label();
             this.B_BackBut = new System.Windows.Forms.Button();
             this.Pan_MainMenu = new System.Windows.Forms.Panel();
@@ -227,8 +239,13 @@ namespace Stereo_Vision
             this.TPAGE_WB.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.TrB_WB_CorPower)).BeginInit();
-            this.tabPage3.SuspendLayout();
+            this.TPAGE_AppSettings.SuspendLayout();
             this.TB_Set_CalibStereoFilePath.SuspendLayout();
+            this.TPAGE_ScreenSettings.SuspendLayout();
+            this.tableLayoutPanel3.SuspendLayout();
+            this.TPAGE_EndoLight.SuspendLayout();
+            this.tableLayoutPanel4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.TrB_LightAdjustment)).BeginInit();
             this.Pan_MainMenu.SuspendLayout();
             this.TLP_UserMainPanel.SuspendLayout();
             this.Pan_Measurements.SuspendLayout();
@@ -1380,9 +1397,11 @@ namespace Stereo_Vision
             this.TABC_Settings.Controls.Add(this.TPAGE_VidSettings);
             this.TABC_Settings.Controls.Add(this.TPAGE_PhotoSettings);
             this.TABC_Settings.Controls.Add(this.TPAGE_CameraSettings);
+            this.TABC_Settings.Controls.Add(this.TPAGE_ScreenSettings);
+            this.TABC_Settings.Controls.Add(this.TPAGE_EndoLight);
             this.TABC_Settings.Controls.Add(this.TPAGE_WB);
-            this.TABC_Settings.Controls.Add(this.tabPage3);
-            this.TABC_Settings.Controls.Add(this.tabPage5);
+            this.TABC_Settings.Controls.Add(this.TPAGE_AppSettings);
+            this.TABC_Settings.Controls.Add(this.TPAGE_AnotherSettings);
             this.TABC_Settings.Dock = System.Windows.Forms.DockStyle.Fill;
             this.TABC_Settings.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.TABC_Settings.Location = new System.Drawing.Point(0, 0);
@@ -1937,15 +1956,15 @@ namespace Stereo_Vision
             this.B_WB_Calculate.UseVisualStyleBackColor = true;
             this.B_WB_Calculate.Click += new System.EventHandler(this.B_WB_Calculate_Click);
             // 
-            // tabPage3
+            // TPAGE_AppSettings
             // 
-            this.tabPage3.BackColor = System.Drawing.Color.Black;
-            this.tabPage3.Controls.Add(this.TB_Set_CalibStereoFilePath);
-            this.tabPage3.Location = new System.Drawing.Point(4, 25);
-            this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Size = new System.Drawing.Size(492, 48);
-            this.tabPage3.TabIndex = 2;
-            this.tabPage3.Text = "Настройки приложения";
+            this.TPAGE_AppSettings.BackColor = System.Drawing.Color.Black;
+            this.TPAGE_AppSettings.Controls.Add(this.TB_Set_CalibStereoFilePath);
+            this.TPAGE_AppSettings.Location = new System.Drawing.Point(4, 25);
+            this.TPAGE_AppSettings.Name = "TPAGE_AppSettings";
+            this.TPAGE_AppSettings.Size = new System.Drawing.Size(492, 48);
+            this.TPAGE_AppSettings.TabIndex = 2;
+            this.TPAGE_AppSettings.Text = "Настройки приложения";
             // 
             // TB_Set_CalibStereoFilePath
             // 
@@ -2059,14 +2078,181 @@ namespace Stereo_Vision
             this.B_Set_FindStereoCalibFile.UseVisualStyleBackColor = false;
             this.B_Set_FindStereoCalibFile.Click += new System.EventHandler(this.B_Set_FindStereoCalibFile_Click);
             // 
-            // tabPage5
+            // TPAGE_ScreenSettings
             // 
-            this.tabPage5.Location = new System.Drawing.Point(4, 25);
-            this.tabPage5.Name = "tabPage5";
-            this.tabPage5.Size = new System.Drawing.Size(492, 48);
-            this.tabPage5.TabIndex = 4;
-            this.tabPage5.Text = "Прочие";
-            this.tabPage5.UseVisualStyleBackColor = true;
+            this.TPAGE_ScreenSettings.BackColor = System.Drawing.Color.Black;
+            this.TPAGE_ScreenSettings.Controls.Add(this.tableLayoutPanel3);
+            this.TPAGE_ScreenSettings.Location = new System.Drawing.Point(4, 25);
+            this.TPAGE_ScreenSettings.Name = "TPAGE_ScreenSettings";
+            this.TPAGE_ScreenSettings.Padding = new System.Windows.Forms.Padding(3);
+            this.TPAGE_ScreenSettings.Size = new System.Drawing.Size(492, 48);
+            this.TPAGE_ScreenSettings.TabIndex = 6;
+            this.TPAGE_ScreenSettings.Text = "Настройки экрана";
+            // 
+            // tableLayoutPanel3
+            // 
+            this.tableLayoutPanel3.ColumnCount = 5;
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
+            this.tableLayoutPanel3.Controls.Add(this.B_ArdKey_4, 4, 0);
+            this.tableLayoutPanel3.Controls.Add(this.B_ArdKey_3, 3, 0);
+            this.tableLayoutPanel3.Controls.Add(this.B_ArdKey_2, 2, 0);
+            this.tableLayoutPanel3.Controls.Add(this.B_ArdKey_1, 1, 0);
+            this.tableLayoutPanel3.Controls.Add(this.B_ArdKey_0, 0, 0);
+            this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel3.Location = new System.Drawing.Point(3, 3);
+            this.tableLayoutPanel3.Name = "tableLayoutPanel3";
+            this.tableLayoutPanel3.RowCount = 1;
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 42F));
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 42F));
+            this.tableLayoutPanel3.Size = new System.Drawing.Size(486, 42);
+            this.tableLayoutPanel3.TabIndex = 0;
+            // 
+            // B_ArdKey_4
+            // 
+            this.B_ArdKey_4.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.B_ArdKey_4.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.B_ArdKey_4.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            this.B_ArdKey_4.Location = new System.Drawing.Point(391, 3);
+            this.B_ArdKey_4.Name = "B_ArdKey_4";
+            this.B_ArdKey_4.Size = new System.Drawing.Size(92, 36);
+            this.B_ArdKey_4.TabIndex = 5;
+            this.B_ArdKey_4.Text = "BK4";
+            this.B_ArdKey_4.UseVisualStyleBackColor = true;
+            this.B_ArdKey_4.Click += new System.EventHandler(this.B_ArdKey_N_Click);
+            // 
+            // B_ArdKey_3
+            // 
+            this.B_ArdKey_3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.B_ArdKey_3.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.B_ArdKey_3.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            this.B_ArdKey_3.Location = new System.Drawing.Point(294, 3);
+            this.B_ArdKey_3.Name = "B_ArdKey_3";
+            this.B_ArdKey_3.Size = new System.Drawing.Size(91, 36);
+            this.B_ArdKey_3.TabIndex = 4;
+            this.B_ArdKey_3.Text = "BK3";
+            this.B_ArdKey_3.UseVisualStyleBackColor = true;
+            this.B_ArdKey_3.Click += new System.EventHandler(this.B_ArdKey_N_Click);
+            // 
+            // B_ArdKey_2
+            // 
+            this.B_ArdKey_2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.B_ArdKey_2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.B_ArdKey_2.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            this.B_ArdKey_2.Location = new System.Drawing.Point(197, 3);
+            this.B_ArdKey_2.Name = "B_ArdKey_2";
+            this.B_ArdKey_2.Size = new System.Drawing.Size(91, 36);
+            this.B_ArdKey_2.TabIndex = 3;
+            this.B_ArdKey_2.Text = "BK2";
+            this.B_ArdKey_2.UseVisualStyleBackColor = true;
+            this.B_ArdKey_2.Click += new System.EventHandler(this.B_ArdKey_N_Click);
+            // 
+            // B_ArdKey_1
+            // 
+            this.B_ArdKey_1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.B_ArdKey_1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.B_ArdKey_1.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            this.B_ArdKey_1.Location = new System.Drawing.Point(100, 3);
+            this.B_ArdKey_1.Name = "B_ArdKey_1";
+            this.B_ArdKey_1.Size = new System.Drawing.Size(91, 36);
+            this.B_ArdKey_1.TabIndex = 2;
+            this.B_ArdKey_1.Text = "BK1";
+            this.B_ArdKey_1.UseVisualStyleBackColor = true;
+            this.B_ArdKey_1.Click += new System.EventHandler(this.B_ArdKey_N_Click);
+            // 
+            // B_ArdKey_0
+            // 
+            this.B_ArdKey_0.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.B_ArdKey_0.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.B_ArdKey_0.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            this.B_ArdKey_0.Location = new System.Drawing.Point(3, 3);
+            this.B_ArdKey_0.Name = "B_ArdKey_0";
+            this.B_ArdKey_0.Size = new System.Drawing.Size(91, 36);
+            this.B_ArdKey_0.TabIndex = 1;
+            this.B_ArdKey_0.Text = "BK0";
+            this.B_ArdKey_0.UseVisualStyleBackColor = true;
+            this.B_ArdKey_0.Click += new System.EventHandler(this.B_ArdKey_N_Click);
+            // 
+            // TPAGE_EndoLight
+            // 
+            this.TPAGE_EndoLight.BackColor = System.Drawing.Color.Black;
+            this.TPAGE_EndoLight.Controls.Add(this.tableLayoutPanel4);
+            this.TPAGE_EndoLight.Location = new System.Drawing.Point(4, 25);
+            this.TPAGE_EndoLight.Name = "TPAGE_EndoLight";
+            this.TPAGE_EndoLight.Padding = new System.Windows.Forms.Padding(3);
+            this.TPAGE_EndoLight.Size = new System.Drawing.Size(492, 48);
+            this.TPAGE_EndoLight.TabIndex = 7;
+            this.TPAGE_EndoLight.Text = "Подсветка";
+            // 
+            // tableLayoutPanel4
+            // 
+            this.tableLayoutPanel4.ColumnCount = 3;
+            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 15F));
+            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 70F));
+            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 15F));
+            this.tableLayoutPanel4.Controls.Add(this.B_Endo_DecreaseIntensity, 0, 0);
+            this.tableLayoutPanel4.Controls.Add(this.B_Endo_IncreaseIntensity, 2, 0);
+            this.tableLayoutPanel4.Controls.Add(this.TrB_LightAdjustment, 1, 0);
+            this.tableLayoutPanel4.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel4.Location = new System.Drawing.Point(3, 3);
+            this.tableLayoutPanel4.Name = "tableLayoutPanel4";
+            this.tableLayoutPanel4.RowCount = 1;
+            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 42F));
+            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 42F));
+            this.tableLayoutPanel4.Size = new System.Drawing.Size(486, 42);
+            this.tableLayoutPanel4.TabIndex = 0;
+            // 
+            // B_Endo_DecreaseIntensity
+            // 
+            this.B_Endo_DecreaseIntensity.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.B_Endo_DecreaseIntensity.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.B_Endo_DecreaseIntensity.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            this.B_Endo_DecreaseIntensity.Location = new System.Drawing.Point(3, 3);
+            this.B_Endo_DecreaseIntensity.Name = "B_Endo_DecreaseIntensity";
+            this.B_Endo_DecreaseIntensity.Size = new System.Drawing.Size(66, 36);
+            this.B_Endo_DecreaseIntensity.TabIndex = 0;
+            this.B_Endo_DecreaseIntensity.Text = "-";
+            this.B_Endo_DecreaseIntensity.UseVisualStyleBackColor = true;
+            this.B_Endo_DecreaseIntensity.Click += new System.EventHandler(this.B_Endo_DecreaseIntensity_Click);
+            // 
+            // B_Endo_IncreaseIntensity
+            // 
+            this.B_Endo_IncreaseIntensity.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.B_Endo_IncreaseIntensity.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.B_Endo_IncreaseIntensity.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            this.B_Endo_IncreaseIntensity.Location = new System.Drawing.Point(415, 3);
+            this.B_Endo_IncreaseIntensity.Name = "B_Endo_IncreaseIntensity";
+            this.B_Endo_IncreaseIntensity.Size = new System.Drawing.Size(68, 36);
+            this.B_Endo_IncreaseIntensity.TabIndex = 1;
+            this.B_Endo_IncreaseIntensity.Text = "+";
+            this.B_Endo_IncreaseIntensity.UseVisualStyleBackColor = true;
+            this.B_Endo_IncreaseIntensity.Click += new System.EventHandler(this.B_Endo_IncreaseIntensity_Click);
+            // 
+            // TrB_LightAdjustment
+            // 
+            this.TrB_LightAdjustment.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.TrB_LightAdjustment.Location = new System.Drawing.Point(75, 3);
+            this.TrB_LightAdjustment.Maximum = 255;
+            this.TrB_LightAdjustment.Name = "TrB_LightAdjustment";
+            this.TrB_LightAdjustment.Size = new System.Drawing.Size(334, 36);
+            this.TrB_LightAdjustment.TabIndex = 2;
+            this.TrB_LightAdjustment.TickFrequency = 0;
+            this.TrB_LightAdjustment.TickStyle = System.Windows.Forms.TickStyle.None;
+            this.TrB_LightAdjustment.Scroll += new System.EventHandler(this.TrB_LightAdjustment_Scroll);
+            // 
+            // TPAGE_AnotherSettings
+            // 
+            this.TPAGE_AnotherSettings.Location = new System.Drawing.Point(4, 25);
+            this.TPAGE_AnotherSettings.Name = "TPAGE_AnotherSettings";
+            this.TPAGE_AnotherSettings.Size = new System.Drawing.Size(492, 48);
+            this.TPAGE_AnotherSettings.TabIndex = 4;
+            this.TPAGE_AnotherSettings.Text = "Прочие";
+            this.TPAGE_AnotherSettings.UseVisualStyleBackColor = true;
             // 
             // label6
             // 
@@ -2723,9 +2909,15 @@ namespace Stereo_Vision
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.TrB_WB_CorPower)).EndInit();
-            this.tabPage3.ResumeLayout(false);
+            this.TPAGE_AppSettings.ResumeLayout(false);
             this.TB_Set_CalibStereoFilePath.ResumeLayout(false);
             this.TB_Set_CalibStereoFilePath.PerformLayout();
+            this.TPAGE_ScreenSettings.ResumeLayout(false);
+            this.tableLayoutPanel3.ResumeLayout(false);
+            this.TPAGE_EndoLight.ResumeLayout(false);
+            this.tableLayoutPanel4.ResumeLayout(false);
+            this.tableLayoutPanel4.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.TrB_LightAdjustment)).EndInit();
             this.Pan_MainMenu.ResumeLayout(false);
             this.TLP_UserMainPanel.ResumeLayout(false);
             this.TLP_UserMainPanel.PerformLayout();
@@ -2754,9 +2946,12 @@ namespace Stereo_Vision
         private System.Windows.Forms.TabControl TABC_Settings;
         private System.Windows.Forms.TabPage TPAGE_VidSettings;
         private System.Windows.Forms.TabPage TPAGE_PhotoSettings;
-        private System.Windows.Forms.TabPage tabPage3;
+        private System.Windows.Forms.TabPage TPAGE_AppSettings;
         private System.Windows.Forms.TabPage TPAGE_CameraSettings;
-        private System.Windows.Forms.TabPage tabPage5;
+        private System.Windows.Forms.TabPage TPAGE_WB;
+        private System.Windows.Forms.TabPage TPAGE_ScreenSettings;
+        private System.Windows.Forms.TabPage TPAGE_EndoLight;
+        private System.Windows.Forms.TabPage TPAGE_AnotherSettings;
         private System.Windows.Forms.Button B_ExportMode;
         private System.Windows.Forms.Button B_Quit;
         private System.Windows.Forms.TableLayoutPanel TLP_Settings;
@@ -2874,7 +3069,6 @@ namespace Stereo_Vision
         private System.Windows.Forms.Timer Timer_3DRenderer;
         private System.ComponentModel.BackgroundWorker BGW_3DRotator;
         private System.ComponentModel.BackgroundWorker BWorkerForLoad3D;
-        private System.Windows.Forms.TabPage TPAGE_WB;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.Button B_WB_LowerFrames;
@@ -2895,6 +3089,16 @@ namespace Stereo_Vision
         private System.Windows.Forms.Timer T_3DCancellingChecker;
         private System.ComponentModel.BackgroundWorker BGW_StereoInitializer;
         private System.Windows.Forms.Timer T_CameraPluggedIn_Checker;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
+        private System.Windows.Forms.Button B_ArdKey_4;
+        private System.Windows.Forms.Button B_ArdKey_3;
+        private System.Windows.Forms.Button B_ArdKey_2;
+        private System.Windows.Forms.Button B_ArdKey_1;
+        private System.Windows.Forms.Button B_ArdKey_0;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel4;
+        private System.Windows.Forms.Button B_Endo_DecreaseIntensity;
+        private System.Windows.Forms.Button B_Endo_IncreaseIntensity;
+        private System.Windows.Forms.TrackBar TrB_LightAdjustment;
     }
 }
 

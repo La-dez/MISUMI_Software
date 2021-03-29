@@ -19,7 +19,7 @@ namespace Stereo_Vision
         bool HiberNoAsk = false;
         int AttachmentFactor = 10;
         bool FullScrin = false;
-        TabPage[] adminPages = null;
+        List<TabPage> adminPages = null;
         int LastChargeLevel_percents = 100;
         int CriticalLevel_percents = 5; // Critical TimeLeft in percents
 
@@ -374,17 +374,35 @@ namespace Stereo_Vision
             else LBConsole.SendToBack();
             if (!isAdmin)
             {
-                adminPages = new TabPage[] { /*TABC_Settings.TabPages[3],*/ TABC_Settings.TabPages[4], TABC_Settings.TabPages[5] };
-                TABC_Settings.TabPages[5].Parent = null;
-                TABC_Settings.TabPages[4].Parent = null;
-                //TABC_Settings.TabPages[3].Parent = null;
-                // TABC_Settings.TabPages[2].Parent = null;
+                adminPages = new List<TabPage>();
+                for (int i = 0; i < TABC_Settings.TabPages.Count; i++)
+                {
+                    if ((TABC_Settings.TabPages[i].Name != "TPAGE_VidSettings")
+                        && (TABC_Settings.TabPages[i].Name != "TPAGE_PhotoSettings")
+                        && (TABC_Settings.TabPages[i].Name != "TPAGE_CameraSettings")
+                        && (TABC_Settings.TabPages[i].Name != "TPAGE_ScreenSettings")
+                        && (TABC_Settings.TabPages[i].Name != "TPAGE_EndoLight"))
+                    {
+                        try
+                        {
+                            adminPages.Add(TABC_Settings.TabPages[i]);
+                            TABC_Settings.TabPages[i].Parent = null;
+                            i--;
+                        }
+                        catch(Exception e)
+                        {
+                            var mes = e.Message;
+                        }
+                    }
+                }
             }
             else
             {
-               TABC_Settings.TabPages.Add(adminPages[0]);
-                TABC_Settings.TabPages.Add(adminPages[1]);
-               // TABC_Settings.TabPages.Add(adminPages[2]);
+                for (int i = 0; i < adminPages.Count; i++)
+                {
+                    TABC_Settings.TabPages.Add(adminPages[i]);
+                }
+                adminPages.Clear();
             }
 
             LogMessage("AdminMode = " + isAdmin.ToString());

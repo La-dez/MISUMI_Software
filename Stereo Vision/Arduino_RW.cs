@@ -15,8 +15,22 @@ namespace Stereo_Vision
 
         float _Voltage_critical_measured = 0;
         float TimeLeft_critical_percents = 0;
+        
         float _Voltage_measured_previous = 4.482f;
         float? _Voltage_measured = 4.482f;
+        protected byte _LightIntensity = 0;
+        public byte LightIntensity
+        {
+            set
+            {
+                if (!(_LightIntensity == 255 || _LightIntensity == 0)) 
+                { _LightIntensity = value; }      
+            }
+            get
+            {
+                return _LightIntensity;
+            }
+        }
         float? Voltage_measured
         {
             set
@@ -127,6 +141,48 @@ namespace Stereo_Vision
             Panduino.Close();
             GC.SuppressFinalize(this);
         }
+        public  float Click_DKey(int number,int shift = 0)
+        {
+            Measuring_Completed = false;
+            Panduino.digitalWrite(number + shift, Arduino.HIGH);
+            System.Threading.Thread.Sleep(20);
+            Panduino.digitalWrite(number + shift, Arduino.LOW);
+            Measuring_Completed = true;
+            return 0;
+        }
+
+        public float Press_DKey(int number)
+        {
+            Measuring_Completed = false;
+            Panduino.digitalWrite(number + 0, Arduino.HIGH);
+            Measuring_Completed = true;
+            return 0;
+        }
+        public float Unpress_DKey(int number)
+        {
+            Measuring_Completed = false;         
+            Panduino.digitalWrite(number + 0, Arduino.LOW);
+            Measuring_Completed = true;
+            return 0;
+        }
+        public void IncreaseIntensity()
+        {
+            LightIntensity++;
+            AdjustIntensity(LightIntensity);
+        }
+        public void DecreaseIntensity()
+        {
+            LightIntensity--;
+            AdjustIntensity(LightIntensity);
+        }
+        public void AdjustIntensity(byte IntValue)
+        {
+            Measuring_Completed = false;
+            Panduino.analogWrite(8, IntValue);
+            System.Threading.Thread.Sleep(20);
+            Measuring_Completed = true;
+        }
+
 
         private void BGW_Thread_DoWork(object sender, DoWorkEventArgs e)
         {
@@ -204,6 +260,7 @@ namespace Stereo_Vision
             return 0.0f;
         }
 
+       
         private static float? Measure_Voltage(bool p_isDebug,ref BackgroundWorker BGW, Arduino p_arduino, Action<string> pLog = null)
         {
             bool cancelled = BGW.CancellationPending;

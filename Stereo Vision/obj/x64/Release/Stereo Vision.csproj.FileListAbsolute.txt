@@ -141,4 +141,6 @@ E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\obj\x6
 E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\obj\x64\Release\HDVision.exe
 E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\obj\x64\Release\HDVision.pdb
 E:\Работа Саша\Эндоскопы\MISUMI_Software\Stereo Vision\obj\x64\Release\Stereo Vision.csprojAssemblyReference.cache
-D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Stereo Vision\obj\x64\Release\Stereo Vision.csprojResolveAssemblyReference.cache
+D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Stereo Vision\obj\x64\Release\Stereo Vision.csprojAssemblyReference.cache
+D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Stereo Vision\obj\x64\Release\Stereo Vision.csproj.CoreCompileInputs.cache
+D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Stereo Vision\obj\x64\Release\Stereo Vision.csproj.CopyComplete

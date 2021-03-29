@@ -1177,6 +1177,28 @@ namespace Stereo_Vision
         {
 
         }
+
+        private void B_ArdKey_N_Click(object sender, EventArgs e)
+        {
+            int Num_of_Key = Convert.ToInt32(((sender as Button).Name.Last().ToString())); //Узнаем номер клавиши, которая нажата
+            Arduino_bus.Click_DKey(Num_of_Key);
+
+        }
+
+        private void B_Endo_IncreaseIntensity_Click(object sender, EventArgs e)
+        {
+            Arduino_bus.IncreaseIntensity();
+        }
+
+        private void B_Endo_DecreaseIntensity_Click(object sender, EventArgs e)
+        {
+            Arduino_bus.DecreaseIntensity();
+        }
+
+        private void TrB_LightAdjustment_Scroll(object sender, EventArgs e)
+        {
+            Arduino_bus.AdjustIntensity((byte)TrB_LightAdjustment.Value);
+        }
     }
 }
 
