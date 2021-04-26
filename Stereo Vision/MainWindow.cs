@@ -1181,7 +1181,7 @@ namespace Stereo_Vision
         private void B_ArdKey_N_Click(object sender, EventArgs e)
         {
             int Num_of_Key = Convert.ToInt32(((sender as Button).Name.Last().ToString())); //Узнаем номер клавиши, которая нажата
-            Arduino_bus.Click_DKey(Num_of_Key);
+            Arduino_bus.Click_DKey(Num_of_Key,1);
 
         }
 

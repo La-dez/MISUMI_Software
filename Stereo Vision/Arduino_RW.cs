@@ -19,6 +19,7 @@ namespace Stereo_Vision
         float _Voltage_measured_previous = 4.482f;
         float? _Voltage_measured = 4.482f;
         protected byte _LightIntensity = 0;
+        int AnalogPin_Light = 9;
         public byte LightIntensity
         {
             set
@@ -113,7 +114,15 @@ namespace Stereo_Vision
             TimeLeft_critical_percents = pTimeLeft_critical_percents;
             _Voltage_critical_measured = Convert_TimePercent_toVoltage(pTimeLeft_critical_percents);
             _Voltage_measured = 4.482f; //Convert_TimePercent_toVoltage(Initial_percents);
+
             Panduino.pinMode(0, Arduino.ANALOG);
+            Panduino.pinMode(AnalogPin_Light, Arduino.PWM);
+            Panduino.pinMode(1, Arduino.OUTPUT);
+            Panduino.pinMode(2, Arduino.OUTPUT);
+            Panduino.pinMode(3, Arduino.OUTPUT);
+            Panduino.pinMode(4, Arduino.OUTPUT);
+            Panduino.pinMode(5, Arduino.OUTPUT);
+
             BGW_Thread.DoWork += new DoWorkEventHandler(this.BGW_Thread_DoWork);
             BGW_Thread.RunWorkerCompleted += BGW_Thread_RunWorkerCompleted;
             BGW_Thread.WorkerSupportsCancellation = true;
@@ -148,21 +157,26 @@ namespace Stereo_Vision
             System.Threading.Thread.Sleep(20);
             Panduino.digitalWrite(number + shift, Arduino.LOW);
             Measuring_Completed = true;
+            Log("Arduino Button clicked: "+ (number+shift).ToString());
             return 0;
         }
 
-        public float Press_DKey(int number)
+        public float Press_DKey(int number, int shift = 0)
         {
             Measuring_Completed = false;
-            Panduino.digitalWrite(number + 0, Arduino.HIGH);
+            Panduino.digitalWrite(number + shift, Arduino.HIGH);
             Measuring_Completed = true;
+
+            Log("Arduino Button pressed: " + (number + shift).ToString());
             return 0;
         }
-        public float Unpress_DKey(int number)
+        public float Unpress_DKey(int number, int shift = 0)
         {
             Measuring_Completed = false;         
-            Panduino.digitalWrite(number + 0, Arduino.LOW);
+            Panduino.digitalWrite(number + shift, Arduino.LOW);
             Measuring_Completed = true;
+
+            Log("Arduino Button unpressed: " + (number + shift).ToString());
             return 0;
         }
         public void IncreaseIntensity()
@@ -177,9 +191,12 @@ namespace Stereo_Vision
         }
         public void AdjustIntensity(byte IntValue)
         {
+            LightIntensity = IntValue;
             Measuring_Completed = false;
-            Panduino.analogWrite(8, IntValue);
-            System.Threading.Thread.Sleep(20);
+            Panduino.analogWrite(AnalogPin_Light, IntValue);
+            
+            System.Threading.Thread.Sleep(100);
+            Log("Arduino analog intensity adjusted to value: " + (IntValue).ToString());
             Measuring_Completed = true;
         }
 
