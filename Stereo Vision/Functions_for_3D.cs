@@ -98,7 +98,8 @@ namespace Stereo_Vision
             }
             catch (Exception exc)
             {
-                throw new Exception("Ошибка при инициализации объекта stereoEstimator. Вероятно, неправильно считаны файлы stereo_params_new.xml");
+                LogError("Ошибка при инициализации объекта stereoEstimator. Вероятно, неправильно считаны файлы stereo_params_new.xml");
+               // throw new Exception("Ошибка при инициализации объекта stereoEstimator. Вероятно, неправильно считаны файлы stereo_params_new.xml");
             }
         }
 

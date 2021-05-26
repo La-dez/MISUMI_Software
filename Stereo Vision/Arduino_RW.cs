@@ -19,7 +19,7 @@ namespace Stereo_Vision
         float _Voltage_measured_previous = 4.482f;
         float? _Voltage_measured = 4.482f;
         protected byte _LightIntensity = 0;
-        int AnalogPin_Light = 9;
+        int AnalogPin_Light = 13;
         public byte LightIntensity
         {
             set
@@ -154,7 +154,7 @@ namespace Stereo_Vision
         {
             Measuring_Completed = false;
             Panduino.digitalWrite(number + shift, Arduino.HIGH);
-            System.Threading.Thread.Sleep(20);
+            System.Threading.Thread.Sleep(100);
             Panduino.digitalWrite(number + shift, Arduino.LOW);
             Measuring_Completed = true;
             Log("Arduino Button clicked: "+ (number+shift).ToString());
@@ -195,7 +195,7 @@ namespace Stereo_Vision
             Measuring_Completed = false;
             Panduino.analogWrite(AnalogPin_Light, IntValue);
             
-            System.Threading.Thread.Sleep(100);
+       //     System.Threading.Thread.Sleep(100);
             Log("Arduino analog intensity adjusted to value: " + (IntValue).ToString());
             Measuring_Completed = true;
         }
@@ -210,7 +210,7 @@ namespace Stereo_Vision
                 Measuring_Completed = false;
                 if (Panduino.isOpen() && !BGW_Thread.CancellationPending)
                 {
-                    Voltage_measured = Measure_Voltage(false, ref worker, Panduino, Log);
+                    Voltage_measured = Measure_Voltage(true, ref worker, Panduino, Log);
                  //  Voltage_measured = (float)(3.48 + a.NextDouble());
                    // System.Threading.Thread.Sleep(500);
                 }
