@@ -15,43 +15,31 @@ namespace Stereo_Vision
         private VideoCapture _capture = null;
         bool isRecording = false;
         bool isSnapShot_needed = false;
-        bool lastFrame_processed = true;
         private Mat CurrentFrame;
         private Mat CurrentFrame2;
-        private Mat resizedim;
-        int Width_for_Resizing = 1280;
-        int Height_for_Resizing = 720;
-        System.Drawing.Size Size_for_Resizing = new System.Drawing.Size(1280, 720);
         //Var's for Video Translation and recording
         int TotalFramesGotten = 0;
         double CurrentFPS = 0;
-        double Fps_toWrite = 30;
-        double FpsMax_toTranslate = 30;
+        double Fps_toWrite = 10;
 
         //Var's for videorecord
         double Lenght_secs = 10;
         int FramesToGot = 60 * 30;
         string RecVid_path = Path.Combine(/*System.Windows.Forms.Application.StartupPath*/"C:\\", "Video");
-        string RecPhotos_path = Path.Combine(/*System.Windows.Forms.Application.StartupPath*/"C:\\", "Photo");
+        string RecSnapShot_path = Path.Combine(/*System.Windows.Forms.Application.StartupPath*/"C:\\", "Photo");
         string Export_Vid_from = Path.Combine(/*System.Windows.Forms.Application.StartupPath*/"C:\\", "Video");
         string Export_Photos_from = Path.Combine(/*System.Windows.Forms.Application.StartupPath*/"C:\\", "Photo");
         string Export_Vid_to = null;
         string Export_Photos_to = null;
         string Current_Extension_video = ".mp4";
-        string Current_Extension_photo = ".jpeg";
+        string Current_Extension_photo = ".bmp";
         string Video_name = "Video_";
         string Snapshot_name = "Snapshot_";
-        string Video_name_lastcaptured = "Video_00.mp4";
-        string Photo_name_lastcaptured = "Snapshot_000.jpeg";
         int Brightness_Value = 0;
         int Contrast_Value = 0;
         int Saturation_Value = 0;
         int Gamma_Value = 0;
         int Gain_Value = 0;
-        int Loaded_Width = 1280;
-        int Loaded_Height = 720;
-        int Current_FourCC = -1;
-        double exposure = 0;
 
         int Export_style = 0; //0 - С момента последнего включения, 
                               //1 - За время(укажите время в часах),
@@ -70,42 +58,18 @@ namespace Stereo_Vision
         bool All_isPrepared_forCapture = false;
         VideoWriter VidWriter = null;
         bool CaptureStoped_byUser = false;
-        System.Diagnostics.Stopwatch STW = new System.Diagnostics.Stopwatch();
-        System.Diagnostics.Stopwatch STW_Draw = new System.Diagnostics.Stopwatch();
-        System.Diagnostics.Stopwatch STW_Resizing = new System.Diagnostics.Stopwatch();
-        System.Diagnostics.Stopwatch STW_2HideLabel = new System.Diagnostics.Stopwatch();
-        
-        int FramesGotten = 0;
-        float FramesDrawen = 0;
-        bool FrameDrawen = true;
 
-        // List<string> Captured_names_Vids = new List<string>(); Вместо этого пишу цифры просто
-        // List<string> Captured_names_Photos = new List<string>();
+       // List<string> Captured_names_Vids = new List<string>(); Вместо этого пишу цифры просто
+       // List<string> Captured_names_Photos = new List<string>();
 
         private void PrepareTheCamera()
         {
-            CvInvoke.UseOpenCL = false;
+             CvInvoke.UseOpenCL = false;
             try
             {
 
-                _capture = new VideoCapture(/*CaptureType.*/);
-             /*  double Aexp = _capture.GetCaptureProperty(CapProp.AutoExposure);
-                _capture.SetCaptureProperty(CapProp.AutoExposure, 0.25);
-                Aexp = _capture.GetCaptureProperty(CapProp.AutoExposure);*/
-
-               // _capture.SetCaptureProperty(CapProp.Settings, 1);
-
-                //Не работает, по факту
-              /*  exposure = _capture.GetCaptureProperty(CapProp.Exposure);
-                _capture.SetCaptureProperty(CapProp.Exposure,-7);
-                exposure = _capture.GetCaptureProperty(CapProp.Exposure);*/
-                //Тоже не раотает
-                /*_capture.SetCaptureProperty(CapProp.AutoExposure,  0.25);
-                
-                Aexp = Convert.ToBoolean(_capture.GetCaptureProperty(CapProp.AutoExposure));
-                double exp = _capture.GetCaptureProperty(CapProp.Exposure);
-                Timer_Frame.Start();*/
-                // _capture.
+                _capture = new VideoCapture(0);
+               // _capture.
                 _capture.ImageGrabbed += ProcessFrame;
             }
             catch (NullReferenceException excpt)
@@ -114,91 +78,46 @@ namespace Stereo_Vision
             }
             CurrentFrame = new Mat();
 
+           
+            _capture.SetCaptureProperty(CapProp.Fps, 30);
+           var FPS = _capture.GetCaptureProperty(CapProp.Fps);
+
+            var CurFourCC = (int)_capture.GetCaptureProperty(CapProp.FourCC);
+            var RealName_what = FourCC_decoder(CurFourCC);
+
+
+
+            int FourCC_LAGS = VideoWriter.Fourcc('L', 'A', 'G', 'S');
+            _capture.SetCaptureProperty(CapProp.FourCC, FourCC_LAGS);
+            int FourCC_LAGS_maybe = (int)_capture.GetCaptureProperty(CapProp.FourCC);
+            var RealName_LAGS_maybe = FourCC_decoder(FourCC_LAGS_maybe);
+
             int FourCC_MJPG = VideoWriter.Fourcc('M', 'J', 'P', 'G');
-           // int FourCC_noc = 0;
-           // int FourCC_noc2 = -466162819;
-            Current_FourCC = FourCC_MJPG;
-            /* int FourCC_MP4 = VideoWriter.Fourcc('M', 'P', '4', 'V'); 
-             int FourCC_LAGS = VideoWriter.Fourcc('L', 'A', 'G', 'S');
-             int FourCC_H264 = VideoWriter.Fourcc('H', '2', '6', '4');
-             int FourCC_YUY2 = VideoWriter.Fourcc('Y', 'U', 'Y', '2');*/
-
-             char[] FourCC_MJPG_str = FourCC_int_2_str(FourCC_MJPG);
-
-             int FourCC_Current = (int)_capture.GetCaptureProperty(CapProp.FourCC);
-             char[] FourCC_Current_str = FourCC_int_2_str(FourCC_Current);
-
             _capture.SetCaptureProperty(CapProp.FourCC, FourCC_MJPG);
-            _capture.SetCaptureProperty(CapProp.FrameWidth, 1280);
-            _capture.SetCaptureProperty(CapProp.FrameHeight, 720);
-            FourCC_Current = (int)_capture.GetCaptureProperty(CapProp.FourCC);
-            FourCC_Current_str = FourCC_int_2_str(FourCC_Current);
-            int CurrentWidth = (int)_capture.GetCaptureProperty(CapProp.FrameWidth);
+            int FourCC_MJPG_maybe = (int)_capture.GetCaptureProperty(CapProp.FourCC);
+            var RealName_MJPG_maybe = FourCC_decoder(FourCC_MJPG_maybe);
+            //  _capture.SetCaptureProperty(CapProp.FourCC,);
 
-
-            STW.Start();
-            STW_Draw.Start();
-
-            // 
-            /*FourCC_Current = (int)_capture.GetCaptureProperty(CapProp.FourCC);
-            FourCC_Current_str = FourCC_int_2_str(FourCC_Current);
-            int CurFps = (int)_capture.GetCaptureProperty(CapProp.Fps);*/
-
-
-            /*   _capture.SetCaptureProperty(CapProp.FourCC, FourCC_YUY2);
-               _capture.SetCaptureProperty(CapProp.FrameWidth, MaxWidth);
-               _capture.SetCaptureProperty(CapProp.FrameHeight, MaxHeight);
-               FourCC_Current = (int)_capture.GetCaptureProperty(CapProp.FourCC);
-               FourCC_Current_str = FourCC_int_2_str(FourCC_Current);
-               _capture = new VideoCapture();*/
-
-
+        }
+        private char[] FourCC_decoder(int fourcc)
+        {
+            return new char[5] {(char)(fourcc & 0XFF),(char)((fourcc & 0XFF00) >> 8), (char)((fourcc & 0XFF0000) >> 16), (char)((fourcc & 0XFF000000) >> 24), (char)0};
         }
         private void ProcessFrame(object sender, EventArgs arg) //Все, что происходит при получении кадра
         {
 
-            lastFrame_processed = false;
-
-
-              try
-              {
-                  if (_capture != null && _capture.Ptr != IntPtr.Zero)
-                  {
-
-                    _capture.Retrieve(CurrentFrame, 0); //Получение кадра. Переодический промер FPS
-                    FramesGotten++;
-                    if ((STW.Elapsed.Seconds > 5) && (STW.Elapsed.Seconds % 10 == 0))
+            
+            try
+            {
+                if (_capture != null && _capture.Ptr != IntPtr.Zero)
+                {
+                    _capture.Retrieve(CurrentFrame,0);
+                    Refresh_image_Invoke(CurrentFrame);
+                  //  CV_ImBox_Capture.Image = CurrentFrame;
+                    using (CurrentFrame2 = CurrentFrame.Clone())
                     {
-
-                        LogMessage("Current exp is: " + exposure.ToString());
-                        LogMessage("Скорость получения кадров: " + ((float)FramesGotten / STW.Elapsed.TotalSeconds).ToString());
-                        FramesGotten = 0;
-                        STW.Restart();
-                    }
-
-                    FrameDrawen = false; //отрисовка кадра. Переодический промер скорости отрисовки
-                    CvInvoke.Resize(CurrentFrame, resizedim, Size_for_Resizing, 0, 0, Inter.Linear);
-                    STW_Resizing.Start();
-                    if ((STW_Draw.Elapsed.Seconds > 5) && (STW_Draw.Elapsed.Seconds % 10 == 0))
-                    {
-                        LogMessage("Время перерисовки кадра: " + (STW_Resizing.Elapsed.TotalSeconds / FramesDrawen).ToString());
-                        LogMessage("Скорость отрисовки кадров: " + (FramesDrawen / STW_Draw.Elapsed.TotalSeconds).ToString());
-                        FramesDrawen = 0;
-                        STW_Draw.Restart();
-                        STW_Resizing.Reset();
-                    }
-
-                    //   Refresh_image_Invoke(resizedim);
-                    CV_ImBox_Capture.Image = resizedim;
-                    FramesDrawen++;
-                    STW_Resizing.Stop();
-                    FrameDrawen = true;
-
-                    if (isRecording)
-                    {
-                        using (CurrentFrame2 = CurrentFrame.Clone())
+                        if (isRecording)
                         {
-
                             if (All_isPrepared_forCapture)
                             {
                                 if (!CaptureStoped_byUser)
@@ -224,6 +143,7 @@ namespace Stereo_Vision
                                 else
                                 {
                                     LogMessage("Запись остановлена пользователем!");
+                                    LastNumber_Vid++;
                                     All_isPrepared_forCapture = false;
                                     try
                                     {
@@ -231,11 +151,7 @@ namespace Stereo_Vision
                                         {
                                             VidWriter.Dispose();
                                         }
-
-                                        UpdateTextBox("Фрагмент " + Video_name_lastcaptured + " сохранен!", L_SnapShotSaved);
                                         LogMessage("Фрагмент сохранен успешно!");
-                                        ToogleLabelVisibility(true, ref L_SnapShotSaved);
-                                        LastNumber_Vid++;
                                         CaptureStoped_byUser = false;
                                     }
                                     catch
@@ -249,46 +165,25 @@ namespace Stereo_Vision
                                 }
                             }
                         }
-                    }
-                    if (isSnapShot_needed)
-                    {
-                      /*  using (CurrentFrame2 = resizedim.Clone())
-                        {*/
-                            Photo_name_lastcaptured = CalculatenName_forNewPhoto_withoutPath();
-                            CurrentFrame.Save(RecPhotos_path + "\\" + Photo_name_lastcaptured);
-                            LastNumber_Photo++;
-                            isSnapShot_needed = false;
-                            UpdateTextBox("Кадр " + Photo_name_lastcaptured + " сохранен!" , L_SnapShotSaved);
-                          //  L_SnapShotSaved.Text = "Кадр "+ FinalSnapShotName  + " сохранен!";
-                      //  }
-                    }
-                    if(L_SnapShotSaved.Visible)
-                    {
-                        if (STW_2HideLabel.Elapsed.TotalSeconds > Saving_ShowLabel_time)
+                        if (isSnapShot_needed)
                         {
-                            double RT_Elapsed = STW_2HideLabel.Elapsed.TotalSeconds;
-                            ToogleLabelVisibility(false, ref L_SnapShotSaved);
-                            STW_2HideLabel.Stop();
+                            CurrentFrame2.Save(RecSnapShot_path + "\\" + Snapshot_name + LastNumber_Photo.ToString() + Current_Extension_photo);
+                            LastNumber_Photo++;
+                            if (LastNumber_Photo > Math.Pow(10, Count_of_Digits_snap) - 1) LastNumber_Photo = 0;
+                            isSnapShot_needed = false;
                         }
                     }
-                      
-                      //if (throwed_to_hiber) System.Windows.Forms.Application.SetSuspendState(System.Windows.Forms.PowerState.Hibernate, true, false);
-                  }
-              }
-              catch
-              {
-                  //Попробуем в следующий раз
-              }
-            lastFrame_processed = true;
+                   // if (throwed_to_hiber) System.Windows.Forms.Application.SetSuspendState(System.Windows.Forms.PowerState.Hibernate, true, false);
+                }
+            }
+            catch
+            {
+                //Попробуем в следующий раз
+            }
         }
-        
         private void TakeSnapShot()
         {
             isSnapShot_needed = true;
-            UpdateTextBox("Сохранение...", L_SnapShotSaved);
-            ToogleLabelVisibility(true,ref L_SnapShotSaved);
-            STW_2HideLabel.Restart();
-
         }
         private void Restore_CaptureDirectory()
         {
@@ -300,18 +195,8 @@ namespace Stereo_Vision
             if (_capture != null)
             {
                 //start the capture
-                LogMessage("Камера не нуль");
                 _capture.Start();
-                LogMessage("Запись включена");
                 isInTranslation = !isInTranslation;
-            }
-            else
-            {
-                PrepareTheCamera();
-                SetResolution(1920, 1080);
-                Read_and_Load_Settings();
-                _capture.Start();
-                isInTranslation = true;
             }
         }
         private void StopCapture()
@@ -343,16 +228,8 @@ namespace Stereo_Vision
         {
             bool noErrors = true;
             CaptureStoped_byUser = true;
-            try
-            {
-                Delete_Indicator();
-                Toogle_Rec_Button(false);
-                STW_2HideLabel.Restart();
-            }
-            catch
-            {
-                noErrors = false;
-            }
+            Delete_Indicator();
+            Toogle_Rec_Button(false);
             if (noErrors) return true;
             else return false;
         }
@@ -363,9 +240,8 @@ namespace Stereo_Vision
                 LogMessage("Подготовка к записи...");
                 TotalFramesGotten = 0;
                 FramesToGot = (int)(Fps_toWrite * Lenght_secs);
-                Video_name_lastcaptured = CalculatenName_forNewVideo();
-                string FullPathAndName = RecVid_path + "\\" + Video_name_lastcaptured;
-
+                string FullPathAndName = CalculatenName_forNewVideo();
+                
                 int fWidth = Convert.ToInt32(_capture.GetCaptureProperty(CapProp.FrameWidth));
                 int fHeight = Convert.ToInt32(_capture.GetCaptureProperty(CapProp.FrameHeight));
                 //int FourCC = Convert.ToInt32(_capture.GetCaptureProperty(CapProp.FourCC));
@@ -373,7 +249,7 @@ namespace Stereo_Vision
                 int FourCC = VideoWriter.Fourcc('L', 'A', 'G', 'S');
                 // int FourCC = VideoWriter.Fourcc('H', '2', '6', '4');
 
-                VidWriter = new VideoWriter(FullPathAndName, FourCC, Fps_toWrite, new System.Drawing.Size(fWidth, fHeight), true);
+                VidWriter = new VideoWriter(FullPathAndName, -1, Fps_toWrite, new System.Drawing.Size(fWidth, fHeight), true);
                 All_isPrepared_forCapture = true;
                 LogMessage("Подготовка к записи завершена успешно!");
             }
@@ -382,35 +258,16 @@ namespace Stereo_Vision
                 LogError("Ошибка при подготовке к записи. Проверьте настойки. ");
             }
         }
-        private char[] FourCC_int_2_str(int FourCC)
-        {
-            char[] st = new char[5];
-            st[0] = (char)(FourCC & 0xff);
-            st[1] = (char)((FourCC >> 8) & 0xff);
-            st[2] = (char)((FourCC >> 16) & 0xff);
-            st[3] = (char)((FourCC >> 24) & 0xff);
-            st[4] = (char)0;
-            return st;
-        }
         private string CalculatenName_forNewVideo()
         {
             string Digit_PostFix = "";
             if (LastNumber_Vid > Math.Pow(10, Count_of_Digits_vid) - 1) LastNumber_Vid = 0;
             while (Digit_PostFix.Length < Count_of_Digits_vid) Digit_PostFix += "0";//Заполняем нулями до нужной кондиции
             Digit_PostFix = String.Format(("{0:d"+ Count_of_Digits_vid.ToString()+"}"), LastNumber_Vid);
-            string resultivename = Video_name + Digit_PostFix + Current_Extension_video;
-            return resultivename;
-            
-        }
-        private string CalculatenName_forNewPhoto_withoutPath()
-        {
-            string Digit_PostFix = "";
-            if (LastNumber_Photo > Math.Pow(10, Count_of_Digits_snap) - 1) LastNumber_Photo = 0;
-            while (Digit_PostFix.Length < Count_of_Digits_snap) Digit_PostFix += "0";//Заполняем нулями до нужной кондиции
-            Digit_PostFix = String.Format(("{0:d" + Count_of_Digits_snap.ToString() + "}"), LastNumber_Photo);
-            string resultivename = Snapshot_name + Digit_PostFix + Current_Extension_photo;
+            string resultivename = RecVid_path + "\\" + Video_name + Digit_PostFix + Current_Extension_video;
             return resultivename;
         }
+        
         private void SetResolution(int w,int h)
         {
             _capture.SetCaptureProperty(CapProp.FrameWidth, w);

@@ -36,7 +36,7 @@ namespace Stereo_Vision
 
         private void B_Abort_Click(object sender, EventArgs e)
         {
-           if(backgroundWorker1.IsBusy) CancelAsync();
+            CancelAsync();
         }
         private void StartAsync()
         {
@@ -52,7 +52,6 @@ namespace Stereo_Vision
             {
                 // Cancel the asynchronous operation.
                 this.Text = "Отмена...";
-                System.Threading.Thread.Sleep(1000);
                 backgroundWorker1.CancelAsync();
             }
         }
@@ -72,11 +71,7 @@ namespace Stereo_Vision
                     }
                     else
                     {
-                        if(File.Exists(mass_to[i]))
-                        {
-                            try { File.Delete(mass_to[i]); }
-                            catch { }
-                        }
+                        System.Threading.Thread.Sleep(1000);
                         File.Copy(mass_from[i], mass_to[i]);
                         lastfile = i;
                         worker.ReportProgress((int)((((float)i+1) / (float)(mass_from.Count())) * 100));
@@ -124,11 +119,6 @@ namespace Stereo_Vision
         {
             ticks++;
             if(ticks==10) this.Close();
-        }
-
-        private void Export_files_form_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            if (backgroundWorker1.IsBusy) CancelAsync();
         }
     }
 }
