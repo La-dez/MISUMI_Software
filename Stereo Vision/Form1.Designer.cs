@@ -106,6 +106,7 @@ namespace Stereo_Vision
             this.LBConsole = new System.Windows.Forms.ListBox();
             this.CV_ImBox_Capture = new Emgu.CV.UI.ImageBox();
             this.BGWR_ChargeLev = new System.ComponentModel.BackgroundWorker();
+            this.WakeUpTimer = new System.Windows.Forms.Timer(this.components);
             this.TLP_MainPanel.SuspendLayout();
             this.Pan_BackgroundPanel.SuspendLayout();
             this.Pan_UserMain.SuspendLayout();
@@ -1252,6 +1253,11 @@ namespace Stereo_Vision
             // 
             this.BGWR_ChargeLev.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BGWR_ChargeLev_DoWork);
             // 
+            // WakeUpTimer
+            // 
+            this.WakeUpTimer.Interval = 200;
+            this.WakeUpTimer.Tick += new System.EventHandler(this.WakeUpTimer_Tick);
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1378,6 +1384,7 @@ namespace Stereo_Vision
         private System.Windows.Forms.TrackBar TrBSaturation;
         private System.Windows.Forms.TrackBar TrBGamma;
         private System.Windows.Forms.TrackBar TrBGain;
+        private System.Windows.Forms.Timer WakeUpTimer;
     }
 }
 

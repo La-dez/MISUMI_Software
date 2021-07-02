@@ -114,6 +114,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "Export_files_form";
             this.Text = "Экспорт...";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Export_files_form_FormClosed);
             this.Load += new System.EventHandler(this.Export_files_form_Load);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();

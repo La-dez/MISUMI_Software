@@ -16,6 +16,7 @@ namespace Stereo_Vision
 {
     public partial class MainWindow
     {
+        bool HiberNoAsk = false;
         int AttachmentFactor = 10;
         bool FullScrin = false;
         TabPage[] adminPages = null;
@@ -30,6 +31,8 @@ namespace Stereo_Vision
         static Bitmap BMP_ExMode_Video_off = new Bitmap("ex_video_off.png");
         static Bitmap BMP_ExMode_Photo = new Bitmap("ex_photo2.png");
         static Bitmap BMP_ExMode_Photo_off = new Bitmap("ex_photo2_off.png");
+        static Bitmap BMP_Playing_Play = new Bitmap("play_play.png");
+        static Bitmap BMP_Playing_Pause = new Bitmap("play_pause.png");
         string Text2set = "?%";
 
         delegate void DelegateForMessages(string text);
@@ -149,25 +152,61 @@ namespace Stereo_Vision
                 this.Refresh();
             }
         }
+        private delegate void UpdateLabelVisibilityDelegate(bool IsVisible,ref Label lbl);
+        private void ToogleLabelVisibility(bool IsVisible,ref Label Ctrl)
+        {
+            if (Ctrl.InvokeRequired)
+            {
+                try
+                {
+                    UpdateLabelVisibilityDelegate UT = new UpdateLabelVisibilityDelegate(ToogleLabelVisibility);
+                    this.BeginInvoke(UT, new object[] { IsVisible, Ctrl });
+                }
+                catch (Exception ex)
+                {
+                    LogError("ORIGINAL: " + ex.Message);
+                }
+            }
+            else
+            {
+                Ctrl.Visible = IsVisible;
+            }
+        }
         private void OpenSettings()
         {
             Pan_Export.Visible = false;
             Pan_UserMain.Visible = false;
             Pan_Settings.Visible = true;
+            Pan_Player.Visible = false;
         }
         private void OpenMainPanel()
         {
             Pan_Export.Visible = false;
             Pan_UserMain.Visible = true;
-            Pan_Settings.Visible = false;           
+            Pan_Settings.Visible = false;
+            Pan_Player.Visible = false;
         }
         private void OpenExportPanel()
         {
             Pan_Export.Visible = true;
             Pan_UserMain.Visible = false;
             Pan_Settings.Visible = false;
+            Pan_Player.Visible = false;
             CB_Ex_ChooseExportMode.SelectedIndex = Export_style;
+            Open_Export_DirectoryTo(true);
         }
+        private void OpenPlayPanel()
+        {
+            Pan_Export.Visible = false;
+            Pan_UserMain.Visible = false;
+            Pan_Settings.Visible = false;
+            Pan_Player.Visible = true;
+
+            StopCapture();
+            Initialize_Player_Controls(Playing_mode);
+            
+        }
+       
         private void SwitchAdminMode(bool isAdmin)
         {
             LBConsole.Visible = isAdmin;
@@ -236,6 +275,12 @@ namespace Stereo_Vision
                             {
                                 string toObject = CutFromEdges(AllLines[i]);
                                 Fps_toWrite = Convert.ToInt16(toObject);
+                                break;
+                            }
+                        case "FpsMax_toTranslate":
+                            {
+                                string toObject = CutFromEdges(AllLines[i]);
+                                FpsMax_toTranslate = Convert.ToInt16(toObject);
                                 break;
                             }
                         case "LastFileDigit_vid":
@@ -313,13 +358,13 @@ namespace Stereo_Vision
                         case "Width":
                             {
                                 string toObject = CutFromEdges(AllLines[i]);
-                                _capture.SetCaptureProperty(CapProp.FrameWidth, Convert.ToInt16(toObject));
+                                Loaded_Width = Convert.ToInt16(toObject);
                                 break;
                             }
                         case "Height":
                             {
                                 string toObject = CutFromEdges(AllLines[i]);
-                                _capture.SetCaptureProperty(CapProp.FrameHeight, Convert.ToInt16(toObject));
+                                Loaded_Height = Convert.ToInt16(toObject);
                                 break;
                             }
                         case "Path_2save_Video":
@@ -331,7 +376,7 @@ namespace Stereo_Vision
                         case "Path_2save_Photo":
                             {
                                 string toObject = CutFromEdges(AllLines[i]);
-                                RecSnapShot_path = toObject;
+                                RecPhotos_path = toObject;
                                 break;
                             }
                         case "Last_export_path_Video":
@@ -375,7 +420,8 @@ namespace Stereo_Vision
             LastChargeLevel = 100;
             User_Name = "PNTZ";
             Lenght_secs = 60;                           
-            Fps_toWrite = 15;
+            Fps_toWrite = 30;
+            FpsMax_toTranslate = 30;
             LastNumber_Vid = 0;
             LastNumber_Photo = 0;
             Count_of_Digits_vid = 2;
@@ -387,10 +433,11 @@ namespace Stereo_Vision
             Saturation_Value = 0;
             Gamma_Value = 0;
             Gain_Value = 0;
-            _capture.SetCaptureProperty(CapProp.FrameWidth, 1920);
-            _capture.SetCaptureProperty(CapProp.FrameHeight, 1080);
+
+            Loaded_Width = 1280;
+            Loaded_Height = 720;
             RecVid_path = Path.Combine("C:\\", "Video");
-            RecSnapShot_path = Path.Combine("C:\\", "Photo");
+            RecPhotos_path = Path.Combine("C:\\", "Photo");
             Export_Vid_from = Path.Combine("C:\\", "Video");
             Export_Photos_from = Path.Combine("C:\\", "Photo");
             Export_Vid_to = Path.Combine("C:\\", "Video" + " export " + User_Name); ;
@@ -415,13 +462,38 @@ namespace Stereo_Vision
                 Adjust_Saturation();
                 Adjust_Gamma();
                 Adjust_Gain();
+
+                try
+                {
+
+                    _capture.SetCaptureProperty(CapProp.FrameWidth, 640);
+                    _capture.SetCaptureProperty(CapProp.FrameHeight, 480);
+                }
+                catch
+                {
+                    _capture.SetCaptureProperty(CapProp.FrameWidth, 1280);
+                    _capture.SetCaptureProperty(CapProp.FrameHeight, 720);
+                }
+             //   int W_try = (int)_capture.GetCaptureProperty(CapProp.FrameWidth);
+                _capture.SetCaptureProperty(CapProp.FourCC, Current_FourCC);
+                _capture.SetCaptureProperty(CapProp.Fps, FpsMax_toTranslate);
+                int W_cur = (int)_capture.GetCaptureProperty(CapProp.FrameWidth);
+                if(W_cur!= Loaded_Width)
+                {
+                    _capture.SetCaptureProperty(CapProp.FourCC, Current_FourCC);
+                    _capture.SetCaptureProperty(CapProp.FrameWidth, Loaded_Width);
+                    _capture.SetCaptureProperty(CapProp.FrameHeight, Loaded_Height);
+                }
+                W_cur = (int)_capture.GetCaptureProperty(CapProp.FrameWidth);
+                int FourCC_Current = (int)_capture.GetCaptureProperty(CapProp.FourCC);
+                char[] FourCC_Current_str = FourCC_int_2_str(FourCC_Current);
             }
             catch
             {
 
             }
             TB_Settings_VidSavePath.Text = RecVid_path;
-            TB_Settings_PhotoSavePath.Text = RecSnapShot_path;
+            TB_Settings_PhotoSavePath.Text = RecPhotos_path;
 
             if (Export_mode)
             {
@@ -459,6 +531,8 @@ namespace Stereo_Vision
                 {
                     sw.WriteLine("<LenghtOfOneFileInSeconds>" + Lenght_secs+ "</LenghtOfOneFileInSeconds>");
                     sw.WriteLine("<FPStoWrite>" + Fps_toWrite+"</FPStoWrite>");
+                    sw.WriteLine("<FpsMax_toTranslate>" + FpsMax_toTranslate + "</FpsMax_toTranslate>");
+
                     sw.WriteLine("<LastFileDigit_vid>" + LastNumber_Vid+"</LastFileDigit_vid>");
                     sw.WriteLine("<LastFileDigit_Photo>" + LastNumber_Photo + "</LastFileDigit_Photo>");
                     sw.WriteLine("<Count_of_files_Vid>" + Count_of_Digits_vid + "</Count_of_files_Vid>");
@@ -472,11 +546,13 @@ namespace Stereo_Vision
                     sw.WriteLine("<Saturation>" + Saturation_Value + "</Saturation>");
                     sw.WriteLine("<Gamma>" + Gamma_Value + "</Gamma>");
                     sw.WriteLine("<Gain>" + Gain_Value + "</Gain>");
-                    sw.WriteLine("<Width>" + (_capture.GetCaptureProperty(CapProp.FrameWidth)).ToString() + "</Width>");
-                    sw.WriteLine("<Height>" + (_capture.GetCaptureProperty(CapProp.FrameHeight)).ToString() + "</Height>");
+                   // sw.WriteLine("<Width>" + (_capture.GetCaptureProperty(CapProp.FrameWidth)).ToString() + "</Width>");
+                   // sw.WriteLine("<Height>" + (_capture.GetCaptureProperty(CapProp.FrameHeight)).ToString() + "</Height>");
+                    sw.WriteLine("<Width>" + (1280).ToString() + "</Width>");
+                    sw.WriteLine("<Height>" + (720).ToString() + "</Height>");
 
                     sw.WriteLine("<Path_2save_Video>" + RecVid_path + "</Path_2save_Video>");
-                    sw.WriteLine("<Path_2save_Photo>" + RecSnapShot_path + "</Path_2save_Photo>");
+                    sw.WriteLine("<Path_2save_Photo>" + RecPhotos_path + "</Path_2save_Photo>");
                     sw.WriteLine("<Last_export_path_Video>" + Export_Vid_from + "</Last_export_path_Video>");
                     sw.WriteLine("<Last_export_path_Photo>" + Export_Photos_from + "</Last_export_path_Photo>");
                     sw.WriteLine("<Last_export_path_Video_to>" + Export_Vid_to + "</Last_export_path_Photo>");
@@ -499,6 +575,7 @@ namespace Stereo_Vision
 
         void SystemEvents_PowerModeChanged(object sender, PowerModeChangedEventArgs e)
         {
+            LogMessage("Что-то случилось");
             if ((e.Mode == PowerModes.Suspend))
             {              
                 LogMessage("standby");
@@ -510,46 +587,31 @@ namespace Stereo_Vision
             }
             else if (e.Mode == PowerModes.Resume)
             {
-                throwed_to_hiber = false;
-                LogMessage("Resumed from standby");               
-                if (!isInTranslation) StartCapture();
-                try
-                {
-                    //Thread_for_Refreshing_of_ChargeLev = new System.Threading.Thread(RefreshChargeControls);
-                    Set_ChargeBMP(BMP2set_chargelev);
-                    Set_ChargeTEXT(Text2set);
-                    LastNumber_Photo_forExport = DateTime.Now;
-                    LastNumber_Vid_forExport = DateTime.Now;
-                    //  Thread_for_Refreshing_of_ChargeLev.Start();
-                }
-                catch(Exception eeee) { MessageBox.Show(eeee.Message); }
-            }
-            switch (SystemInformation.PowerStatus.PowerLineStatus)
-            {
-                case PowerLineStatus.Online:
-                    LogMessage("Устройство работает от сети.");
-                    break;
-                case PowerLineStatus.Offline:
-                    LogMessage("Устройство работает от аккумулятора.");
-                    switch (SystemInformation.PowerStatus.BatteryChargeStatus)
-                    {
-                        case System.Windows.Forms.BatteryChargeStatus.Low:
-                            LogMessage("Внимание! Малый уровень зарядки.");
-                            break;
-                        case System.Windows.Forms.BatteryChargeStatus.Critical:
-                            LogMessage("Внимание! Критический уровень зарядки.");
-                            break;
-                        default:
-                            LogMessage("Уровень зарядки в норме.");
-                            break;
-                    }
-                    LogMessage("Уровень заряда аккумулятора: " + SystemInformation.PowerStatus.BatteryLifePercent.ToString());
-                    break;
-                case PowerLineStatus.Unknown:
-                    LogMessage("Источник питания устройства неопознан.");
-                    break;
+                ToDo_OnWakeUp();
             }
 
+        }
+        private void ToDo_OnWakeUp()
+        {
+            throwed_to_hiber = false;
+            LogMessage("Resumed from standby");
+            if (!isInTranslation)
+            {
+                StartCapture();
+                LogMessage("Запись включена 2");
+            }
+            try
+            {
+                //Thread_for_Refreshing_of_ChargeLev = new System.Threading.Thread(RefreshChargeControls);
+
+                LastNumber_Photo_forExport = DateTime.Now;
+                LastNumber_Vid_forExport = DateTime.Now;
+
+                Set_ChargeBMP(BMP2set_chargelev);
+                Set_ChargeTEXT(Text2set);
+                //  Thread_for_Refreshing_of_ChargeLev.Start();
+            }
+            catch (Exception eeee) { MessageBox.Show(eeee.Message); }
         }
         private void MaximizeWindow()
         {
@@ -567,7 +629,8 @@ namespace Stereo_Vision
         {
             Pan_Settings.Visible = false;
             Pan_Export.Visible = false;
-            
+            Pan_Player.Visible = false;
+            L_SnapShotSaved.Visible = false;
         }
         private void MinimizeWindow()
         {
@@ -612,7 +675,7 @@ namespace Stereo_Vision
         }
         private void Refresh_image_NOInvoke(Mat ppImage)
         {
-            CV_ImBox_Capture.Image = CurrentFrame;
+            CV_ImBox_Capture.Image = ppImage;
         }
         private void RefreshChargeControls(ref System.ComponentModel.BackgroundWorker pWorker,ref bool p_isArdClosed)
         {
@@ -630,8 +693,10 @@ namespace Stereo_Vision
                     Set_ChargeBMP(BMP2set_chargelev);
                     if (LastChargeLevel < 5)
                     {
+                        HiberNoAsk = true;
                         System.Threading.Thread.Sleep(2000);
                         B_Quit_Click(null, null);
+                        HiberNoAsk = false;
                     }
                     else
                     {
@@ -645,7 +710,7 @@ namespace Stereo_Vision
         {
             FolderBrowserDialog folderBrowser = new FolderBrowserDialog();
             if(Export_mode) folderBrowser.SelectedPath = RecVid_path;
-            else folderBrowser.SelectedPath = RecSnapShot_path;
+            else folderBrowser.SelectedPath = RecPhotos_path;
             DialogResult result = folderBrowser.ShowDialog();
             
             if (Export_mode) Export_Vid_from = folderBrowser.SelectedPath;
@@ -668,10 +733,20 @@ namespace Stereo_Vision
             }
 
         }
-        private void Open_Export_DirectoryTo()
+        private void Open_Export_DirectoryTo(bool SilentMode)
         {
             FolderBrowserDialog folderBrowser = new FolderBrowserDialog();
-            if (((Export_mode) && (Export_Vid_to == null)) || ((!Export_mode) && (Export_Photos_to == null)))
+            
+            if ((Export_mode) && (!Directory.Exists(Export_Vid_to)))
+            {
+                Export_Vid_to = "";
+            }
+            if ((!Export_mode) && (!Directory.Exists(Export_Photos_to)))
+            {
+                Export_Photos_to = "";
+            }
+            //  if (((Export_mode) && (String.IsNullOrEmpty(Export_Vid_to))) || ((!Export_mode) && (String.IsNullOrEmpty(Export_Photos_to))))
+            if(true)
             {
                 string Non_C_disk = "C:\\";
                 if (Export_mode) Non_C_disk = Find_another_disk();
@@ -690,24 +765,42 @@ namespace Stereo_Vision
                 {
                     if (Export_mode) { Final_directory = Path.Combine("C:\\", "Video"+ " export "+ User_Name); }
                     else { Final_directory = Path.Combine("C:\\", "Photo"+ " export "+ User_Name); }
+
+                    try //если такой директории нет, то создаем
+                    {
+                        if (!Directory.Exists(Final_directory))
+                            Directory.CreateDirectory(Final_directory);
+                    }
+                    catch //если и сейчас не получилось создать, копируем в корень найденного диска
+                    {
+                         Final_directory = Non_C_disk; 
+                    }
                 }
                 if (Export_mode) { Export_Vid_to = Final_directory; }
                 else { Export_Photos_to = Final_directory; }
             }
-            if (Export_mode) folderBrowser.SelectedPath = Export_Vid_to;
-            else folderBrowser.SelectedPath = Export_Photos_to;
-
-            DialogResult result = folderBrowser.ShowDialog();
-
-            if (Export_mode) Export_Vid_to = folderBrowser.SelectedPath;
-            else Export_Photos_to = folderBrowser.SelectedPath;
-
-            if (result == DialogResult.OK)
+            if (!SilentMode)
             {
-                TB_Ex_PathTo.Text = folderBrowser.SelectedPath;
+                if (Export_mode) folderBrowser.SelectedPath = Export_Vid_to;
+                else folderBrowser.SelectedPath = Export_Photos_to;
+
+                DialogResult result = folderBrowser.ShowDialog();
+
+                if (Export_mode) Export_Vid_to = folderBrowser.SelectedPath;
+                else Export_Photos_to = folderBrowser.SelectedPath;
+                if (result == DialogResult.OK)
+                {
+                    TB_Ex_PathTo.Text = folderBrowser.SelectedPath;
+                }
             }
+            else
+            {
+                if (Export_mode) TB_Ex_PathTo.Text = Export_Vid_to;
+                else TB_Ex_PathTo.Text = Export_Photos_to;
+            }
+
         }
-        private string Find_another_disk()
+        private string Find_another_disk() //если других дисков не найдено, вернет диск С
         {
             DriveInfo[] allDrives = DriveInfo.GetDrives();
             string remDisk = "C:\\";
@@ -784,6 +877,8 @@ namespace Stereo_Vision
 
                     Export_mode = ExportMode_2set;
                 }
+
+                Open_Export_DirectoryTo(true);
             }
             catch
             {

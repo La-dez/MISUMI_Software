@@ -21,7 +21,7 @@ namespace Stereo_Vision
         bool isInTranslation = false;
         bool throwed_to_hiber = false;
         bool isArduino_closed = true;
-
+        int ticks = 0;
         string User_Name = "PNTZ";
 
         public MainWindow()
@@ -36,42 +36,47 @@ namespace Stereo_Vision
 
             //stand by mode then 
             SystemEvents.PowerModeChanged += new PowerModeChangedEventHandler(SystemEvents_PowerModeChanged);
+          //  SystemEvents.Wake
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            CreateAttachmentFactor(ref AttachmentFactor, LBConsole);
-            PrepareTheCamera();
-            // SetResolution(640, 480);
-            SetResolution(1920, 1080);
-            SwitchAdminMode(AdminMode);
-            HideSomeThings();
-            Restore_CaptureDirectory();
-            Read_and_Load_Settings();
-            System.Threading.Thread.CurrentThread.Priority = System.Threading.ThreadPriority.Highest;
-            BGWR_ChargeLev.WorkerSupportsCancellation = true;
-            BGWR_ChargeLev.RunWorkerAsync();
-            Set_ChargeBMP(BMP2set_chargelev);
-            Set_ChargeTEXT(Text2set);
-            StartCapture();
-            this.DoubleBuffered = true;
-            MaximizeWindow();
-            CurrentFrame = new Mat();
-            CurrentFrame2 = new Mat();
-
+            this.Visible = false;
+            try
+            {
+                MaximizeWindow();
+                CreateAttachmentFactor(ref AttachmentFactor, LBConsole);
+                PrepareTheCamera();
+                // SetResolution(640, 480);
+                SetResolution(1920, 1080);
+                SwitchAdminMode(AdminMode);
+                HideSomeThings();
+                Restore_CaptureDirectory();
+                Read_and_Load_Settings();
+                System.Threading.Thread.CurrentThread.Priority = System.Threading.ThreadPriority.Highest;
+                BGWR_ChargeLev.WorkerSupportsCancellation = true;
+                BGWR_ChargeLev.RunWorkerAsync();
+                Set_ChargeBMP(BMP2set_chargelev);
+                Set_ChargeTEXT(Text2set);
+                StartCapture();
+                this.DoubleBuffered = true;
+                CurrentFrame = new Mat();
+                CurrentFrame2 = new Mat();
+            }
+            catch { }
+            finally { this.Visible = true; }
         }
 
         private void MainWindow_KeyDown(object sender, KeyEventArgs e)
         {
-
-
             if ((e.KeyCode == Keys.Q) && e.Alt)
             {
                 // Thread_for_Refreshing_of_ChargeLev.Abort();
-                //Thread_for_Refreshing_of_ChargeLev.Join();
+                //Thread_for_Refreshing_of_ChargeLev.Join();              
                 BGWR_ChargeLev.CancelAsync();
                 SaveSettings();
-                while (!isArduino_closed)
+                StopCapture();
+                while ((!isArduino_closed)&&(!lastFrame_processed))
                 {
                     //we will wait for closing
                 }
@@ -106,18 +111,29 @@ namespace Stereo_Vision
 
         private void B_Quit_Click(object sender, EventArgs e)
         {
-            if (isRecording) { StopRecording(); }
-            if (isInTranslation) { StopCapture(); }
-
-            SaveSettings();
-            throwed_to_hiber = true;
-            BGWR_ChargeLev.CancelAsync();
-            while (!isArduino_closed)
+            DialogResult a;
+            if (!HiberNoAsk)
             {
-                //we will wait for closing
+                a = MessageBox.Show("Перейти в режим гибернации?", "Выход...", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
             }
-            Application.Exit();
-           // Application.SetSuspendState(PowerState.Hibernate, true, false);
+            else { a = DialogResult.Yes; HiberNoAsk = false; }
+            if (a != DialogResult.Cancel)
+            {
+                if (isRecording) { StopRecording(); }
+                if (isInTranslation) { StopCapture(); }
+                isInTranslation = false;
+                SaveSettings();
+                throwed_to_hiber = true;
+                WakeUpTimer.Enabled = true;
+                BGWR_ChargeLev.CancelAsync();
+                // BGWR_ChargeLev.run
+                while ((!isArduino_closed) && (!lastFrame_processed))
+                {
+                    //we will wait for closing
+                }
+                if (a == DialogResult.Yes) Application.SetSuspendState(PowerState.Hibernate, true, false);
+                else Application.Exit();
+            }
         }
        
         private void TLP_UserMainPanel_MouseMove(object sender, MouseEventArgs e)
@@ -317,6 +333,22 @@ namespace Stereo_Vision
         {
             Simple_choose_Directory(ref TB_Settings_PhotoSavePath);
             RecSnapShot_path = TB_Settings_PhotoSavePath.Text;
+        }
+
+        private void WakeUpTimer_Tick(object sender, EventArgs e)
+        {
+            ticks++;
+            if(ticks % 5 ==0)
+            {
+                LogMessage((ticks/5).ToString());
+                try
+                {
+                    ToDo_OnWakeUp();
+                    WakeUpTimer.Enabled = false;
+                    ticks = 0;
+                }
+                catch { }
+            }
         }
     }
 }
