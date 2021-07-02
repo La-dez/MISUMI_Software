@@ -1,0 +1,18 @@
+c:\visual studio 2015\Projects\ConsoleApplication1\ConsoleApplication1\bin\Debug\ConsoleApplication1.exe.config
+c:\visual studio 2015\Projects\ConsoleApplication1\ConsoleApplication1\bin\Debug\ConsoleApplication1.exe
+c:\visual studio 2015\Projects\ConsoleApplication1\ConsoleApplication1\bin\Debug\ConsoleApplication1.pdb
+c:\visual studio 2015\Projects\ConsoleApplication1\ConsoleApplication1\obj\Debug\ConsoleApplication1.csprojResolveAssemblyReference.cache
+c:\visual studio 2015\Projects\ConsoleApplication1\ConsoleApplication1\obj\Debug\ConsoleApplication1.exe
+c:\visual studio 2015\Projects\ConsoleApplication1\ConsoleApplication1\obj\Debug\ConsoleApplication1.pdb
+D:\Работа\Программы (мои разработки)\Другие\Пример подключения к ардуино\ConsoleApplication1\bin\Debug\ConsoleApplication1.exe.config
+D:\Работа\Программы (мои разработки)\Другие\Пример подключения к ардуино\ConsoleApplication1\obj\Debug\ConsoleApplication1.exe
+D:\Работа\Программы (мои разработки)\Другие\Пример подключения к ардуино\ConsoleApplication1\obj\Debug\ConsoleApplication1.pdb
+D:\Работа\Программы (мои разработки)\Другие\Пример подключения к ардуино\ConsoleApplication1\obj\Debug\ConsoleApplication1.csprojResolveAssemblyReference.cache
+D:\Работа\Программы (мои разработки)\Другие\Пример подключения к ардуино\ConsoleApplication1\bin\Debug\ConsoleApplication1.exe
+D:\Работа\Программы (мои разработки)\Другие\Пример подключения к ардуино\ConsoleApplication1\bin\Debug\ConsoleApplication1.pdb
+D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Пример подключения к ардуино\ConsoleApplication1\bin\Debug\ConsoleApplication1.exe.config
+D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Пример подключения к ардуино\ConsoleApplication1\obj\Debug\ConsoleApplication1.exe
+D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Пример подключения к ардуино\ConsoleApplication1\obj\Debug\ConsoleApplication1.pdb
+D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Пример подключения к ардуино\ConsoleApplication1\bin\Debug\ConsoleApplication1.exe
+D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Пример подключения к ардуино\ConsoleApplication1\bin\Debug\ConsoleApplication1.pdb
+D:\Работа\Программы (мои разработки)\Технические эндоскопы\MISUMI_Software\Пример подключения к ардуино\ConsoleApplication1\obj\Debug\ConsoleApplication1.csprojResolveAssemblyReference.cache

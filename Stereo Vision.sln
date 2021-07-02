@@ -1,28 +1,65 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.329
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stereo Vision", "Stereo Vision\Stereo Vision.csproj", "{1A998FE1-60DC-4641-9496-105253A7C006}"
+	ProjectSection(ProjectDependencies) = postProject
+		{901C9091-E93E-405B-9B07-63CD8FB51ECE} = {901C9091-E93E-405B-9B07-63CD8FB51ECE}
+		{95467A9E-5772-45AC-85FC-17A578B4653F} = {95467A9E-5772-45AC-85FC-17A578B4653F}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CameraMathDLL", "..\..\Математика\CameraMath\CameraMath_092018_new\CameraMath_092018\CameraMathDLL\CameraMathDLL.vcxproj", "{901C9091-E93E-405B-9B07-63CD8FB51ECE}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImageProcDLL", "..\..\Математика\CameraMath\CameraMath_092018_new\CameraMath_092018\ImageProcDLL\ImageProcDLL.vcxproj", "{95467A9E-5772-45AC-85FC-17A578B4653F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
 		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
+		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{1A998FE1-60DC-4641-9496-105253A7C006}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1A998FE1-60DC-4641-9496-105253A7C006}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1A998FE1-60DC-4641-9496-105253A7C006}.Debug|x64.ActiveCfg = Debug|x64
 		{1A998FE1-60DC-4641-9496-105253A7C006}.Debug|x64.Build.0 = Debug|x64
+		{1A998FE1-60DC-4641-9496-105253A7C006}.Debug|x86.ActiveCfg = Debug|x86
+		{1A998FE1-60DC-4641-9496-105253A7C006}.Debug|x86.Build.0 = Debug|x86
 		{1A998FE1-60DC-4641-9496-105253A7C006}.Release|Any CPU.ActiveCfg = Release|x64
 		{1A998FE1-60DC-4641-9496-105253A7C006}.Release|Any CPU.Build.0 = Release|x64
 		{1A998FE1-60DC-4641-9496-105253A7C006}.Release|x64.ActiveCfg = Release|x64
 		{1A998FE1-60DC-4641-9496-105253A7C006}.Release|x64.Build.0 = Release|x64
+		{1A998FE1-60DC-4641-9496-105253A7C006}.Release|x86.ActiveCfg = Release|x86
+		{1A998FE1-60DC-4641-9496-105253A7C006}.Release|x86.Build.0 = Release|x86
+		{901C9091-E93E-405B-9B07-63CD8FB51ECE}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{901C9091-E93E-405B-9B07-63CD8FB51ECE}.Debug|x64.ActiveCfg = Debug|x64
+		{901C9091-E93E-405B-9B07-63CD8FB51ECE}.Debug|x64.Build.0 = Debug|x64
+		{901C9091-E93E-405B-9B07-63CD8FB51ECE}.Debug|x86.ActiveCfg = Debug|Win32
+		{901C9091-E93E-405B-9B07-63CD8FB51ECE}.Debug|x86.Build.0 = Debug|Win32
+		{901C9091-E93E-405B-9B07-63CD8FB51ECE}.Release|Any CPU.ActiveCfg = Release|Win32
+		{901C9091-E93E-405B-9B07-63CD8FB51ECE}.Release|x64.ActiveCfg = Release|x64
+		{901C9091-E93E-405B-9B07-63CD8FB51ECE}.Release|x64.Build.0 = Release|x64
+		{901C9091-E93E-405B-9B07-63CD8FB51ECE}.Release|x86.ActiveCfg = Release|Win32
+		{901C9091-E93E-405B-9B07-63CD8FB51ECE}.Release|x86.Build.0 = Release|Win32
+		{95467A9E-5772-45AC-85FC-17A578B4653F}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{95467A9E-5772-45AC-85FC-17A578B4653F}.Debug|x64.ActiveCfg = Debug|x64
+		{95467A9E-5772-45AC-85FC-17A578B4653F}.Debug|x64.Build.0 = Debug|x64
+		{95467A9E-5772-45AC-85FC-17A578B4653F}.Debug|x86.ActiveCfg = Debug|Win32
+		{95467A9E-5772-45AC-85FC-17A578B4653F}.Debug|x86.Build.0 = Debug|Win32
+		{95467A9E-5772-45AC-85FC-17A578B4653F}.Release|Any CPU.ActiveCfg = Release|Win32
+		{95467A9E-5772-45AC-85FC-17A578B4653F}.Release|x64.ActiveCfg = Release|x64
+		{95467A9E-5772-45AC-85FC-17A578B4653F}.Release|x64.Build.0 = Release|x64
+		{95467A9E-5772-45AC-85FC-17A578B4653F}.Release|x86.ActiveCfg = Release|Win32
+		{95467A9E-5772-45AC-85FC-17A578B4653F}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D23FF63C-EBC2-417C-8134-30E76BCDBE7B}
 	EndGlobalSection
 EndGlobal

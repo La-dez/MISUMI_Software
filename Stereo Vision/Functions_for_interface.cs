@@ -19,20 +19,34 @@ namespace Stereo_Vision
         bool HiberNoAsk = false;
         int AttachmentFactor = 10;
         bool FullScrin = false;
-        TabPage[] adminPages = null;
-        int LastChargeLevel = 100;
-        Bitmap BMP2set_chargelev = new Bitmap("20-0.png");
-        public static Bitmap BMP2set_chargelev_100_80 = new Bitmap("100-80.png");
-        public static Bitmap BMP2set_chargelev_80_60 = new Bitmap("80-60.png");
-        public static Bitmap BMP2set_chargelev_60_40 = new Bitmap("60-40.png");
-        public static Bitmap BMP2set_chargelev_40_20 = new Bitmap("40-20.png");
-        public static Bitmap BMP2set_chargelev_20_0 = new Bitmap("20-0.png");
-        static Bitmap BMP_ExMode_Video = new Bitmap("ex_video.png");
-        static Bitmap BMP_ExMode_Video_off = new Bitmap("ex_video_off.png");
-        static Bitmap BMP_ExMode_Photo = new Bitmap("ex_photo2.png");
-        static Bitmap BMP_ExMode_Photo_off = new Bitmap("ex_photo2_off.png");
-        static Bitmap BMP_Playing_Play = new Bitmap("play_play.png");
-        static Bitmap BMP_Playing_Pause = new Bitmap("play_pause.png");
+        List<TabPage> adminPages = null;
+        int LastChargeLevel_percents = 100;
+        int CriticalLevel_percents = 5; // Critical TimeLeft in percents
+
+        Arduino_RW Arduino_bus;
+
+        Bitmap BMP2set_chargelev = new Bitmap("Resources\\20-0.png");
+        public static Bitmap BMP2set_chargelev_100_80 = new Bitmap("Resources\\100-80.png");
+        public static Bitmap BMP2set_chargelev_80_60 = new Bitmap("Resources\\80-60.png");
+        public static Bitmap BMP2set_chargelev_60_40 = new Bitmap("Resources\\60-40.png");
+        public static Bitmap BMP2set_chargelev_40_20 = new Bitmap("Resources\\40-20.png");
+        public static Bitmap BMP2set_chargelev_20_0 = new Bitmap("Resources\\20-0.png");
+        static Bitmap BMP_ExMode_Video = new Bitmap("Resources\\ex_video.png");
+        static Bitmap BMP_ExMode_Video_off = new Bitmap("Resources\\ex_video_off.png");
+        static Bitmap BMP_ExMode_Photo = new Bitmap("Resources\\ex_photo2.png");
+        static Bitmap BMP_ExMode_Photo_off = new Bitmap("Resources\\ex_photo2_off.png");
+        static Bitmap BMP_PlMode_3D = new Bitmap("Resources\\3D.png");
+        static Bitmap BMP_PlMode_3D_off = new Bitmap("Resources\\3D_off.png");
+        static Bitmap BMP_Playing_Play = new Bitmap("Resources\\play_play.png");
+        static Bitmap BMP_Playing_Pause = new Bitmap("Resources\\play_pause.png");
+        static Bitmap BMP_PlNext_off = new Bitmap("Resources\\play_next_dis.png");
+        static Bitmap BMP_PlNext_on = new Bitmap("Resources\\play_next.png");
+        static Bitmap BMP_PlBack_off = new Bitmap("Resources\\play_back_dis.png");
+        static Bitmap BMP_PlBack_on = new Bitmap("Resources\\play_back.png");
+        static Bitmap BMP_Build3D_off = new Bitmap("Resources\\3D_mes_v1_off.png");
+        static Bitmap BMP_Build3D_on = new Bitmap("Resources\\3D_mes_v1.png");
+        // 3D_mes_v1.png
+
         string Text2set = "?%";
 
         delegate void DelegateForMessages(string text);
@@ -148,6 +162,7 @@ namespace Stereo_Vision
             }
             else
             {
+                
                 Control.Text = Text;
                 this.Refresh();
             }
@@ -170,58 +185,225 @@ namespace Stereo_Vision
             else
             {
                 Ctrl.Visible = IsVisible;
+                LogMessage("Состояние видимости TB = " + Ctrl.Visible.ToString());
             }
+        }
+        
+        private void ChargeLevel_preparence()
+        {
+            Arduino_bus = new Arduino_RW(CriticalLevel_percents, LastChargeLevel_percents);
+            Arduino_bus.ChargeLevel_onUpdated += Arduino_bus_ChargeLevel_onUpdated;
+            Arduino_bus.ChargeLevel_OnCriticalLevel += Arduino_bus_ChargeLevel_OnCriticalLevel;
+            Arduino_bus.ChargeLevel_NewMessage += Arduino_bus_ChargeLevel_NewMessage;
+
+            Arduino_bus_ChargeLevel_onUpdated(LastChargeLevel_percents); //установка последнего уровня заряда (считано из файла)
+
+            LogMessage("Arduino Prepared");
+          /*  string FirstError = "";
+            try { BGWR_ChargeLev.WorkerSupportsCancellation = true; } catch (Exception exc) { FirstError = FirstError == "" ? exc.Message : FirstError; }
+            try { BGWR_ChargeLev.RunWorkerAsync(); } catch (Exception exc) { FirstError = FirstError == "" ? exc.Message : FirstError; }
+            try { Set_ChargeBMP(BMP2set_chargelev); } catch (Exception exc) { FirstError = FirstError == "" ? exc.Message : FirstError; }
+            try { Set_ChargeTEXT(Text2set); } catch (Exception exc) { FirstError = FirstError == "" ? exc.Message : FirstError; }
+            if (FirstError != "") throw new Exception(FirstError);*/
+        }
+
+        private void Arduino_bus_ChargeLevel_NewMessage(string Message)
+        {
+            LogMessage(Message);
+        }
+
+        private void Arduino_bus_ChargeLevel_OnCriticalLevel(int percentage)
+        {
+            HiberNoAsk = true;
+            System.Threading.Thread.Sleep(2000);
+            B_Quit_Click(null, null);
+            HiberNoAsk = false;
+        }
+
+        private void Arduino_bus_ChargeLevel_onUpdated(int percentage)
+        {
+            Arduino_RW.ToogleCharge_Level(ref BMP2set_chargelev, ref Text2set, percentage);
+
+            LogMessage(String.Format("Осталось {0}", Text2set));
+            Set_ChargeTEXT(Text2set);
+            Set_ChargeBMP(BMP2set_chargelev);
+        }
+
+        private void Build_Interface()
+        {
+            //Pan_pl_Base Restruct
+            this.Pan_Pl_Base_forAnyPLCtrls.Controls.Add(this.Pan_Pl_Photo);
+            this.Pan_Pl_Base_forAnyPLCtrls.Controls.Add(this.Pan_Pl_3D);
+            this.Pan_Pl_Base_forAnyPLCtrls.Controls.Add(this.Pan_Pl_Video);
+            Pan_Pl_Photo.Dock = DockStyle.Fill;
+            Pan_Pl_Video.Dock = DockStyle.Fill;
+            Pan_Pl_3D.Dock = DockStyle.Fill;
+
+            //MainPanel Restruct
+            Pan_BASE_BackgroundPanel.Controls.Add(this.Pan_Settings);
+            Pan_BASE_BackgroundPanel.Controls.Add(this.Pan_Export);
+            Pan_BASE_BackgroundPanel.Controls.Add(this.Pan_Player);
+            Pan_BASE_BackgroundPanel.Controls.Add(this.Pan_MainMenu);
+            Pan_BASE_BackgroundPanel.Controls.Add(this.Pan_Measurements);
+            Pan_Settings.Dock = DockStyle.Fill;
+            Pan_Export.Dock = DockStyle.Fill;
+            Pan_Player.Dock = DockStyle.Fill;
+            Pan_MainMenu.Dock = DockStyle.Fill;
+            Pan_Measurements.Dock = DockStyle.Fill;
+            Pan_MainMenu.BringToFront();
+
+            //ViewRegion restruct
+            this.Pan_ViewRegion.Controls.Add(this.CV_ImBox_VidPhoto_Player);
+            this.Pan_ViewRegion.Controls.Add(this.CV_ImBox_Capture);
+            this.Pan_ViewRegion.Controls.Add(this.PB_MeasurementPB);
+            this.Pan_ViewRegion.Controls.Add(this.OTK_3D_Control);
+            this.Pan_ViewRegion.Controls.Add(this.L_SnapShotSaved);
+            this.Pan_ViewRegion.Controls.Add(this.P_ChargeLev);
+            this.Pan_ViewRegion.Controls.Add(this.PB_Indicator);
+            this.Pan_ViewRegion.Controls.Add(this.LBConsole);
+
+            CV_ImBox_VidPhoto_Player.Dock = DockStyle.Fill;
+            CV_ImBox_Capture.Dock = DockStyle.Fill;
+            PB_MeasurementPB.Dock = DockStyle.Fill;
+            OTK_3D_Control.Dock = DockStyle.Fill;
+            L_SnapShotSaved.BringToFront();
+            P_ChargeLev.BringToFront();
+        }
+        private void Prepare_frame_objects()
+        {
+            this.DoubleBuffered = true;
+            CurrentFrame = new Mat();
+            CurrentFrame2 = new Mat();
+            CurrentFrame_wb = new Mat();
+            resizedim = new Mat();
+            if (FullScrin) Size_for_Resizing = new Size(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height - 185);
+            else Size_for_Resizing = new Size(this.Width, this.Height - 185);
+        }
+        private void Prepare_drawing_buffer()
+        {
+            myBuffer = currentContext.Allocate(PB_MeasurementPB.CreateGraphics(), PB_MeasurementPB.DisplayRectangle);
+            Draw_Base(false);
+            myBuffer.Render();
+            myBuffer.Dispose();
         }
         private void OpenSettings()
         {
-            Pan_Export.Visible = false;
-            Pan_UserMain.Visible = false;
-            Pan_Settings.Visible = true;
-            Pan_Player.Visible = false;
+            TogglePanelsVisability(false,false,true);
         }
         private void OpenMainPanel()
         {
-            Pan_Export.Visible = false;
-            Pan_UserMain.Visible = true;
-            Pan_Settings.Visible = false;
-            Pan_Player.Visible = false;
+            TogglePanelsVisability(true);
+            CV_ImBox_Capture.Visible = true;
+            CV_ImBox_VidPhoto_Player.Visible = false;
+            PB_MeasurementPB.Visible = true;
         }
         private void OpenExportPanel()
         {
-            Pan_Export.Visible = true;
-            Pan_UserMain.Visible = false;
-            Pan_Settings.Visible = false;
-            Pan_Player.Visible = false;
+            TogglePanelsVisability(false, true);
+
             CB_Ex_ChooseExportMode.SelectedIndex = Export_style;
             Open_Export_DirectoryTo(true);
         }
         private void OpenPlayPanel()
         {
-            Pan_Export.Visible = false;
-            Pan_UserMain.Visible = false;
-            Pan_Settings.Visible = false;
-            Pan_Player.Visible = true;
+            TogglePanelsVisability(false,false,false,true);
 
             StopCapture();
             Initialize_Player_Controls(Playing_mode);
             
         }
-       
-        private void SwitchAdminMode(bool isAdmin)
+        bool BWG_restart = false;
+        private void Open_3DViewPanel(bool Build3D_fromstereo)
         {
-            LBConsole.Visible = isAdmin;
-            if (!isAdmin)
+            TogglePanelsVisability(false, false, false, true);
+            bool AsyncBuilding = true;
+            StopCapture();
+            Initialize_Player_Controls(Playing_mode, false);       
+        }
+        private void Build3D_fromstereo(bool AsyncBuilding = true)
+        {
+            Bitmap data = new Bitmap(CurrentStereoImage.BasicImage);
+            Pan_3D_Building.Show();
+            B_Pl_ModelNext.BackgroundImage = BMP_PlNext_off;
+            B_Pl_ModelPrevious.BackgroundImage = BMP_PlBack_off;
+            B_Pl_ModelNext.Enabled = false;
+            B_Pl_ModelPrevious.Enabled = false;
+            if (AsyncBuilding)
             {
-                adminPages = new TabPage[] { /*TABC_Settings.TabPages[2], */TABC_Settings.TabPages[3], TABC_Settings.TabPages[4] };
-                TABC_Settings.TabPages[4].Parent = null;
-                TABC_Settings.TabPages[3].Parent = null;
-               // TABC_Settings.TabPages[2].Parent = null;
+                if (!BWorkerForLoad3D.IsBusy)
+                {
+                    is3DBuilding_cancelled = false;
+                    BWorkerForLoad3D.RunWorkerAsync();//BuildModel3D();
+                }
+                else
+                {
+                    BWorkerForLoad3D.CancelAsync();
+                    BWG_restart = true;
+                }
             }
             else
             {
-               TABC_Settings.TabPages.Add(adminPages[0]);
-                TABC_Settings.TabPages.Add(adminPages[1]);
-                /*TABC_Settings.TabPages.Add(adminPages[2]);*/
+                BuildModel3D(null, data, true);
+            }           
+        }
+        private void OpenMeasurementsPanel()
+        {
+            StopCapture();
+            TogglePanelsVisability(false,false,false,false,true);
+
+            isMeasuring = true;
+            CV_ImBox_Capture.Visible = false;
+            CV_ImBox_VidPhoto_Player.Visible = false;
+            PB_MeasurementPB.Visible = true;
+            PB_MeasurementPB.Show();
+            Timer_InvalidateAfter_EnteringMes.Start(); //Баг, связанный с некорректной отрисовкой (картинка отрисовывалась поверх всего)
+            //DB_Invalidate();
+
+        }
+        private void TogglePanelsVisability(bool isMainMenuVisible = false, bool isExportVisible=false,bool isSettingsVisible=false, bool isPlayerVisible=false, bool isMeasurementsVisible=false)
+        {
+            Pan_MainMenu.Visible = isMainMenuVisible;
+            Pan_Export.Visible = isExportVisible;
+            Pan_Settings.Visible = isSettingsVisible;
+            Pan_Player.Visible = isPlayerVisible;
+            Pan_Measurements.Visible = isMeasurementsVisible;
+        }
+        private void SwitchAdminMode(bool isAdmin)
+        {
+            LBConsole.Visible = isAdmin;
+            if (isAdmin) LBConsole.BringToFront();
+            else LBConsole.SendToBack();
+            if (!isAdmin)
+            {
+                adminPages = new List<TabPage>();
+                for (int i = 0; i < TABC_Settings.TabPages.Count; i++)
+                {
+                    if ((TABC_Settings.TabPages[i].Name != "TPAGE_VidSettings")
+                        && (TABC_Settings.TabPages[i].Name != "TPAGE_PhotoSettings")
+                        && (TABC_Settings.TabPages[i].Name != "TPAGE_CameraSettings")
+                        && (TABC_Settings.TabPages[i].Name != "TPAGE_ScreenSettings")
+                        && (TABC_Settings.TabPages[i].Name != "TPAGE_EndoLight"))
+                    {
+                        try
+                        {
+                            adminPages.Add(TABC_Settings.TabPages[i]);
+                            TABC_Settings.TabPages[i].Parent = null;
+                            i--;
+                        }
+                        catch(Exception e)
+                        {
+                            var mes = e.Message;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                for (int i = 0; i < adminPages.Count; i++)
+                {
+                    TABC_Settings.TabPages.Add(adminPages[i]);
+                }
+                adminPages.Clear();
             }
 
             LogMessage("AdminMode = " + isAdmin.ToString());
@@ -230,12 +412,12 @@ namespace Stereo_Vision
         {
             if(recison)
             {
-                B_SwitchRec.BackgroundImage = new Bitmap("stop.png");
+                B_SwitchRec.BackgroundImage = new Bitmap("Resources\\stop.png");
                 label1.Text = "Стоп";
             }
             else
             {
-                B_SwitchRec.BackgroundImage = new Bitmap("rec.png");
+                B_SwitchRec.BackgroundImage = new Bitmap("Resources\\rec.png");
                 label1.Text = "Запись";
             }
         }
@@ -243,7 +425,7 @@ namespace Stereo_Vision
         {
             PB_Indicator.Visible = true;
             PB_Indicator.ImageLocation =
-                System.IO.Path.Combine(System.Windows.Forms.Application.StartupPath, "rec_anim.gif");
+                System.IO.Path.Combine(System.Windows.Forms.Application.StartupPath, "Resources\\rec_anim.gif");
             LogMessage("Индикатор показан!");
         }
         private void Delete_Indicator()
@@ -295,6 +477,12 @@ namespace Stereo_Vision
                                 LastNumber_Photo = Convert.ToInt16(toObject);
                                 break;
                             }
+                        case "LastNumber_Model":
+                            {
+                                string toObject = CutFromEdges(AllLines[i]);
+                                LastNumber_Model = Convert.ToInt16(toObject);
+                                break;
+                            }
                         case "Count_of_files_Vid":
                             {
                                 string toObject = CutFromEdges(AllLines[i]);
@@ -307,6 +495,12 @@ namespace Stereo_Vision
                                 Count_of_Digits_snap = Convert.ToInt16(toObject);
                                 break;
                             }
+                        case "Count_of_Digits_mod":
+                            {
+                                string toObject = CutFromEdges(AllLines[i]);
+                                Count_of_Digits_mod = Convert.ToInt16(toObject);
+                                break;
+                            }                           
                         case "Export_style":
                             {
                                 string toObject = CutFromEdges(AllLines[i]);
@@ -322,7 +516,7 @@ namespace Stereo_Vision
                         case "LastChargeLevel":
                             {
                                 string toObject = CutFromEdges(AllLines[i]);
-                                LastChargeLevel = Convert.ToInt16(toObject);
+                                LastChargeLevel_percents = Convert.ToInt16(toObject);
                                 break;
                             }
                         case "Brightness":
@@ -370,13 +564,19 @@ namespace Stereo_Vision
                         case "Path_2save_Video":
                             {
                                 string toObject = CutFromEdges(AllLines[i]);
-                                RecVid_path = toObject;
+                                Rec_Videos_path = toObject;
                                 break;
                             }
                         case "Path_2save_Photo":
                             {
                                 string toObject = CutFromEdges(AllLines[i]);
-                                RecPhotos_path = toObject;
+                                Rec_Photos_path = toObject;
+                                break;
+                            }
+                        case "Path_2save_Models":
+                            {
+                                string toObject = CutFromEdges(AllLines[i]);
+                                Rec_Models_path = toObject;
                                 break;
                             }
                         case "Last_export_path_Video":
@@ -391,6 +591,12 @@ namespace Stereo_Vision
                                 Export_Photos_from = toObject;
                                 break;
                             }
+                        case "Last_export_path_Models":
+                            {
+                                string toObject = CutFromEdges(AllLines[i]);
+                                Export_Models_from = toObject;
+                                break;
+                            }
                         case "Last_export_path_Video_to":
                             {
                                 string toObject = CutFromEdges(AllLines[i]);
@@ -403,11 +609,30 @@ namespace Stereo_Vision
                                 Export_Photos_to = toObject;
                                 break;
                             }
+                        case "Last_export_path_Models_to":
+                            {
+                                string toObject = CutFromEdges(AllLines[i]);
+                                Export_Models_to = toObject;
+                                break;
+                            }
+                        case "XMLCalib_path":
+                            {
+                                string toObject = CutFromEdges(AllLines[i]);
+                                XMLCalib_path = toObject;
+                                break;
+                            }
+                        case "RGBCalib_path":
+                            {
+                                string toObject = CutFromEdges(AllLines[i]);
+                                RGBCalib_path = toObject;
+                                break;
+                            }
                     }
 
                 }
                 LastNumber_Photo_forExport = DateTime.Now;
                 LastNumber_Vid_forExport = DateTime.Now;
+                LastNumber_Models_forExport = DateTime.Now;
                 Load_Settings();
             }
             catch
@@ -417,7 +642,7 @@ namespace Stereo_Vision
         }
         private void Read_and_Load_Default_Settings() //На случай, если что-то пойдет не так
         {
-            LastChargeLevel = 100;
+            LastChargeLevel_percents = 100;
             User_Name = "PNTZ";
             Lenght_secs = 60;                           
             Fps_toWrite = 30;
@@ -426,6 +651,7 @@ namespace Stereo_Vision
             LastNumber_Photo = 0;
             Count_of_Digits_vid = 2;
             Count_of_Digits_snap = 3;
+            Count_of_Digits_mod = 3;
             Export_style = 3;
             Number_of_FilesorHours = 1;
             Brightness_Value = 0;
@@ -436,14 +662,21 @@ namespace Stereo_Vision
 
             Loaded_Width = 1280;
             Loaded_Height = 720;
-            RecVid_path = Path.Combine("C:\\", "Video");
-            RecPhotos_path = Path.Combine("C:\\", "Photo");
+            Rec_Videos_path = Path.Combine("C:\\", "Video");
+            Rec_Photos_path = Path.Combine("C:\\", "Photo");
+            Rec_Models_path = Path.Combine("C:\\", "Models");
+
             Export_Vid_from = Path.Combine("C:\\", "Video");
             Export_Photos_from = Path.Combine("C:\\", "Photo");
-            Export_Vid_to = Path.Combine("C:\\", "Video" + " export " + User_Name); ;
-            Export_Photos_to = Path.Combine("C:\\", "Photo" + " export " + User_Name); ;
+            Export_Models_from = Path.Combine("C:\\", "Models");
+
+            Export_Vid_to = Path.Combine("C:\\", "Video" + " export " + User_Name); 
+            Export_Photos_to = Path.Combine("C:\\", "Photo" + " export " + User_Name);
+            Export_Models_to = Path.Combine("C:\\", "Models" + " export " + User_Name);
+
             LastNumber_Photo_forExport = DateTime.Now;
             LastNumber_Vid_forExport = DateTime.Now;
+            LastNumber_Models_forExport = DateTime.Now;
             Load_Settings();
         }
         private void Load_Settings()
@@ -466,8 +699,10 @@ namespace Stereo_Vision
                 try
                 {
 
-                    _capture.SetCaptureProperty(CapProp.FrameWidth, 640);
-                    _capture.SetCaptureProperty(CapProp.FrameHeight, 480);
+                    /*_capture.SetCaptureProperty(CapProp.FrameWidth, 640);
+                    _capture.SetCaptureProperty(CapProp.FrameHeight, 480);*/
+                    _capture.SetCaptureProperty(CapProp.FrameWidth, 1280);
+                    _capture.SetCaptureProperty(CapProp.FrameHeight, 720);
                 }
                 catch
                 {
@@ -492,8 +727,8 @@ namespace Stereo_Vision
             {
 
             }
-            TB_Settings_VidSavePath.Text = RecVid_path;
-            TB_Settings_PhotoSavePath.Text = RecPhotos_path;
+            TB_Settings_VidSavePath.Text = Rec_Videos_path;
+            TB_Settings_PhotoSavePath.Text = Rec_Photos_path;
 
             if (Export_mode)
             {
@@ -506,7 +741,7 @@ namespace Stereo_Vision
                 TB_Ex_PathTo.Text = Export_Photos_to;
             }
 
-            Charge.ToogleCharge_Level(ref BMP2set_chargelev, ref Text2set, LastChargeLevel);
+            Arduino_RW.ToogleCharge_Level(ref BMP2set_chargelev, ref Text2set, LastChargeLevel_percents);
             CB_Ex_ChooseExportMode.SelectedIndex = Export_style;
             TB_Ex_Count.Text = Number_of_FilesorHours.ToString();
         }
@@ -527,37 +762,50 @@ namespace Stereo_Vision
         private void SaveSettings()
         {
             string ExactFileName = "App_prop.cfg";
-                using (StreamWriter sw = new StreamWriter(new FileStream(ExactFileName, FileMode.Create, FileAccess.Write)))
-                {
-                    sw.WriteLine("<LenghtOfOneFileInSeconds>" + Lenght_secs+ "</LenghtOfOneFileInSeconds>");
-                    sw.WriteLine("<FPStoWrite>" + Fps_toWrite+"</FPStoWrite>");
-                    sw.WriteLine("<FpsMax_toTranslate>" + FpsMax_toTranslate + "</FpsMax_toTranslate>");
+            using (StreamWriter sw = new StreamWriter(new FileStream(ExactFileName, FileMode.Create, FileAccess.Write)))
+            {
+                sw.WriteLine("<LenghtOfOneFileInSeconds>" + Lenght_secs+ "</LenghtOfOneFileInSeconds>");
+                sw.WriteLine("<FPStoWrite>" + Fps_toWrite+"</FPStoWrite>");
+                sw.WriteLine("<FpsMax_toTranslate>" + FpsMax_toTranslate + "</FpsMax_toTranslate>");
 
-                    sw.WriteLine("<LastFileDigit_vid>" + LastNumber_Vid+"</LastFileDigit_vid>");
-                    sw.WriteLine("<LastFileDigit_Photo>" + LastNumber_Photo + "</LastFileDigit_Photo>");
-                    sw.WriteLine("<Count_of_files_Vid>" + Count_of_Digits_vid + "</Count_of_files_Vid>");
-                    sw.WriteLine("<Count_of_files_Photo>" + Count_of_Digits_snap + "</Count_of_files_Photo>");
-                    sw.WriteLine("<Export_style>" + Export_style + "</Export_style>");
-                    sw.WriteLine("<Number_of_FilesorHours>" + Number_of_FilesorHours + "</Number_of_FilesorHours>");
-                    sw.WriteLine("<LastChargeLevel>" + LastChargeLevel + "</LastChargeLevel>");
+                sw.WriteLine("<LastFileDigit_vid>" + LastNumber_Vid+"</LastFileDigit_vid>");
+                sw.WriteLine("<LastFileDigit_Photo>" + LastNumber_Photo + "</LastFileDigit_Photo>");
+                sw.WriteLine("<LastNumber_Model>" + LastNumber_Model + "</LastNumber_Model>");
 
-                    sw.WriteLine("<Brightness>" + Brightness_Value + "</Brightness>");
-                    sw.WriteLine("<Contrast>" + Contrast_Value + "</Contrast>");
-                    sw.WriteLine("<Saturation>" + Saturation_Value + "</Saturation>");
-                    sw.WriteLine("<Gamma>" + Gamma_Value + "</Gamma>");
-                    sw.WriteLine("<Gain>" + Gain_Value + "</Gain>");
-                   // sw.WriteLine("<Width>" + (_capture.GetCaptureProperty(CapProp.FrameWidth)).ToString() + "</Width>");
-                   // sw.WriteLine("<Height>" + (_capture.GetCaptureProperty(CapProp.FrameHeight)).ToString() + "</Height>");
-                    sw.WriteLine("<Width>" + (1280).ToString() + "</Width>");
-                    sw.WriteLine("<Height>" + (720).ToString() + "</Height>");
+                sw.WriteLine("<Count_of_files_Vid>" + Count_of_Digits_vid + "</Count_of_files_Vid>");                
+                sw.WriteLine("<Count_of_files_Photo>" + Count_of_Digits_snap + "</Count_of_files_Photo>");
+                sw.WriteLine("<Count_of_Digits_mod>" + Count_of_Digits_mod + "</Count_of_Digits_mod>");
+                
+                sw.WriteLine("<Export_style>" + Export_style + "</Export_style>");
+                sw.WriteLine("<Number_of_FilesorHours>" + Number_of_FilesorHours + "</Number_of_FilesorHours>");
+                sw.WriteLine("<LastChargeLevel>" + LastChargeLevel_percents + "</LastChargeLevel>");
 
-                    sw.WriteLine("<Path_2save_Video>" + RecVid_path + "</Path_2save_Video>");
-                    sw.WriteLine("<Path_2save_Photo>" + RecPhotos_path + "</Path_2save_Photo>");
-                    sw.WriteLine("<Last_export_path_Video>" + Export_Vid_from + "</Last_export_path_Video>");
-                    sw.WriteLine("<Last_export_path_Photo>" + Export_Photos_from + "</Last_export_path_Photo>");
-                    sw.WriteLine("<Last_export_path_Video_to>" + Export_Vid_to + "</Last_export_path_Photo>");
-                    sw.WriteLine("<Last_export_path_Photo_to>" + Export_Photos_to + "</Last_export_path_Photo_to>");
-                }
+                sw.WriteLine("<Brightness>" + Brightness_Value + "</Brightness>");
+                sw.WriteLine("<Contrast>" + Contrast_Value + "</Contrast>");
+                sw.WriteLine("<Saturation>" + Saturation_Value + "</Saturation>");
+                sw.WriteLine("<Gamma>" + Gamma_Value + "</Gamma>");
+                sw.WriteLine("<Gain>" + Gain_Value + "</Gain>");
+                // sw.WriteLine("<Width>" + (_capture.GetCaptureProperty(CapProp.FrameWidth)).ToString() + "</Width>");
+                // sw.WriteLine("<Height>" + (_capture.GetCaptureProperty(CapProp.FrameHeight)).ToString() + "</Height>");
+                sw.WriteLine("<Width>" + (1280).ToString() + "</Width>");
+                sw.WriteLine("<Height>" + (720).ToString() + "</Height>");
+
+                sw.WriteLine("<Path_2save_Video>" + Rec_Videos_path + "</Path_2save_Video>");
+                sw.WriteLine("<Path_2save_Photo>" + Rec_Photos_path + "</Path_2save_Photo>");
+                sw.WriteLine("<Path_2save_Models>" + Rec_Models_path + "</Path_2save_Models>");
+
+                sw.WriteLine("<Last_export_path_Video>" + Export_Vid_from + "</Last_export_path_Video>");
+                sw.WriteLine("<Last_export_path_Photo>" + Export_Photos_from + "</Last_export_path_Photo>");
+                sw.WriteLine("<Last_export_path_Models>" + Export_Models_from + "</Last_export_path_Models>");
+
+                sw.WriteLine("<Last_export_path_Video_to>" + Export_Vid_to + "</Last_export_path_Photo>");
+                sw.WriteLine("<Last_export_path_Photo_to>" + Export_Photos_to + "</Last_export_path_Photo_to>");
+                sw.WriteLine("<Last_export_path_Models_to>" + Export_Models_to + "</Last_export_path_Photo_to>");
+
+                sw.WriteLine("<XMLCalib_path>" + XMLCalib_path + "</XMLCalib_path>");
+                sw.WriteLine("<RGBCalib_path>" + RGBCalib_path + "</RGBCalib_path>");
+                
+            }
         }
 
         void SystemEvents_SessionSwitch(object sender, SessionSwitchEventArgs e)
@@ -606,6 +854,7 @@ namespace Stereo_Vision
 
                 LastNumber_Photo_forExport = DateTime.Now;
                 LastNumber_Vid_forExport = DateTime.Now;
+                LastNumber_Models_forExport = DateTime.Now;
 
                 Set_ChargeBMP(BMP2set_chargelev);
                 Set_ChargeTEXT(Text2set);
@@ -615,9 +864,9 @@ namespace Stereo_Vision
         }
         private void MaximizeWindow()
         {
+            FullScrin = true;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.WindowState = FormWindowState.Maximized;
-            FullScrin = true;
       
         }
         private void InvalidateAllThis()
@@ -627,9 +876,6 @@ namespace Stereo_Vision
         }
         private void HideSomeThings()
         {
-            Pan_Settings.Visible = false;
-            Pan_Export.Visible = false;
-            Pan_Player.Visible = false;
             L_SnapShotSaved.Visible = false;
         }
         private void MinimizeWindow()
@@ -644,25 +890,37 @@ namespace Stereo_Vision
         delegate void DelegateForChargeLev_BMP(System.Drawing.Bitmap pBMP);
         private void Set_ChargeBMP(Bitmap pBMP2set)
         {
-
-            if (PB_ChargeVal.InvokeRequired)
+            try
             {
-                DelegateForChargeLev_BMP del = new DelegateForChargeLev_BMP(Set_ChargeBMP);
-                this.Invoke(del, new object[] { pBMP2set });
+                if (PB_ChargeVal.InvokeRequired)
+                {
+                    DelegateForChargeLev_BMP del = new DelegateForChargeLev_BMP(Set_ChargeBMP);
+                    this.Invoke(del, new object[] { pBMP2set });
+                }
+                else { PB_ChargeVal.Image = pBMP2set; }
             }
-            else { PB_ChargeVal.Image = pBMP2set; }
-            
+            catch
+            {
+                LogError("Ошибка при пересылки граф данных");
+            }
         }
         private void Set_ChargeTEXT(string pTextLevel)
         {
-            if (L_ChargeLev.InvokeRequired)
+            try
             {
-                DelegateForChargeLev_text del = new DelegateForChargeLev_text(Set_ChargeTEXT);
-                this.Invoke(del, new object[] { pTextLevel });
+                if (L_ChargeLev.InvokeRequired)
+                {
+                    DelegateForChargeLev_text del = new DelegateForChargeLev_text(Set_ChargeTEXT);
+                    this.Invoke(del, new object[] { pTextLevel });
+                }
+                else
+                {
+                    L_ChargeLev.Text = pTextLevel;
+                }
             }
-            else
+            catch
             {
-                L_ChargeLev.Text = pTextLevel;
+                LogError("Ошибка при пересылки текстовых данных");
             }
             
         }
@@ -677,21 +935,22 @@ namespace Stereo_Vision
         {
             CV_ImBox_Capture.Image = ppImage;
         }
-        private void RefreshChargeControls(ref System.ComponentModel.BackgroundWorker pWorker,ref bool p_isArdClosed)
+       /* private void RefreshChargeControls(ref System.ComponentModel.BackgroundWorker pWorker,ref bool p_isArdClosed)
         {
             System.Threading.Thread.CurrentThread.Priority = System.Threading.ThreadPriority.Lowest;
             while (true)
             {
 
                 float CurVoltage = Charge.GetChargeLevel_Voltage(ref pWorker,false,ref p_isArdClosed);
-               
+               // TLP_ChargeLev.BringToFront(); //не работает
                 if (CurVoltage >= 1.0f)
                 {
-                    LastChargeLevel = Charge.TimeLeft2Percents(Charge.Gained_voltage_2_timeleft(CurVoltage));
-                    Charge.ToogleCharge_Level(ref BMP2set_chargelev, ref Text2set, LastChargeLevel);
+                    var TimeLeft = Charge.Gained_voltage_2_timeleft(CurVoltage);
+                    LastChargeLevel_percents = Charge.TimeLeft2Percents(TimeLeft);
+                    Charge.ToogleCharge_Level(ref BMP2set_chargelev, ref Text2set, LastChargeLevel_percents);
                     Set_ChargeTEXT(Text2set);
                     Set_ChargeBMP(BMP2set_chargelev);
-                    if (LastChargeLevel < 5)
+                    if (LastChargeLevel_percents < 5)
                     {
                         HiberNoAsk = true;
                         System.Threading.Thread.Sleep(2000);
@@ -705,12 +964,12 @@ namespace Stereo_Vision
                 }
             }
             
-        }
+        }*/
         private void Open_Export_DirectoryFrom()
         {
             FolderBrowserDialog folderBrowser = new FolderBrowserDialog();
-            if(Export_mode) folderBrowser.SelectedPath = RecVid_path;
-            else folderBrowser.SelectedPath = RecPhotos_path;
+            if(Export_mode) folderBrowser.SelectedPath = Rec_Videos_path;
+            else folderBrowser.SelectedPath = Rec_Photos_path;
             DialogResult result = folderBrowser.ShowDialog();
             
             if (Export_mode) Export_Vid_from = folderBrowser.SelectedPath;
@@ -1021,7 +1280,16 @@ namespace Stereo_Vision
             }
             else return TargetString;
         }
+        private void Draw_Frame_NoCamera()
+        {
+            Mat Image_NoCamera = new Mat(1080, 1920,DepthType.Cv8U,1);
+            
+            CvInvoke.PutText(Image_NoCamera,"No camera detected!", new Point(250,550), FontFace.HersheyDuplex, 4.0, new Bgr(255, 255, 255).MCvScalar);
 
+            CvInvoke.Resize(Image_NoCamera, Image_NoCamera, new Size(CV_ImBox_Capture.Width,CV_ImBox_Capture.Height), 0, 0, Inter.Linear);
+
+            CV_ImBox_Capture.Image = Image_NoCamera; 
+        }
 
     }
 }
